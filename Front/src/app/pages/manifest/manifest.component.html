@@ -1,0 +1,37 @@
+<div class="w-full h-full flex justify-center">
+  <div class="text-center w-[70%] text-cText mym:w-[92%]">
+    <div>
+      <p class="mb-[25px]">
+        {{ "manifest.description1" | translate }}
+        <a [href]="githubLink" target="_blank" rel="noopener noreferrer"><i>open-source</i></a>
+        {{ "manifest.description2" | translate }}
+      </p>
+      <h1 class="mb-[25px]">
+        {{ "manifest.how_works_title" | translate }}
+      </h1>
+      <p class="mb-[15px]">
+        {{ "manifest.how_works1" | translate }}
+        <br />
+        {{ "manifest.how_works2" | translate }} (gemma-3-27b-it) {{ "manifest.how_works3" | translate }}
+        <br />
+        {{ "manifest.how_works4" | translate }}
+        <br />
+      </p>
+      <h2 class="mb-[15px]">{{ "manifest.warning_title" | translate }}</h2>
+      <p>
+        {{ "manifest.warning1" | translate }}
+        <br />
+        {{ "manifest.warning2" | translate }}
+        <br />
+        {{ "manifest.warning3" | translate }}
+        <a [href]="githubLink" target="_blank" rel="noopener noreferrer"><i>open-source</i></a>{{ "manifest.warning4" | translate }}
+        <br />
+        <br />
+        <i>{{ "manifest.footer1" | translate }}
+          <br />
+          {{ "manifest.footer2" | translate }} <b>{{contactEmail}}</b>
+        </i>
+      </p>
+    </div>
+  </div>
+</div>

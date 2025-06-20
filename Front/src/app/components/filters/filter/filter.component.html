@@ -1,0 +1,57 @@
+<div class="flex flex-wrap justify-start gap-[var(--margin-standard)]">
+  @for (item of mediaCompose; track item) {
+  <div>
+    <p-floatlabel variant="on">
+      <p-select
+        [id]="item.type"
+        [options]="item.data()"
+        [showClear]="true"
+        [(ngModel)]="item.value"
+        class="w-40"
+        [filter]="true"
+        filterBy="label"
+        [group]="item.type === MEDIAS"
+        [disabled]="item.disabled()"
+        (onChange)="onSelectCompose(item)"
+      >
+        @if(item.type === MEDIAS) {
+        <ng-template let-group #group>
+          <div class="flex items-center" [style]="'color: ' + group.color">
+            <div>
+              <i [class]="'icon mr-2 bi bi-' + group.icon"></i>
+            </div>
+            <div>
+              <span
+                ><b>{{ "media_group." + group.label | translate }}</b></span
+              >
+            </div>
+          </div>
+        </ng-template>
+        }
+      </p-select>
+      <label [for]="item.type">{{ "filters." + item.type | translate }}</label>
+    </p-floatlabel>
+  </div>
+  }
+  <div>
+    <p-floatlabel variant="on">
+      <p-datepicker
+        id="date"
+        [(ngModel)]="rangeDates"
+        [minDate]="absoluteMinDate"
+        [maxDate]="absoluteMaxDate"
+        [showIcon]="true"
+        inputId="buttondisplay"
+        selectionMode="range"
+        [firstDayOfWeek]="1"
+        [dateFormat]="LOCALE_ID === 'en' ? 'm/d/yy' : 'd/m/yy'"
+        [readonlyInput]="true"
+        [showButtonBar]="true"
+        (ngModelChange)="sendComposeValue()"
+        styleClass="w-[230px]"
+        [yearRange]="minDate?.getFullYear() + ':' + maxDate?.getFullYear()"
+      />
+      <label for="date">{{ "filters.date" | translate }}</label>
+    </p-floatlabel>
+  </div>
+</div>

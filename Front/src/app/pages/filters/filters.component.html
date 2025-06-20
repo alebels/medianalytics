@@ -1,0 +1,43 @@
+<div>
+  <div class="flex items-center justify-center mb-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full font-serif text-2xl text-center px-[10px]">
+      {{ "filters.filter_sentiment" | translate }}
+    </div>
+    <div class="w-full h-[3px] bg-accent"></div>
+  </div>
+  <div class="mb-[var(--margin-standard)]">
+    <app-filter-sentiment></app-filter-sentiment>
+  </div>
+  <div class="mb-[var(--margin-standard)]">
+    <app-filter-sentiment></app-filter-sentiment>
+  </div>
+  <div class="flex items-center justify-center my-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full font-serif text-2xl text-center px-[10px]">
+      {{ "filters.filter_ideology" | translate }}
+    </div>
+    <div class="w-full h-[3px] bg-accent"></div>
+  </div>
+  <div class="mb-[var(--margin-standard)]">
+    <app-filter-ideology></app-filter-ideology>
+  </div>
+  <div class="mb-[var(--margin-standard)]">
+    <app-filter-ideology></app-filter-ideology>
+  </div>
+  <div class="flex items-center justify-center my-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full font-serif text-2xl text-center px-[10px]">
+      {{ "filters.filter_words" | translate }}
+    </div>
+    <div class="w-full h-[3px] bg-accent"></div>
+  </div>
+  <div class="flex flex-wrap justify-between items-center">
+    <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full lym:mb-[var(--margin-standard)]">
+      <app-filter-word></app-filter-word>
+    </div>
+    <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
+      <app-filter-word></app-filter-word>
+    </div>
+  </div>
+</div>

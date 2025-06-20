@@ -1,0 +1,13 @@
+#topBtn {
+  position: fixed;
+  bottom: 18px;
+  right: 20px;
+  color: var(--color-accent);
+  cursor: pointer;
+  z-index: 1000;
+  font-size: 40px;
+}
+
+#topBtn:hover {
+  color: var(--color-text);
+}

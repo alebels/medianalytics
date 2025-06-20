@@ -1,0 +1,60 @@
+<p-table
+  [value]="dataTable"
+  showGridlines
+  stripedRows
+  [frozenValue]="dataTable"
+  selectionMode="multiple"
+  [scrollable]="true"
+  scrollHeight="585px"
+  [(selection)]="select"
+  dataKey="name"
+  [metaKeySelection]="false"
+  sortField="count"
+  [sortOrder]="sortOrder"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 2rem"></th>
+      <th pSortableColumn="name">
+        <div class="flex items-center justify-start">
+          {{ "filters." + label1 | translate }}
+          <p-sortIcon field="name" />
+          <p-columnFilter
+            class="ml-3"
+            type="text"
+            field="name"
+            display="menu"
+            [showOperator]="false"
+            [showAddButton]="false"
+          />
+        </div>
+      </th>
+      <th pSortableColumn="count">
+        <div class="flex items-center justify-start">
+          {{ "filters." + label2 | translate }}
+          <p-sortIcon field="count" />
+          <p-columnFilter
+            class="ml-3"
+            type="text"
+            field="count"
+            display="menu"
+            [showOperator]="false"
+            [showAddButton]="false"
+          />
+        </div>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item let-i="rowIndex">
+    <tr [pSelectableRow]="item">
+      <td>{{ i + 1 }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.count }}</td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="3">{{ "messages.no_data" | translate }}</td>
+    </tr>
+  </ng-template>
+</p-table>

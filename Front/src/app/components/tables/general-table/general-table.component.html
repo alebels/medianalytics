@@ -1,0 +1,350 @@
+<div class="h-full w-full">
+  <div class="mb-[10px] w-full">
+    <p-floatlabel variant="on">
+      <p-iconfield>
+        <p-inputicon>
+          <i class="bi bi-search"></i>
+        </p-inputicon>
+        <input
+          #globalFilter
+          class="w-[250px]"
+          type="text"
+          pInputText
+          (input)="filterGlobal(globalFilter.value)"
+        />
+      </p-iconfield>
+      <label for="globalFilter">{{
+        "general_table.search_filter" | translate
+      }}</label>
+    </p-floatlabel>
+  </div>
+  <p-card styleClass="rounded bg-miscellany h-[966px]">
+    <p-table
+      #pgeneraltable
+      [value]="dataTable"
+      [frozenValue]="dataTableLocked"
+      showGridlines
+      stripedRows
+      [scrollable]="true"
+      scrollHeight="950px"
+      dataKey="name"
+      sortField="name"
+      [metaKeySelection]="false"
+      [(selection)]="select"
+      selectionMode="multiple"
+    >
+      <ng-template #header>
+        <tr>
+          <th style="width: 30px"></th>
+          <th pSortableColumn="type">
+            {{ "general_table." + labelType | translate }}
+            <p-sortIcon field="type" />
+          </th>
+          <th pSortableColumn="region">
+            {{ "general_table." + labelRegion | translate }}
+            <p-sortIcon field="region" />
+          </th>
+          <th pSortableColumn="country">
+            {{ "general_table." + labelCountry | translate }}
+            <p-sortIcon field="country" />
+          </th>
+          <th pSortableColumn="name">
+            {{ "general_table." + labelName | translate }}
+            <p-sortIcon field="name" />
+          </th>
+          <th>
+            {{ "general_table." + labelTopWords | translate }}
+          </th>
+          <th pSortableColumn="total_articles">
+            {{ "general_table." + labelTotalArticles | translate }}
+            <p-sortIcon field="total_articles" />
+          </th>
+          <th>
+            {{ "general_table." + labelTopSentiments | translate }}
+          </th>
+          <th>
+            {{ "general_table." + labelBottomSentiments | translate }}
+          </th>
+          <th pSortableColumn="average_words_article">
+            {{ "general_table." + labelAverageWordsArticle | translate }}
+            <p-sortIcon field="average_words_article" />
+          </th>
+          <th>
+            {{ "general_table." + labelTopIdeologies | translate }}
+          </th>
+          <th>
+            {{ "general_table." + labelBottomIdeologies | translate }}
+          </th>
+          <th>
+            {{ "general_table." + labelTopGrammar | translate }}
+            <i
+              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              [pTooltip]="'general_table.top_grammar_tooltip' | translate"
+              [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+              tabindex="0"
+            ></i>
+          </th>
+          <th>
+            {{ "general_table." + labelUrl | translate }}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template #frozenbody let-item>
+        <tr class="font-bold">
+          <td>
+            <button
+              pButton
+              pRipple
+              type="button"
+              class="text-xl font-bold text-cText"
+              (click)="toggleLock(item, false)"
+              size="small"
+              text
+            >
+              <i class="bi bi-lock-fill"></i>
+            </button>
+          </td>
+          <td>{{ "types." + item.type | translate }}</td>
+          <td>{{ "regions." + item.region | translate }}</td>
+          <td>{{ "countries." + item.country | translate }}</td>
+          <td>
+            <b>{{ item.name }}</b>
+            @if (item.full_name) {
+            <i
+              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              [pTooltip]="item.full_name"
+              [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+              tabindex="0"
+            ></i>
+            }
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (word of item.top_words; track word.name; let i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
+                {{ word.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td class="text-center">
+            {{ item.total_articles | number : "1.0-0" }}
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (sentiment of item.top_sentiments; track sentiment.name; let
+              i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "sentiments." + sentiment.name | translate }}:
+                {{ sentiment.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (sentiment of item.bottom_sentiments; track sentiment.name;
+              let i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "sentiments." + sentiment.name | translate }}:
+                {{ sentiment.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td class="text-center">
+            {{ item.average_words_article | number : "1.0-0" }}
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (ideology of item.top_ideologies; track ideology.name; let i
+              = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "ideologies." + ideology.name | translate }}:
+                {{ ideology.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (ideology of item.bottom_ideologies; track ideology.name; let
+              i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "ideologies." + ideology.name | translate }}:
+                {{ ideology.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (grammar of item.top_grammar; track grammar.name; let i =
+              $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b> {{ "grammar." + grammar.name | translate }}:
+                {{ grammar.count }} %
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+              <button
+                pButton
+                pRipple
+                type="button"
+                size="small"
+                text
+                class="text-xl font-bold text-cText z-10"
+                [pTooltip]="item.url"
+                tooltipPosition="left"
+                [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+                tabindex="0"
+              >
+                <i class="bi bi-box-arrow-up-right"></i>
+              </button>
+            </a>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr [pSelectableRow]="item">
+          <td>
+            <button
+              pButton
+              pRipple
+              type="button"
+              class="text-xl font-bold text-cText"
+              (click)="toggleLock(item, true)"
+              size="small"
+              text
+            >
+              <i class="bi bi-unlock-fill"></i>
+            </button>
+          </td>
+          <td>{{ "types." + item.type | translate }}</td>
+          <td>{{ "regions." + item.region | translate }}</td>
+          <td>{{ "countries." + item.country | translate }}</td>
+          <td>
+            <b>{{ item.name }}</b>
+            @if (item.full_name) {
+            <i
+              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              [pTooltip]="item.full_name"
+              [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+              tabindex="0"
+            ></i>
+            }
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (word of item.top_words; track word.name; let i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
+                {{ word.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td class="text-center">
+            {{ item.total_articles | number : "1.0-0" }}
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (sentiment of item.top_sentiments; track sentiment.name; let
+              i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "sentiments." + sentiment.name | translate }}:
+                {{ sentiment.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (sentiment of item.bottom_sentiments; track sentiment.name;
+              let i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "sentiments." + sentiment.name | translate }}:
+                {{ sentiment.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td class="text-center">
+            {{ item.average_words_article | number : "1.0-0" }}
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (ideology of item.top_ideologies; track ideology.name; let i
+              = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "ideologies." + ideology.name | translate }}:
+                {{ ideology.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (ideology of item.bottom_ideologies; track ideology.name; let
+              i = $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b>
+                {{ "ideologies." + ideology.name | translate }}:
+                {{ ideology.count | number : "1.0-0" }}
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (grammar of item.top_grammar; track grammar.name; let i =
+              $index) {
+              <div class="mr-2 mb-1">
+                <b>{{ i + 1 }}.</b> {{ "grammar." + grammar.name | translate }}:
+                {{ grammar.count }} %
+              </div>
+              }
+            </div>
+          </td>
+          <td class="text-center">
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+              <button
+                pButton
+                pRipple
+                type="button"
+                size="small"
+                text
+                class="text-xl font-bold text-cText z-10"
+                [pTooltip]="item.url"
+                tooltipPosition="left"
+                [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+                tabindex="0"
+              >
+                <i class="bi bi-box-arrow-up-right"></i>
+              </button>
+            </a>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    @if (dataTable.length === 0) {
+    <div class="flex items-center justify-center h-full w-full">
+      <p-message
+        severity="secondary"
+        [text]="'messages.no_data' | translate"
+      ></p-message>
+    </div>
+    }
+  </p-card>
+</div>

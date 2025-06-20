@@ -1,0 +1,243 @@
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@layer tailwind-base, primeng, tailwind-utilities;
+
+:root {
+  /* Colors */
+  --color-text: #323232;
+  --color-background: #f8f8f8;
+  --color-miscellany: #ffffff;
+  --color-accent: #ab972c;
+  --color-accent-background: #ab982c46;
+
+  /* Semantic colors */
+  --color-positive: #4caf50;
+  --color-negative: #f44336;
+  --color-neutral: #999999;
+  --color-political-spectrum: #d32f2f;
+  --color-economic-orientations: #04796d;
+  --color-political-systems: #263175;
+  --color-national-stances: #5499dd;
+  --color-geopolitical-alignments: #ab972c;
+  --color-religious-orientations: #1ebfd4;
+  --color-social-movements: #5d9b28;
+  --color-philosophical-orientations: #f57c00;
+  --color-epistemological-orientations: #b342e4;
+  --color-warning: #f57c00;
+  --color-info: #1976d2;
+  --color-success: #43a047;
+  --color-error: #d32f2f;
+
+  /* Dimensions */
+  --height-header: 60px;
+  --height-footer: 60px;
+  --height-chart-filter: 431px;
+  --height-table-filter: 601px;
+  --height-chart-home: 469px;
+  --height-table-home: 639px;
+  --height-table-general: 1018px;
+  --height-chart-home-res: 958px;
+  --margin-standard: 18px;
+  --margin-header-divider: 2.5rem;
+  --margin-header-footer: 12px;
+
+  /* PrimeNG values overrides */
+  --p-toast-detail-font-size: 1rem;
+  --p-tooltip-border-radius: 3px;
+}
+
+/* Dark mode */
+html.dark {
+  --color-miscellany: #202020;
+  --color-background: #323232;
+  --color-text: #f8f8f8;
+}
+
+html {
+  width: 100%;
+  min-height: 100vh; /* Fallback for browsers that don't support dvh */
+  min-height: 100dvh;
+  background-color: var(--color-background);
+}
+
+@media screen and (max-width: 1095px) {
+  :root {
+    --height-table-home: 1013px;
+    --margin-standard: 12px;
+    --margin-header-divider: 1.5rem;
+  }
+}
+
+/* ApexCharts overrides */
+.apexcharts-menu-item.exportPNG {
+  display: none !important;
+}
+.apexcharts-legend {
+  max-height: 90px !important;
+}
+.apexcharts-menu-item {
+  text-align: center !important;
+}
+.apexcharts-menu-item:hover {
+  background-color: var(--color-accent-background) !important;
+}
+
+/* ApexCharts dark mode styling */
+html.dark .apexcharts-text {
+  fill: var(--color-text);
+}
+html.dark .apexcharts-tooltip,
+html.dark .apexcharts-tooltip-title {
+  background-color: var(--color-miscellany) !important;
+  color: var(--color-text) !important;
+  border: 1px solid #555 !important;
+}
+html.dark .apexcharts-legend-text {
+  color: var(--color-text) !important;
+}
+
+/* Tailwind layers */
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
+/* Fonts */
+@layer base {
+  @font-face {
+    font-family: "SourceSans3";
+    src: url("/fonts/source_sans_3/SourceSans3-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "SourceSans3";
+    src: url("/fonts/source_sans_3/SourceSans3-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "SourceSans3";
+    src: url("/fonts/source_sans_3/SourceSans3-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Rasa";
+    src: url("/fonts/rasa/Rasa-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Rasa";
+    src: url("/fonts/rasa/Rasa-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Rasa";
+    src: url("/fonts/rasa/Rasa-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+  }
+
+  header,
+  main,
+  footer {
+    @apply mx-auto px-4 sm:px-6 md:px-8 max-w-[2400px];
+  }
+}
+
+/* PrimeNG component overrides */
+@layer primeng {
+  .p-card-body {
+    height: 100% !important;
+    padding: 8px !important;
+  }
+
+  .p-card-content {
+    height: 100% !important;
+  }
+
+  .p-accordionheader {
+    padding: 0 !important;
+    color: var(--color-text) !important;
+    font-weight: 500 !important;
+    background-color: var(--color-miscellany) !important;
+  }
+
+  .p-accordionheader:hover {
+    color: var(--color-accent) !important;
+  }
+
+  .p-accordionpanel {
+    border: none !important;
+  }
+
+  .p-accordioncontent-content {
+    padding-bottom: 0 !important;
+    background-color: var(--color-miscellany) !important;
+    color: var(--color-text) !important;
+  }
+
+  .p-divider-horizontal {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+    background: var(--color-text) !important;
+    border: none !important;
+  }
+
+  /* Disable transitions for better performance between dark modes */
+  .p-accordionheader,
+  .p-multiselect,
+  .p-select,
+  .p-datepicker-dropdown,
+  .p-inputtext,
+  .p-button,
+  .p-radiobutton-box,
+  .p-menu {
+    transition: none !important;
+  }
+
+  .p-menu {
+    min-width: auto !important;
+    width: 135px !important;
+  }
+
+  .p-menu-submenu-label {
+    display: none !important;
+  }
+
+  .p-button {
+    letter-spacing: 0.7px !important;
+  }
+
+  p-sorticon {
+    margin-left: 3px !important;
+  }
+
+  .p-inputnumber input {
+    width: 100% !important;
+  }
+
+  .p-tooltip {
+    opacity: 0.85 !important;
+  }
+
+  .p-toast-message {
+    position: fixed !important;
+    max-width: 315px !important;
+    right: 18px !important;
+  }
+}

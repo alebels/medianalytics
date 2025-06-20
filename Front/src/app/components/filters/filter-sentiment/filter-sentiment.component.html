@@ -1,0 +1,82 @@
+<p-toast />
+<div
+  class="flex flex-wrap justify-start items-center gap-[var(--margin-standard)] mb-[var(--margin-standard)]"
+>
+  <app-filter (composeValues)="getComposeValues($event)"></app-filter>
+  <p-floatlabel variant="on">
+    <p-multiselect
+      [id]="sentiments.type"
+      [options]="sentiments.data()"
+      [(ngModel)]="sentiments.value"
+      [group]="true"
+      scrollHeight="300px"
+      display="chip"
+      class="w-64"
+      [selectionLimit]="selectionLimit"
+    >
+      <ng-template let-group #group>
+        <div class="flex items-center" [style]="'color: ' + group.color">
+          <div>
+            <i [class]="'icon mr-2 bi bi-' + group.icon"></i>
+          </div>
+          <div>
+            <span
+              ><b>{{
+                sentiments.type + "." + group.label | translate
+              }}</b></span
+            >
+          </div>
+        </div>
+      </ng-template>
+    </p-multiselect>
+    <label [for]="sentiments.type">{{
+      "filters." + sentiments.type | translate
+    }}</label>
+    <i
+      class="bi bi-info-circle text-sm absolute mt-[-10px] ml-[-5px] z-10"
+      pTooltip="{{ 'filters.sentiments_info' | translate }}"
+      tooltipPosition="left"
+      [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+      tabindex="0"
+    ></i>
+  </p-floatlabel>
+  <div>
+    <p-button (onClick)="onClickFilter()" [raised]="true" size="small">{{
+      "filters.filter" | translate
+    }}</p-button>
+  </div>
+</div>
+
+<div
+  class="flex flex-wrap justify-between mb-[var(--margin-standard)] w-full h-[var(--height-chart-filter)] xym:h-full"
+>
+  @if (barChart && barChart.xLabels.length > 0 && !lineChart) {
+  <div
+    [style.width]="pieChart ? 'calc(70% - var(--margin-standard))' : '100%'"
+    class="xym:!w-full xym:mb-[var(--margin-standard)]"
+  >
+    <p-card styleClass="rounded bg-miscellany h-full">
+      <app-bar-chart [dataBarChart]="barChart"></app-bar-chart>
+    </p-card>
+  </div>
+  } @if (pieChart && pieChart.xLabels.length > 0 && !lineChart) {
+  <div class="w-[30%] xym:w-full">
+    <p-card styleClass="rounded bg-miscellany h-full">
+      <div class="flex justify-center items-center h-full">
+        <app-pie-chart [dataPieChart]="pieChart"></app-pie-chart>
+      </div>
+    </p-card>
+  </div>
+  } @if (lineChart && lineChart.xLabels.length > 0 && !pieChart && !barChart) {
+  <div class="w-full">
+    <p-card styleClass="rounded bg-miscellany h-full">
+      <app-line-chart [dataLineChart]="lineChart"></app-line-chart>
+    </p-card>
+  </div>
+  } @if ((!barChart || !barChart.xLabels || barChart.xLabels.length < 1) &&
+  (!lineChart || !lineChart.xLabels || lineChart.xLabels.length < 1)) {
+  <div class="w-full h-full">
+    <app-no-data [noData]="noData"></app-no-data>
+  </div>
+  }
+</div>

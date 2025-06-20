@@ -1,0 +1,24 @@
+<div class="mock">
+  @if(type !== 'loading_data_home') { @if (isLoading) {
+  <div class="w-2/3">
+    <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
+  </div>
+  } @else {
+  <div class="max-w-[80%]">
+    <p-message
+      severity="secondary"
+      [text]="'messages.' + type | translate"
+    ></p-message>
+  </div>
+  } } @else {
+  <div class="max-w-[80%]">
+    <p-message
+      severity="secondary"
+      [text]="'messages.' + type | translate"
+    ></p-message>
+  </div>
+  <div class="w-2/3 mt-4">
+    <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
+  </div>
+  }
+</div>

@@ -1,0 +1,24 @@
+h1 {
+  font-family: 'Rasa';
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-family: 'Rasa';
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+p {
+  font-family: 'SourceSans3';
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 40px;
+  text-align: start;
+}
+
+a {
+  text-decoration: underline;
+  font-weight: bold;
+}

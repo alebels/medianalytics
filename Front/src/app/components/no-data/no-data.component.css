@@ -1,0 +1,13 @@
+.mock {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed var(--color-accent);
+  min-height: var(--height-chart-filter);
+  height: 100%;
+  border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+}

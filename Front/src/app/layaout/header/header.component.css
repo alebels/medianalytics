@@ -1,0 +1,47 @@
+/* .hover-underline styles remain the same */
+.hover-underline {
+  color: var(--color-text);
+}
+
+.hover-underline:hover {
+  cursor: pointer;
+  border-bottom: 2px solid var(--color-accent);
+}
+
+.hover-settings {
+  color: var(--color-text);
+  position: relative; /* Add this to make it a positioning context */
+}
+
+.hover-settings:hover {
+  cursor: pointer;
+  color: var(--color-accent);
+}
+
+.menu {
+  position: absolute;
+  z-index: 100;
+  right: 31px;
+  /* top: 100%; */
+  display: block;
+  margin-top: 5px;
+}
+
+@media screen and (max-width: 768px) {
+  .menu {
+    right: 23px;
+  }
+}
+
+.menu-res {
+  position: absolute;
+  z-index: 100;
+  right: 138px;
+  top: 50px;
+  display: block;
+}
+
+/* Add this class to show/hide the menu */
+.menu-hide {
+  display: none;
+}
