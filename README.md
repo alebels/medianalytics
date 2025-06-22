@@ -1,6 +1,6 @@
 ![alt text](./Front/public/assets/full-logo.png)
 
-Medianalytics is an open-source platform that processes 5 main articles daily from each registered source and provides users with tools to view this information from a broader, more objective perspective through comprehensive data visualization and analysis.
+Medianalytics is an open-source platform that processes 5 main articles daily from each registered source and provides users with tools to view this information from a broader perspective through comprehensive data visualization and analysis.
 
 ## Contributing
 
@@ -18,30 +18,30 @@ You can download it from [Docker](https://www.docker.com/get-started).
 
 ## Setup Instructions
 
-1. **Create a `.env` file in the root directory of `Back-data/` and `Back-api/`:**
+1. **On `db/` folder create a `password.txt` file with your db password:**
+   ```
+   your_password
+   ```
+
+2. **Create a `.env` file in the root directory of `Back-data/` and `Back-api/`:**
    ```sh
    DATABASE_URL=postgresql+asyncpg://dockeruser:your_password@db:5432/medianalytics
    ```
 
 ### Back-ai
 
-2. **Get an AI API key**
+3. **Get an AI API key**
 
    - Recommended: [Google AI](https://ai.google.dev/) (free tier available with gemma-3-27b-it)
 
-3. **Configure Environment**
+4. **Configure Environment**
    - Create a `.env` file in the root directory of `Back-ai/`:
      ```sh
      API_KEY=your_api_key
      ```
 
 
-### Database
-
-4. **On *db folder* create a password.txt file with your db password:**
-   ```
-   your_password
-   ```
+On `root` folder medianalytics:
 
 5. **Launch Application**
    ```sh
