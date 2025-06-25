@@ -63,7 +63,7 @@ In the back-data container terminal exec:
 
    Edit `alembic.ini` to set the database URL:
    ```ini
-   sqlalchemy.url = postgresql+psycopg2://dockeruser:your_password@db:5432/medianalytics
+   sqlalchemy.url = postgresql+asyncpg://dockeruser:your_password@db:5432/medianalytics
    ```
 
    Update `env.py` in the `alembic` directory to import your models:

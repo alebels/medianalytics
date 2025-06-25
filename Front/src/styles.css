@@ -74,8 +74,14 @@ html {
 .apexcharts-legend {
   max-height: 90px !important;
 }
+.apexcharts-menu {
+  background-color: var(--color-background) !important;
+}
 .apexcharts-menu-item {
   text-align: center !important;
+}
+.apexcharts-menu-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-accent-background) !important;
 }
 .apexcharts-menu-item:hover {
   background-color: var(--color-accent-background) !important;
