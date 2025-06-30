@@ -35,10 +35,12 @@
   --height-chart-home: 469px;
   --height-table-home: 639px;
   --height-table-general: 1018px;
-  --height-chart-home-res: 958px;
-  --margin-standard: 18px;
-  --margin-header-divider: 2.5rem;
+  --height-chart-home-res: auto;
+  --min-height-chart: 280px;
+  --margin-standard: 20px;
+  --margin-header-divider: 3.1rem;
   --margin-header-footer: 12px;
+  --margin-title-lines: 20px;
 
   /* PrimeNG values overrides */
   --p-toast-detail-font-size: 1rem;
@@ -62,8 +64,8 @@ html {
 @media screen and (max-width: 1095px) {
   :root {
     --height-table-home: 1013px;
-    --margin-standard: 12px;
-    --margin-header-divider: 1.5rem;
+    --margin-standard: 14px;
+    --margin-header-divider: 1.9rem;
   }
 }
 
@@ -160,6 +162,27 @@ html.dark .apexcharts-legend-text {
   footer {
     @apply mx-auto px-4 sm:px-6 md:px-8 max-w-[2400px];
   }
+}
+
+/* Typography */
+h1 {
+  font-family: "Rasa", "serif";
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-family: "Rasa", "serif";
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+p {
+  font-family: "SourceSans3", "sans-serif";
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 40px;
+  text-align: start;
 }
 
 /* PrimeNG component overrides */

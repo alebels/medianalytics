@@ -10,7 +10,6 @@ import {
   CategoryValues,
   FilterChartsRead,
   ItemRead,
-  MinMaxDateRead,
 } from '../models/items.model';
 import {
   IDEOLOGIES_GROUPS,
@@ -56,11 +55,6 @@ export class FiltersService {
 
   private readonly mediasSub = new BehaviorSubject<SelectGroupSimple[]>([]);
   public readonly medias$ = this.mediasSub.asObservable();
-
-  private readonly minMaxDateSub = new BehaviorSubject<MinMaxDateRead>(
-    new MinMaxDateRead()
-  );
-  public readonly minMaxDate$ = this.minMaxDateSub.asObservable();
 
   private apiUrl = environment.apiUrl + '/filters';
 
@@ -142,11 +136,7 @@ export class FiltersService {
   }
 
   private async initialize(): Promise<void> {
-    await Promise.all([
-      this.getMediaCompose(),
-      this.getSentimentsIdeologies(),
-      this.getMinMaxDates(),
-    ]);
+    await Promise.all([this.getMediaCompose(), this.getSentimentsIdeologies()]);
   }
 
   private async getMediaCompose(): Promise<void> {
@@ -241,12 +231,5 @@ export class FiltersService {
         })
         .sort((a, b) => a.label.localeCompare(b.label)), // Sort the new array
     }));
-  }
-
-  private async getMinMaxDates(): Promise<void> {
-    const data = await firstValueFrom(
-      this.http.get<MinMaxDateRead>(`${this.apiUrl}/minmaxdate`)
-    );
-    this.minMaxDateSub.next(data);
   }
 }

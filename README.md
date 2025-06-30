@@ -2,21 +2,21 @@
 
 Medianalytics is an open-source platform that processes 5 main articles daily from each registered source and provides users with tools to view this information from a broader perspective through comprehensive data visualization and analysis.
 
-## Contributing
+## 🚀 Contributing
 
 **You are completely welcome to contribute to this project!** Whether by adding new features, improving existing ones, fixing bugs, or enhancing documentation - all contributions are valued.
 
 Please check the [issues](https://github.com/alebels/medianalytics/issues) page for current tasks or create a new issue to discuss your ideas.
 
-## Prerequisites
+## 📋 Prerequisites
 
 This project uses Docker to run the application. Make sure you have Docker installed on your machine.
 You can download it from [Docker](https://www.docker.com/get-started).
 
-## Arquitecture schema
+## 🏗️ Architecture Schema
 ![alt text](./Front/public/assets/arquitecture-schema.png)
 
-## Setup Instructions
+## ⚙️ Setup Instructions
 
 1. **On `db/` folder create a `password.txt` file with your db password:**
    ```
@@ -91,7 +91,8 @@ In the back-data container terminal exec:
       python3 init_db.py
       ```
 
+## 📝 Important Notes
 
-> **Note:** Keep the containers running so scheduled jobs can execute at the times specified in `Back-data/main.py`.
-
-> **Note:** Also you can run the front localy without the container by setup it as an angular project v19.0.6
+- Keep containers running for scheduled jobs to execute as specified in `Back-data/main.py`
+- Frontend can also run locally as an Angular project (v19.0.6)
+- To add new sources, follow the example in `Back-data/media_test_scrap.py`

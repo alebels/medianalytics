@@ -96,6 +96,7 @@ export class BarChartComponent implements OnInit, OnDestroy {
             fontSize: '16px',
           },
           rotate: -45,
+          trim: true,
         },
         categories: xlabels || [],
       },

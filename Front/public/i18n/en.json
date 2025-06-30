@@ -80,10 +80,14 @@
     "sentiments": "Rated sentiments",
     "sentiments_info": "For each article, 3 different sentiments are extracted",
     "sentiments_categorized": "Rated sentiments by category",
-    "top_words": "The 100 most frequent words",
+    "top_words": "The {{num}} most frequent words",
     "bottom_words": "The 100 least frequent words",
     "top_grammar": "Most important grammatical types used",
-    "general_table_info": "Sources collected from their English editions"
+    "general_table_info": "Sources collected from their English editions",
+    "ratings_day": "Ratings of the day",
+    "subtitle_ratings_day": "Result of the ratings extracted from articles published in the sources integrated into the platform for the day",
+    "subtitle_general_table": "Summary table with the most relevant statistics of each of the sources integrated into the platform",
+    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from all their articles from {{ minDate }} to {{ maxDate }}"
   },
   "filters": {
     "filter": "Filter",

@@ -2,43 +2,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import models.py_schemas as schemas
 import repository.home as repo
 from utils.utils import categorize_items
+from utils.constants import C_SENTIMENTS, C_IDEOLOGIES, C_GENERAL, C_DAY
+import asyncio
 
-
-async def get_compound_sentiments(db: AsyncSession) -> schemas.CompoundRead:
+async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: str) -> schemas.CompoundRead:
     """Get compound sentiments with both plain and categorized data."""
     from services.filters import SENTIMENTS_IDEOLOGIES_CATEGORIZED
     
-    # Get plain sentiments data
-    plain_sentiments = await repo.get_general_sentiments(db)
+    # Get plain data
+    plain = []
+    if mode == C_GENERAL:
+        plain = await repo.get_general_sentiments_ideologies(db, type)
+    elif mode == C_DAY:
+        plain = await repo.get_general_day_sentiments_ideologies(db, type)
     
+    categorized_values = []
+    if type == C_SENTIMENTS:
+        categorized_values = SENTIMENTS_IDEOLOGIES_CATEGORIZED.sentiments
+    elif type == C_IDEOLOGIES:
+        categorized_values = SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
+
     # Get categorized sentiments using the reusable function
-    categorized_sentiments = categorize_items(
-        plain_sentiments, 
-        SENTIMENTS_IDEOLOGIES_CATEGORIZED.sentiments
+    categorized = categorize_items(
+        plain, 
+        categorized_values
     )
     
     return schemas.CompoundRead(
-        plain=plain_sentiments,
-        categorized=categorized_sentiments
-    )
-
-
-async def get_compound_ideologies(db: AsyncSession) -> schemas.CompoundRead:
-    """Get compound ideologies with both plain and categorized data."""
-    from services.filters import SENTIMENTS_IDEOLOGIES_CATEGORIZED
-    
-    # Get plain ideologies data
-    plain_ideologies = await repo.get_general_ideologies(db)
-    
-    # Get categorized ideologies using the reusable function
-    categorized_ideologies = categorize_items(
-        plain_ideologies, 
-        SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
-    )
-    
-    return schemas.CompoundRead(
-        plain=plain_ideologies,
-        categorized=categorized_ideologies
+        plain=plain,
+        categorized=categorized
     )
 
 
@@ -75,18 +67,21 @@ async def get_general_table(db: AsyncSession) -> list[schemas.GeneralMediaItemRe
     """
     general_media = await repo.get_general_media(db)
     
-    result = []
-    
-    for item in general_media:
-        top_words = await repo.get_general_media_words(db, item.id)
-        top_sentiments = await repo.get_general_media_top_sentiments(db, item.id)
-        bottom_sentiments = await repo.get_general_media_bottom_sentiments(db, item.id)
-        top_ideologies = await repo.get_general_media_top_ideologies(db, item.id)
-        bottom_ideologies = await repo.get_general_media_bottom_ideologies(db, item.id)
-        top_grammar = await get_grammar_percentages(db, item.id)
+    async def process_media_item(item):
+        # Run all database queries concurrently for each media item
+        tasks = [
+            repo.get_general_media_words(db, item.id),
+            repo.get_general_media_top_sentiments_ideologies(db, item.id, C_SENTIMENTS),
+            repo.get_general_media_bottom_sentiments_ideologies(db, item.id, C_SENTIMENTS),
+            repo.get_general_media_top_sentiments_ideologies(db, item.id, C_IDEOLOGIES),
+            repo.get_general_media_bottom_sentiments_ideologies(db, item.id, C_IDEOLOGIES),
+            get_grammar_percentages(db, item.id)
+        ]
         
-        # Create and append the validated item
-        media_item = schemas.GeneralMediaItemRead(
+        results = await asyncio.gather(*tasks)
+        top_words, top_sentiments, bottom_sentiments, top_ideologies, bottom_ideologies, top_grammar = results
+        
+        return schemas.GeneralMediaItemRead(
             name=item.name,
             full_name=item.full_name,
             type=item.type,
@@ -102,6 +97,9 @@ async def get_general_table(db: AsyncSession) -> list[schemas.GeneralMediaItemRe
             bottom_ideologies=bottom_ideologies,
             top_grammar=top_grammar
         )
-        result.append(media_item)
+    
+    # Process all media items concurrently
+    tasks = [process_media_item(item) for item in general_media]
+    result = await asyncio.gather(*tasks)
     
     return result

@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import models.py_schemas as schemas
 import config.db_models as models
-from sqlalchemy import exists, text
+from sqlalchemy import exists, text, func
 
 
 async def get_medias(db: AsyncSession) -> list[schemas.MediaRead]:
@@ -37,21 +37,21 @@ async def get_min_max_date(db: AsyncSession) -> schemas.MinMaxDateRead:
         schemas.MinMaxDateRead: The minimum and maximum dates.
     """
     # Get minimum date
-    result = await db.execute(select(
-        models.Article.insert_date
-    ).order_by(models.Article.insert_date.asc()))
-    min_date = result.scalars().first()
-
+    min_date_result = await db.execute(
+        select(func.min(models.Article.insert_date))
+    )
+    min_date = min_date_result.scalar()
+    
     # Get maximum date
-    result = await db.execute(select(
-        models.Article.insert_date
-    ).order_by(models.Article.insert_date.desc()))
-    max_date = result.scalars().first()
+    max_date_result = await db.execute(
+        select(func.max(models.Article.insert_date))
+    )
+    max_date = max_date_result.scalar()
 
-    # Create MinMaxDateRead with string values
+    # Create MinMaxDateRead with date values
     return schemas.MinMaxDateRead(
-        min_date=str(min_date),
-        max_date=str(max_date)
+        min_date=min_date,
+        max_date=max_date
     )
 
 

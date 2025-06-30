@@ -1,7 +1,9 @@
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
-import { ItemRead, ItemSerie } from '../models/items.model';
-import { BehaviorSubject } from 'rxjs';
+import { ItemRead, ItemSerie, MinMaxDateRead } from '../models/items.model';
 import { DataChart } from '../models/chart.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +11,17 @@ import { DataChart } from '../models/chart.model';
 export class GeneralService {
   public readonly isMobile$ = new BehaviorSubject<boolean>(false);
 
-  constructor(@Inject(LOCALE_ID) private localeId: string) {
+  private readonly minMaxDateSub = new BehaviorSubject<MinMaxDateRead>(
+    new MinMaxDateRead()
+  );
+  public readonly minMaxDate$ = this.minMaxDateSub.asObservable();
+
+  constructor(
+    private http: HttpClient,
+    @Inject(LOCALE_ID) private localeId: string
+  ) {
     this.isMobile$.next(this.checkIfMobile());
+    this.initialize();
   }
 
   setToBarChart(data: ItemRead[], label: string): DataChart {
@@ -43,9 +54,23 @@ export class GeneralService {
     return new DataChart(labels, series, 'donut');
   }
 
+  private async initialize(): Promise<void> {
+    await this.getMinMaxDates();
+  }
+
+  private async getMinMaxDates(): Promise<void> {
+    const data = await firstValueFrom(
+      this.http.get<MinMaxDateRead>(`${environment.apiUrl}/filters/minmaxdate`)
+    );
+    this.minMaxDateSub.next(data);
+  }
+
   private checkIfMobile(): boolean {
     const userAgent = navigator.userAgent;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        userAgent
+      );
     console.log('Is mobile:', isMobile);
     return isMobile;
   }

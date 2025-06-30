@@ -97,8 +97,8 @@ class MinMaxDateRead(BaseModel):
     Pydantic model for reading minimum and maximum dates.
     """
 
-    min_date: str
-    max_date: str
+    min_date: date
+    max_date: date
 
 
 class FillQuery(BaseModel):

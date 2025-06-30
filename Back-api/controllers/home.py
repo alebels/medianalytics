@@ -9,6 +9,7 @@ import repository.home as repo
 import services.home as srv
 from repository.database import get_session
 from utils.limiter import LIMITER
+from utils.constants import C_GENERAL, C_DAY, C_SENTIMENTS, C_IDEOLOGIES
 
 API_VERSION = "api/v1"
 HOME_ROUTER = APIRouter(prefix=f"/{API_VERSION}/home", tags=["Home"])
@@ -150,7 +151,7 @@ async def get_general_sentiments(
     Returns:
         A list of the sentiments with their counts.
     """
-    db_items = await srv.get_compound_sentiments(db)
+    db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_SENTIMENTS)
     if not db_items:
         raise HTTPException(status_code=404, detail="No sentiments found")
     return db_items
@@ -170,7 +171,7 @@ async def get_general_ideologies(
     Returns:
         A list of the ideologies with their counts.
     """
-    db_items = await srv.get_compound_ideologies(db)
+    db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_IDEOLOGIES)
     if not db_items:
         raise HTTPException(status_code=404, detail="No ideologies found")
     return db_items
@@ -213,4 +214,64 @@ async def get_general_table(
     db_items = await srv.get_general_table(db)
     if not db_items:
         raise HTTPException(status_code=404, detail="No items found")
+    return db_items
+
+
+@HOME_ROUTER.get("/generaldaytopwords", response_model=list[schemas.ItemRead])
+@LIMITER.limit(f"{NUM_REQUESTS}/minute")
+async def get_general_day_top_words(
+    request: Request, db: AsyncSession = Depends(get_session)
+):
+    """
+    Retrieve the top most repeated words for the latest day.
+    
+    Args:
+        db (AsyncSession): The database session.
+        
+    Returns:
+        A list of the top words for the latest insert_date.
+    """
+    db_items = await repo.get_general_day_top_words(db)
+    if not db_items:
+        raise HTTPException(status_code=404, detail="No top words found for today")
+    return db_items
+
+
+@HOME_ROUTER.get("/generaldaysentiments", response_model=schemas.CompoundRead)
+@LIMITER.limit(f"{NUM_REQUESTS}/minute")
+async def get_general_day_sentiments(
+    request: Request, db: AsyncSession = Depends(get_session)
+):
+    """
+    Retrieve the sentiments by frequency for articles from the latest day.
+    
+    Args:
+        db (AsyncSession): The database session.
+        
+    Returns:
+        A list of the sentiments with their counts for the latest insert_date.
+    """
+    db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_SENTIMENTS)
+    if not db_items:
+        raise HTTPException(status_code=404, detail="No sentiments found for today")
+    return db_items
+
+
+@HOME_ROUTER.get("/generaldayideologies", response_model=schemas.CompoundRead)
+@LIMITER.limit(f"{NUM_REQUESTS}/minute")
+async def get_general_day_ideologies(
+    request: Request, db: AsyncSession = Depends(get_session)
+):
+    """
+    Retrieve the ideologies by frequency for articles from the latest day.
+    
+    Args:
+        db (AsyncSession): The database session.
+        
+    Returns:
+        A list of the ideologies with their counts for the latest insert_date.
+    """
+    db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_IDEOLOGIES)
+    if not db_items:
+        raise HTTPException(status_code=404, detail="No ideologies found for today")
     return db_items

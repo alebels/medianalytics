@@ -40,13 +40,13 @@ async def lifespan(_: FastAPI):
             # Schedule daily task
             scheduler.add_job(
                 scheduled_task,
-                CronTrigger(hour=18, minute=31, timezone='Europe/Paris'),
+                CronTrigger(hour=16, minute=37, timezone='Europe/Paris'),
                 id="daily_main_service_task",
                 replace_existing=True,
             )
             
             scheduler.start()
-            logger.info("📅 APScheduler started: daily task scheduled at 08:00 Paris time")
+            logger.info("📅 APScheduler started: daily task scheduled at 17:40 Paris time")
         yield
     finally:
         if scheduler.running:

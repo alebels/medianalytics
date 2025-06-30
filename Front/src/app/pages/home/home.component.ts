@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
 import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
@@ -26,7 +27,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     PieChartComponent,
     GeneralTableComponent,
     NoDataComponent,
-    Tooltip
+    Tooltip,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -41,8 +42,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   generalAverageWords = 0;
   generalTotalWords = 0;
 
-  generalTopWords!: DataChart;
+  minDate!: string;
+  maxDate!: string;
 
+  generalDayTopWords!: DataChart;
+  generalDaySentiments!: CompoundDataCharts;
+  generalDayIdeologies!: CompoundDataCharts;
+
+  generalTopWords!: DataChart;
   generalBottomWords!: DataCountTable;
 
   generalSentiments!: CompoundDataCharts;
@@ -56,9 +63,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private homeSrv: HomeService, private generalSrv: GeneralService) {}
+  constructor(
+    private homeSrv: HomeService,
+    private generalSrv: GeneralService,
+    @Inject(LOCALE_ID) public LOCALE_ID: string
+  ) {}
 
   ngOnInit(): void {
+    this.getMinMaxDate();
+    this.setGeneralDayTopWords();
+    this.setGeneralDaySentiments();
+    this.setGeneralDayIdeologies();
+    this.setGeneralTable();
     this.setGeneralTotalMedias();
     this.setGeneralTotalArticles();
     this.setGeneralAverageWords();
@@ -68,7 +84,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.setGeneralTopWords();
     this.setGeneralBottomWords();
     this.setGeneralTopGrammar();
-    this.setGeneralTable();
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
@@ -99,6 +114,51 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.generalTotalWords = data;
     });
     this.subscriptions.push(totalWordsSub);
+  }
+
+  private setGeneralDayTopWords(): void {
+    const dayTopWordsSub = this.homeSrv.generalDayTopWords$.subscribe(
+      (data) => {
+        this.generalDayTopWords = data;
+      }
+    );
+    this.subscriptions.push(dayTopWordsSub);
+  }
+
+  private setGeneralDaySentiments(): void {
+    const daySentimentsSub = this.homeSrv.generalDaySentiments$.subscribe(
+      (data) => {
+        this.generalDaySentiments = data;
+      }
+    );
+    this.subscriptions.push(daySentimentsSub);
+  }
+
+  private setGeneralDayIdeologies(): void {
+    const dayIdeologiesSub = this.homeSrv.generalDayIdeologies$.subscribe(
+      (data) => {
+        this.generalDayIdeologies = data;
+      }
+    );
+    this.subscriptions.push(dayIdeologiesSub);
+  }
+
+  private getMinMaxDate(): void {
+    const minMaxDateSub = this.generalSrv.minMaxDate$.subscribe((data) => {
+      if (data) {
+        this.minDate = new Date(data.min_date).toLocaleDateString(this.LOCALE_ID || 'en', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+        this.maxDate = new Date(data.max_date).toLocaleDateString(this.LOCALE_ID || 'en', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+      }
+    });
+    this.subscriptions.push(minMaxDateSub);
   }
 
   private setGeneralTopWords(): void {

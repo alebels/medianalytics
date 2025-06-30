@@ -25,6 +25,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { FiltersService } from '../../../services/filters.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
+import { GeneralService } from '../../../services/general.service';
 import { MinMaxDateRead } from '../../../models/items.model';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
@@ -89,6 +90,7 @@ export class FilterComponent implements OnInit, OnDestroy {
 
   constructor(
     private filtersSrv: FiltersService,
+    private generalSrv: GeneralService,
     @Inject(LOCALE_ID) public LOCALE_ID: string
   ) {}
 
@@ -195,7 +197,7 @@ export class FilterComponent implements OnInit, OnDestroy {
   }
 
   private getMinMaxDate(): void {
-    const minMaxDateSub = this.filtersSrv.minMaxDate$.subscribe(
+    const minMaxDateSub = this.generalSrv.minMaxDate$.subscribe(
       (data: MinMaxDateRead) => {
         this.absoluteMinDate = new Date(data.min_date);
         this.absoluteMaxDate = new Date(data.max_date);

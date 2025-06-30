@@ -67,6 +67,19 @@ export class HomeService {
   );
   public readonly generalTableSub$ = this.generalTableSub.asObservable();
 
+  private readonly generalDayTopWordsSub = new BehaviorSubject<DataChart>(
+    new DataChart()
+  );
+  public readonly generalDayTopWords$ = this.generalDayTopWordsSub.asObservable();
+
+  private readonly generalDaySentimentsSub =
+    new BehaviorSubject<CompoundDataCharts>(new CompoundDataCharts());
+  public readonly generalDaySentiments$ = this.generalDaySentimentsSub.asObservable();
+
+  private readonly generalDayIdeologiesSub =
+    new BehaviorSubject<CompoundDataCharts>(new CompoundDataCharts());
+  public readonly generalDayIdeologies$ = this.generalDayIdeologiesSub.asObservable();
+
   private apiUrl = environment.apiUrl + '/home';
 
   constructor(private http: HttpClient, private generalSrv: GeneralService) {
@@ -77,14 +90,17 @@ export class HomeService {
     await Promise.all([
       this.getGeneralTotalMedias(),
       this.getGeneralTotalArticles(),
+      this.getGeneralAverageWordCount(),
+      this.getGeneralTotalWords(),
+      this.getGeneralDayTopWords(),
+      this.getGeneralDaySentiments(),
+      this.getGeneralDayIdeologies(),
+      this.getGeneralTable(),
       this.getGeneralTopWords(),
       this.getGeneralBottomWords(),
-      this.getGeneralAverageWordCount(),
       this.getGeneralSentiments(),
       this.getGeneralIdeologies(),
       this.getGeneralTopGrammar(),
-      this.getGeneralTotalWords(),
-      this.getGeneralTable(),
     ]);
   }
 
@@ -107,6 +123,40 @@ export class HomeService {
       this.http.get<number>(`${this.apiUrl}/generaltotalwords`)
     );
     this.generalTotalWordsSub.next(data);
+  }
+
+  private async getGeneralDayTopWords(): Promise<void> {
+    const data = await firstValueFrom(
+      this.http.get<ItemRead[]>(`${this.apiUrl}/generaldaytopwords`)
+    );
+    const sendData: DataChart = this.generalSrv.setToBarChart(data, COUNT);
+    this.generalDayTopWordsSub.next(sendData);
+  }
+
+  private async getGeneralDaySentiments(): Promise<void> {
+    const data = await firstValueFrom(
+      this.http.get<CompoundRead>(`${this.apiUrl}/generaldaysentiments`)
+    );
+    const sendData: CompoundDataCharts = new CompoundDataCharts(
+      this.generalSrv.setToBarChart(data.plain, COUNT),
+      this.generalSrv.setToPieChart(data.categorized)
+    );
+    sendData.plain.translate = SENTIMENTS;
+    sendData.categorized.translate = SENTIMENTS;
+    this.generalDaySentimentsSub.next(sendData);
+  }
+
+  private async getGeneralDayIdeologies(): Promise<void> {
+    const data = await firstValueFrom(
+      this.http.get<CompoundRead>(`${this.apiUrl}/generaldayideologies`)
+    );
+    const sendData: CompoundDataCharts = new CompoundDataCharts(
+      this.generalSrv.setToBarChart(data.plain, COUNT),
+      this.generalSrv.setToPieChart(data.categorized)
+    );
+    sendData.plain.translate = IDEOLOGIES;
+    sendData.categorized.translate = IDEOLOGIES;
+    this.generalDayIdeologiesSub.next(sendData);
   }
 
   private async getGeneralTopWords(): Promise<void> {

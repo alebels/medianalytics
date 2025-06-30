@@ -30,98 +30,158 @@
     </div>
   </p-card>
 </div>
-<div class="flex items-center my-[var(--margin-header-divider)]">
-  <div class="w-full h-[3px] bg-accent"></div>
-  <div class="w-full font-serif text-2xl text-center px-[10px]">
-    {{ "home.general_values" | translate }}
+<div>
+  <div class="flex items-center mt-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full text-center px-[var(--margin-title-lines)]">
+      <h1>{{ "home.ratings_day" | translate }}</h1>
+    </div>
+    <div class="w-full h-[3px] bg-accent"></div>
   </div>
-  <div class="w-full h-[3px] bg-accent"></div>
-</div>
-<div
-  class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
->
   <div
-    class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
-    @if (generalSentiments.plain && generalSentiments.plain.xLabels.length > 0)
-    {
-    <p-card styleClass="rounded bg-miscellany h-full">
+    {{ "home.subtitle_ratings_day" | translate }}: <b>{{ maxDate }}</b>
+  </div>
+  <div
+    class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
+  >
+    <div
+      class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    >
+      @if (generalDaySentiments.plain &&
+      generalDaySentiments.plain.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.sentiments" | translate
+          }}<i
+            class="bi bi-info-circle text-sm absolute ml-1 z-10"
+            pTooltip="{{ 'home.sentiments_info' | translate }}"
+            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            tabindex="0"
+          ></i>
+        </div>
+        <app-bar-chart
+          [dataBarChart]="generalDaySentiments.plain"
+        ></app-bar-chart>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+    <div class="w-[30%] xym:w-full">
+      @if (generalDaySentiments.categorized &&
+      generalDaySentiments.categorized.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.sentiments_categorized" | translate }}
+        </div>
+        <div class="flex justify-center items-center h-[89%]">
+          <app-pie-chart
+            [dataPieChart]="generalDaySentiments.categorized"
+          ></app-pie-chart>
+        </div>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+  </div>
+  <div
+    class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
+  >
+    <div
+      class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    >
+      @if (generalDayIdeologies.plain &&
+      generalDayIdeologies.plain.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.ideologies" | translate
+          }}<i
+            class="bi bi-info-circle text-sm absolute ml-1 z-10"
+            pTooltip="{{ 'home.ideologies_info' | translate }}"
+            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            tabindex="0"
+          ></i>
+        </div>
+        <app-bar-chart
+          [dataBarChart]="generalDayIdeologies.plain"
+        ></app-bar-chart>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+    <div class="w-[30%] xym:w-full">
+      @if (generalDayIdeologies.categorized &&
+      generalDayIdeologies.categorized.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.ideologies_categorized" | translate }}
+        </div>
+        <div class="flex justify-center items-center h-[89%] sym:h-[80%]">
+          <app-pie-chart
+            [dataPieChart]="generalDayIdeologies.categorized"
+          ></app-pie-chart>
+        </div>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+  </div>
+  <div
+    class="block w-full mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)]"
+  >
+    @if (generalDayTopWords.xLabels.length > 0) {
+    <p-card styleClass="rounded bg-miscellany">
       <div class="mb-[10px]">
-        {{ "home.sentiments" | translate
-        }}<i
+        {{ "home.top_words" | translate : { num: 50 } }}
+      </div>
+      <app-bar-chart [dataBarChart]="generalDayTopWords"></app-bar-chart>
+    </p-card>
+    } @else {
+    <div class="w-full h-full">
+      <app-no-data [noData]="noData"></app-no-data>
+    </div>
+    }
+  </div>
+</div>
+<div>
+  <div class="flex items-center mt-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full text-center px-[var(--margin-title-lines)]">
+      <h1>
+        {{ "home.general_table" | translate }}
+        <i
           class="bi bi-info-circle text-sm absolute ml-1 z-10"
-          pTooltip="{{ 'home.sentiments_info' | translate }}"
+          pTooltip="{{ 'home.general_table_info' | translate }}"
           [tooltipEvent]="isMobile ? 'focus' : 'hover'"
           tabindex="0"
         ></i>
-      </div>
-      <app-bar-chart [dataBarChart]="generalSentiments.plain"></app-bar-chart>
-    </p-card>
-    } @else {
-    <div class="w-full h-full">
-      <app-no-data [noData]="noData"></app-no-data>
+      </h1>
     </div>
-    }
+    <div class="w-full h-[3px] bg-accent"></div>
   </div>
-  <div class="w-[30%] xym:w-full">
-    @if (generalSentiments.categorized &&
-    generalSentiments.categorized.xLabels.length > 0) {
-    <p-card styleClass="rounded bg-miscellany h-full">
-      <div class="mb-[10px]">
-        {{ "home.sentiments_categorized" | translate }}
-      </div>
-      <div class="flex justify-center items-center h-[89%]">
-        <app-pie-chart
-          [dataPieChart]="generalSentiments.categorized"
-        ></app-pie-chart>
-      </div>
-    </p-card>
-    } @else {
-    <div class="w-full h-full">
-      <app-no-data [noData]="noData"></app-no-data>
-    </div>
-    }
-  </div>
-</div>
-<div
-  class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
->
   <div
-    class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
-    @if (generalIdeologies.plain && generalIdeologies.plain.xLabels.length > 0)
-    {
-    <p-card styleClass="rounded bg-miscellany h-full">
-      <div class="mb-[10px]">
-        {{ "home.ideologies" | translate
-        }}<i
-          class="bi bi-info-circle text-sm absolute ml-1 z-10"
-          pTooltip="{{ 'home.ideologies_info' | translate }}"
-          [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-          tabindex="0"
-        ></i>
-      </div>
-      <app-bar-chart [dataBarChart]="generalIdeologies.plain"></app-bar-chart>
-    </p-card>
-    } @else {
-    <div class="w-full h-full">
-      <app-no-data [noData]="noData"></app-no-data>
-    </div>
-    }
+    {{ "home.subtitle_general_table" | translate }}
   </div>
-  <div class="w-[30%] xym:w-full">
-    @if (generalIdeologies.categorized &&
-    generalIdeologies.categorized.xLabels.length > 0) {
-    <p-card styleClass="rounded bg-miscellany h-full">
-      <div class="mb-[10px]">
-        {{ "home.ideologies_categorized" | translate }}
-      </div>
-      <div class="flex justify-center items-center h-[89%] sym:h-[80%]">
-        <app-pie-chart
-          [dataPieChart]="generalIdeologies.categorized"
-        ></app-pie-chart>
-      </div>
-    </p-card>
+  <div class="h-[var(--height-table-general)]">
+    @if (generalTable.data.length > 0) {
+    <div>
+      <app-general-table [dataGeneralTable]="generalTable"></app-general-table>
+    </div>
     } @else {
     <div class="w-full h-full">
       <app-no-data [noData]="noData"></app-no-data>
@@ -129,44 +189,129 @@
     }
   </div>
 </div>
-<div
-  class="block w-full mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)]"
->
-  @if (generalTopWords.xLabels.length > 0) {
-  <p-card styleClass="rounded bg-miscellany">
-    <div class="mb-[10px]">{{ "home.top_words" | translate }}</div>
-    <app-bar-chart [dataBarChart]="generalTopWords"></app-bar-chart>
-  </p-card>
-  } @else {
-  <div class="w-full h-full">
-    <app-no-data [noData]="noData"></app-no-data>
+<div>
+  <div class="flex items-center mt-[var(--margin-header-divider)]">
+    <div class="w-full h-[3px] bg-accent"></div>
+    <div class="w-full text-center px-[var(--margin-title-lines)]">
+      <h1>{{ "home.general_values" | translate }}</h1>
+    </div>
+    <div class="w-full h-[3px] bg-accent"></div>
   </div>
-  }
-</div>
-<div
-  class="block flex flex-wrap justify-between text-lg text-center h-[var(--height-table-home)] lym:h-full"
->
   <div
-    class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full lym:mb-[var(--margin-standard)]"
+    class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
-    @if (generalBottomWords.data.length > 0) {
-    <p-card styleClass="rounded bg-miscellany h-full">
-      <div class="mb-[10px]">{{ "home.bottom_words" | translate }}</div>
-      <app-sort-table [dataSortTable]="generalBottomWords"></app-sort-table>
-    </p-card>
-    } @else {
-    <div class="w-full h-full">
-      <app-no-data [noData]="noData"></app-no-data>
-    </div>
-    }
+    <span
+      [innerHTML]="
+        'home.subtitle_general_values'
+          | translate
+            : {
+                minDate: '<b>' + minDate + '</b>',
+                maxDate: '<b>' + maxDate + '</b>'
+              }
+      "
+    ></span>
   </div>
-  <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
-    @if (generalTopGrammar.xLabels.length > 0) {
-    <p-card styleClass="rounded bg-miscellany h-full">
-      <div class="mb-[10px]">{{ "home.top_grammar" | translate }}</div>
-      <div class="flex justify-center items-center h-[89%] sym:h-[80%]">
-        <app-pie-chart [dataPieChart]="generalTopGrammar"></app-pie-chart>
+  <div
+    class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
+  >
+    <div
+      class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    >
+      @if (generalSentiments.plain && generalSentiments.plain.xLabels.length >
+      0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.sentiments" | translate
+          }}<i
+            class="bi bi-info-circle text-sm absolute ml-1 z-10"
+            pTooltip="{{ 'home.sentiments_info' | translate }}"
+            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            tabindex="0"
+          ></i>
+        </div>
+        <app-bar-chart [dataBarChart]="generalSentiments.plain"></app-bar-chart>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
       </div>
+      }
+    </div>
+    <div class="w-[30%] xym:w-full">
+      @if (generalSentiments.categorized &&
+      generalSentiments.categorized.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.sentiments_categorized" | translate }}
+        </div>
+        <div class="flex justify-center items-center h-[89%]">
+          <app-pie-chart
+            [dataPieChart]="generalSentiments.categorized"
+          ></app-pie-chart>
+        </div>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+  </div>
+  <div
+    class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
+  >
+    <div
+      class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
+    >
+      @if (generalIdeologies.plain && generalIdeologies.plain.xLabels.length >
+      0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.ideologies" | translate
+          }}<i
+            class="bi bi-info-circle text-sm absolute ml-1 z-10"
+            pTooltip="{{ 'home.ideologies_info' | translate }}"
+            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            tabindex="0"
+          ></i>
+        </div>
+        <app-bar-chart [dataBarChart]="generalIdeologies.plain"></app-bar-chart>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+    <div class="w-[30%] xym:w-full">
+      @if (generalIdeologies.categorized &&
+      generalIdeologies.categorized.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">
+          {{ "home.ideologies_categorized" | translate }}
+        </div>
+        <div class="flex justify-center items-center h-[89%] sym:h-[80%]">
+          <app-pie-chart
+            [dataPieChart]="generalIdeologies.categorized"
+          ></app-pie-chart>
+        </div>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+  </div>
+  <div
+    class="block w-full mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)]"
+  >
+    @if (generalTopWords.xLabels.length > 0) {
+    <p-card styleClass="rounded bg-miscellany">
+      <div class="mb-[10px]">
+        {{ "home.top_words" | translate : { num: 100 } }}
+      </div>
+      <app-bar-chart [dataBarChart]="generalTopWords"></app-bar-chart>
     </p-card>
     } @else {
     <div class="w-full h-full">
@@ -174,28 +319,36 @@
     </div>
     }
   </div>
-</div>
-<div class="flex items-center my-[var(--margin-header-divider)]">
-  <div class="w-full h-[3px] bg-accent"></div>
-  <div class="w-full font-serif text-2xl text-center px-[10px]">
-    {{ "home.general_table" | translate
-    }}<i
-      class="bi bi-info-circle text-sm absolute ml-1 z-10"
-      pTooltip="{{ 'home.general_table_info' | translate }}"
-      [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-      tabindex="0"
-    ></i>
+  <div
+    class="block flex flex-wrap justify-between text-lg text-center h-[var(--height-table-home)] lym:h-full"
+  >
+    <div
+      class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full lym:mb-[var(--margin-standard)]"
+    >
+      @if (generalBottomWords.data.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">{{ "home.bottom_words" | translate }}</div>
+        <app-sort-table [dataSortTable]="generalBottomWords"></app-sort-table>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
+    <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
+      @if (generalTopGrammar.xLabels.length > 0) {
+      <p-card styleClass="rounded bg-miscellany h-full">
+        <div class="mb-[10px]">{{ "home.top_grammar" | translate }}</div>
+        <div class="flex justify-center items-center h-[89%] sym:h-[80%]">
+          <app-pie-chart [dataPieChart]="generalTopGrammar"></app-pie-chart>
+        </div>
+      </p-card>
+      } @else {
+      <div class="w-full h-full">
+        <app-no-data [noData]="noData"></app-no-data>
+      </div>
+      }
+    </div>
   </div>
-  <div class="w-full h-[3px] bg-accent"></div>
-</div>
-<div class="h-[var(--height-table-general)]">
-  @if (generalTable.data.length > 0) {
-  <div>
-    <app-general-table [dataGeneralTable]="generalTable"></app-general-table>
-  </div>
-  } @else {
-  <div class="w-full h-full">
-    <app-no-data [noData]="noData"></app-no-data>
-  </div>
-  }
 </div>

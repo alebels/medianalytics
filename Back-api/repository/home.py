@@ -1,6 +1,8 @@
+from datetime import date
 from sqlalchemy import func, text, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from utils.constants import C_SENTIMENTS, C_IDEOLOGIES
 import models.py_schemas as schemas
 import config.db_models as models
 
@@ -92,46 +94,33 @@ async def get_general_average_word_count(db: AsyncSession) -> int:
     return result.scalar()
 
 
-async def get_general_sentiments(db: AsyncSession) -> list[schemas.ItemRead]:
+async def get_general_sentiments_ideologies(db: AsyncSession, type: str) -> list[schemas.ItemRead]:
     """
-    Get the sentiments by count across all articles.
-    
+    Get the sentiments or ideologies by count across all articles.
+
     Args:
         db (AsyncSession): The database session.
     
     Returns:
-        list[schemas.ItemRead]: A list of sentiment counts, ordered by frequency.
+        list[schemas.ItemRead]: A list of sentiment or ideology counts, ordered by frequency.
     """
-    query = text("""
-        SELECT unnest(sentiments) as name, COUNT(*) as count
-        FROM public.article
-        GROUP BY name
-        ORDER BY count DESC
-    """)
+    if type == C_SENTIMENTS:
+        query = text("""
+            SELECT unnest(sentiments) as name, COUNT(*) as count
+            FROM public.article
+            GROUP BY name
+            ORDER BY count DESC
+        """)
+    elif type == C_IDEOLOGIES:
+        query = text("""
+            SELECT unnest(ideologies) as name, COUNT(*) as count
+            FROM public.article
+            GROUP BY name
+            ORDER BY count DESC
+        """)
     result = await db.execute(query)
-    sentiment_counts = result.mappings().all()
-    return [schemas.ItemRead.model_validate(item) for item in sentiment_counts]
-
-
-async def get_general_ideologies(db: AsyncSession) -> list[schemas.ItemRead]:
-    """
-    Get the ideologies by count across all articles.
-
-    Args:
-        db (AsyncSession): The database session.
-
-    Returns:
-        list[schemas.ItemRead]: A list of ideologies counts, ordered by frequency.
-    """
-    query = text("""
-        SELECT unnest(ideologies) as name, COUNT(*) as count
-        FROM public.article
-        GROUP BY name
-        ORDER BY count DESC
-    """)
-    result = await db.execute(query)
-    ideologies_counts = result.mappings().all()
-    return [schemas.ItemRead.model_validate(item) for item in ideologies_counts]
+    result_map = result.mappings().all()
+    return [schemas.ItemRead.model_validate(item) for item in result_map]
 
 
 async def get_general_top_grammar(db: AsyncSession) -> list[schemas.ItemRead]:
@@ -217,112 +206,78 @@ async def get_general_media_words(db: AsyncSession, id_media: int) -> list[schem
     return [schemas.ItemRead.model_validate(word) for word in words]
 
 
-async def get_general_media_top_sentiments(db: AsyncSession, id_media: int) -> list[schemas.ItemRead]:
+async def get_general_media_top_sentiments_ideologies(db: AsyncSession, id_media: int, type: str) -> list[schemas.ItemRead]:
     """
-    Get the top sentiments for a specific media item.
+    Get the top sentiments or ideologies for a specific media item.
     
     Args:
         db (AsyncSession): The database session.
-        id_media (int): The ID of the media to get sentiments for.
+        id_media (int): The ID of the media to get sentiments or ideologies for.
+        type (str): The type to retrieve (C_SENTIMENTS or C_IDEOLOGIES).
         
     Returns:
-        list[schemas.ItemRead]: A list of the top 10 sentiments for the media.
+        list[schemas.ItemRead]: A list of the top 5 sentiments or ideologies for the media.
     """
     
-    # Query to get top 10 most repeated sentiments for a specific media
-    query = text("""
-        SELECT unnest(sentiments) as name, COUNT(*) as count
-        FROM public.article
-        WHERE media_id = :media_id
-        GROUP BY name
-        ORDER BY count DESC
-        LIMIT 5
-    """)
+    if type == C_SENTIMENTS:
+        query = text("""
+            SELECT unnest(sentiments) as name, COUNT(*) as count
+            FROM public.article
+            WHERE media_id = :media_id
+            GROUP BY name
+            ORDER BY count DESC
+            LIMIT 5
+        """)
+    elif type == C_IDEOLOGIES:
+        query = text("""
+            SELECT unnest(ideologies) as name, COUNT(*) as count
+            FROM public.article
+            WHERE media_id = :media_id
+            GROUP BY name
+            ORDER BY count DESC
+            LIMIT 5
+        """)
     
     result = await db.execute(query, {"media_id": id_media})
-    sentiments = result.mappings().all()
-    return [schemas.ItemRead.model_validate(sentiment) for sentiment in sentiments]
+    items = result.mappings().all()
+    return [schemas.ItemRead.model_validate(item) for item in items]
 
 
-async def get_general_media_bottom_sentiments(db: AsyncSession, id_media: int) -> list[schemas.ItemRead]:
+async def get_general_media_bottom_sentiments_ideologies(db: AsyncSession, id_media: int, type: str) -> list[schemas.ItemRead]:
     """
-    Get the bottom sentiments for a specific media item.
+    Get the bottom sentiments or ideologies for a specific media item.
     
     Args:
         db (AsyncSession): The database session.
-        id_media (int): The ID of the media to get sentiments for.
+        id_media (int): The ID of the media to get sentiments or ideologies for.
+        type (str): The type to retrieve (C_SENTIMENTS or C_IDEOLOGIES).
         
     Returns:
-        list[schemas.ItemRead]: A list of the bottom 10 sentiments for the media.
+        list[schemas.ItemRead]: A list of the bottom 5 sentiments or ideologies for the media.
     """
     
-    # Query to get bottom 10 least repeated sentiments for a specific media
-    query = text("""
-        SELECT unnest(sentiments) as name, COUNT(*) as count
-        FROM public.article
-        WHERE media_id = :media_id
-        GROUP BY name
-        ORDER BY count ASC
-        LIMIT 5
-    """)
+    if type == C_SENTIMENTS:
+        query = text("""
+            SELECT unnest(sentiments) as name, COUNT(*) as count
+            FROM public.article
+            WHERE media_id = :media_id
+            GROUP BY name
+            ORDER BY count ASC
+            LIMIT 5
+        """)
+    elif type == C_IDEOLOGIES:
+        query = text("""
+            SELECT unnest(ideologies) as name, COUNT(*) as count
+            FROM public.article
+            WHERE media_id = :media_id
+            GROUP BY name
+            ORDER BY count ASC
+            LIMIT 5
+        """)
     
     result = await db.execute(query, {"media_id": id_media})
-    sentiments = result.mappings().all()
-    return [schemas.ItemRead.model_validate(sentiment) for sentiment in sentiments]
-
-
-async def get_general_media_top_ideologies(db: AsyncSession, id_media: int) -> list[schemas.ItemRead]:
-    """
-    Get the top ideologies for a specific media item.
-    
-    Args:
-        db (AsyncSession): The database session.
-        id_media (int): The ID of the media to get ideologies for.
-        
-    Returns:
-        list[schemas.ItemRead]: A list of the top 10 ideologies for the media.
-    """
-    
-    # Query to get top 10 most repeated ideologies for a specific media
-    query = text("""
-        SELECT unnest(ideologies) as name, COUNT(*) as count
-        FROM public.article
-        WHERE media_id = :media_id
-        GROUP BY name
-        ORDER BY count DESC
-        LIMIT 5
-    """)
-    
-    result = await db.execute(query, {"media_id": id_media})
-    ideologies = result.mappings().all()
-    return [schemas.ItemRead.model_validate(ideology) for ideology in ideologies]
-
-
-async def get_general_media_bottom_ideologies(db: AsyncSession, id_media: int) -> list[schemas.ItemRead]:
-    """
-    Get the bottom ideologies for a specific media item.
-    
-    Args:
-        db (AsyncSession): The database session.
-        id_media (int): The ID of the media to get ideologies for.
-        
-    Returns:
-        list[schemas.ItemRead]: A list of the bottom 10 ideologies for the media.
-    """
-    
-    # Query to get bottom 10 least repeated ideologies for a specific media
-    query = text("""
-        SELECT unnest(ideologies) as name, COUNT(*) as count
-        FROM public.article
-        WHERE media_id = :media_id
-        GROUP BY name
-        ORDER BY count ASC
-        LIMIT 5
-    """)
-    
-    result = await db.execute(query, {"media_id": id_media})
-    ideologies = result.mappings().all()
-    return [schemas.ItemRead.model_validate(ideology) for ideology in ideologies]
+    items = result.mappings().all()
+    return [schemas.ItemRead.model_validate(item) for item in items]
 
 
 async def get_general_media_top_grammar(db: AsyncSession, id_media: int) -> list[schemas.ItemRead]:
@@ -351,3 +306,87 @@ async def get_general_media_top_grammar(db: AsyncSession, id_media: int) -> list
     result = await db.execute(query, {"media_id": id_media})
     grammar_counts = result.mappings().all()
     return [schemas.ItemRead.model_validate(item) for item in grammar_counts]
+
+
+async def get_latest_insert_date(db: AsyncSession) -> date | None:
+    """
+    Get the latest insert_date from the articles table.
+    
+    Args:
+        db (AsyncSession): The database session.
+    
+    Returns:
+        date | None: The latest insert_date as a date object, or None if no articles exist.
+    """
+    result = await db.execute(select(func.max(models.Article.insert_date)))
+    return result.scalar()  # Returns None if no articles exist
+
+
+async def get_general_day_top_words(db: AsyncSession) -> list[schemas.ItemRead]:
+    """
+    Retrieve the top most repeated words for articles from the latest insert_date.
+    Args:
+        db (AsyncSession): The database session.
+    Returns:
+        list[schemas.ItemRead]: A list of the top words for the latest day.
+    """
+    # Get the latest insert_date from articles
+    latest_date = await get_latest_insert_date(db)
+    
+    if latest_date is None:
+        return []
+    
+    # Get top words for articles from the latest insert_date, using Facts table
+    query = text("""
+        SELECT w.name, SUM(f.frequency) as count
+        FROM word w
+        JOIN facts f ON w.id = f.id_word
+        JOIN article a ON a.id = f.id_article
+        WHERE a.insert_date = :latest_date
+        AND w.name != 'said'
+        GROUP BY w.name
+        ORDER BY count DESC, w.name
+        LIMIT 50
+    """)
+    
+    result = await db.execute(query, {"latest_date": latest_date})
+    words = result.mappings().all()
+    return [schemas.ItemRead.model_validate(word) for word in words]
+
+
+async def get_general_day_sentiments_ideologies(db: AsyncSession, type: str) -> list[schemas.ItemRead]:
+    """
+    Get the ideologies or sentiments by count for articles from the latest insert_date only.
+
+    Args:
+        db (AsyncSession): The database session.
+
+    Returns:
+        list[schemas.ItemRead]: A list of ideologies or sentiments counts for the latest day, ordered by frequency.
+    """
+    # Get the latest insert_date first
+    latest_date = await get_latest_insert_date(db)
+
+    if latest_date is None:
+        return []
+    
+    if type == C_SENTIMENTS:
+        query = text("""
+            SELECT unnest(sentiments) as name, COUNT(*) as count
+            FROM public.article
+            WHERE insert_date = :latest_date
+            GROUP BY name
+            ORDER BY count DESC
+        """)
+    elif type == C_IDEOLOGIES:
+        query = text("""
+            SELECT unnest(ideologies) as name, COUNT(*) as count
+            FROM public.article
+            WHERE insert_date = :latest_date
+            GROUP BY name
+            ORDER BY count DESC
+        """)
+
+    result = await db.execute(query, {"latest_date": latest_date})
+    result_map = result.mappings().all()
+    return [schemas.ItemRead.model_validate(item) for item in result_map]
