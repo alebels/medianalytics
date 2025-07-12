@@ -43,7 +43,7 @@
     "apply": "Apply"
   },
   "header": {
-    "home": "Home",
+    "": "Home",
     "report": "Report",
     "manifest": "Manifest",
     "filters": "Filters",
@@ -68,6 +68,7 @@
     "min_max_range": "The minimum range cannot be greater than or equal to the maximum range."
   },
   "home": {
+    "description": "Open source platform for the analysis of media and other relevant sources that influence public opinion",
     "total_sources": "Sources analyzed",
     "total_articles": "Articles processed",
     "average_words": "Average words per article",
@@ -87,9 +88,10 @@
     "ratings_day": "Ratings of the day",
     "subtitle_ratings_day": "Result of the ratings extracted from articles published in the sources integrated into the platform for the day",
     "subtitle_general_table": "Summary table with the most relevant statistics of each of the sources integrated into the platform",
-    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from all their articles from {{ minDate }} to {{ maxDate }}"
+    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from their articles from {{ minDate }} to {{ maxDate }}"
   },
   "filters": {
+    "description": "Filter and compare the data collected by the platform about its sources according to their sentiments, ideological orientations, or words",
     "filter": "Filter",
     "medias": "Source",
     "types": "Type",

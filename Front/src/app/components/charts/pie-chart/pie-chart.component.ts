@@ -75,7 +75,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
         selection: {
           enabled: false,
         },
-        width: 500,
+        width: 470,
       },
       labels: xlabels || [],
       stroke: {
@@ -99,7 +99,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
           breakpoint: 1755,
           options: {
             chart: {
-              width: 450,
+              width: 430,
             },
           },
         },
@@ -107,7 +107,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
           breakpoint: 1570,
           options: {
             chart: {
-              width: 400,
+              width: 390,
             },
           },
         },
@@ -123,7 +123,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
           breakpoint: 1245,
           options: {
             chart: {
-              width: 500,
+              width: 420,
             },
           },
         },
@@ -131,7 +131,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
           breakpoint: 550,
           options: {
             chart: {
-              width: 400,
+              width: 390,
             },
           },
         },

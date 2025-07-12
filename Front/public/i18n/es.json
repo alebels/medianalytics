@@ -43,7 +43,7 @@
     "apply": "Aplicar"
   },
   "header": {
-    "home": "Inicio",
+    "": "Inicio",
     "report": "Informe",
     "manifest": "Manifiesto",
     "filters": "Filtros",
@@ -68,6 +68,7 @@
     "min_max_range": "El rango mínimo no puede ser mayor o igual que el rango máximo."
   },
   "home": {
+    "description": "Plataforma open source para el análisis de medios de comunicación y demás fuentes relevantes que influyen en la opinión pública",
     "total_sources": "Fuentes analizadas",
     "total_articles": "Artículos procesados",
     "average_words": "Promedio de palabras por artículo",
@@ -87,9 +88,10 @@
     "ratings_day": "Valoraciones del día",
     "subtitle_ratings_day": "Resultado de las valoraciones extraídas de los artículos publicados en las fuentes integradas en la plataforma para el día",
     "subtitle_general_table": "Tabla resumen con las estadísticas más relevantes de cada una de las fuentes integradas en la plataforma",
-    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de todos sus artículos desde {{ minDate }} hasta {{ maxDate }}"
+    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de sus artículos desde {{ minDate }} hasta {{ maxDate }}"
   },
   "filters": {
+    "description": "Filtra y compara los datos recopilados por la plataforma sobre sus fuentes según sus sentimientos, orientaciones ideológicas o palabras",
     "filter": "Filtrar",
     "medias": "Fuente",
     "types": "Tipo",

@@ -1,7 +1,6 @@
 import {
   ApplicationConfig,
   LOCALE_ID,
-  PLATFORM_ID,
   provideZoneChangeDetection,
 } from '@angular/core';
 import {
@@ -11,7 +10,6 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { TranslateLoader, provideTranslateService } from '@ngx-translate/core';
-import { isPlatformBrowser, registerLocaleData } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { InterceptorService } from './interceptors/interceptor.service';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -21,6 +19,7 @@ import primeTheme from './utils/prime-theme';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
 import { routes } from './app.routes';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (
@@ -38,14 +37,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     {
       provide: LOCALE_ID,
-      useFactory: (platformId: object) => {
-        if (isPlatformBrowser(platformId)) {
-          const userLang = navigator.language?.split('-')[0];
-          return userLang === 'en' ? 'en' : 'es';
-        }
-        return 'en'; // fallback for server-side
+      useFactory: () => {
+        const userLang = navigator.language?.split('-')[0];
+        return userLang === 'es' ? 'es' : 'en';
       },
-      deps: [PLATFORM_ID],
     },
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     provideTranslateService({

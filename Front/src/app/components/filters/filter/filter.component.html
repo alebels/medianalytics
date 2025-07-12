@@ -44,7 +44,7 @@
         inputId="buttondisplay"
         selectionMode="range"
         [firstDayOfWeek]="1"
-        [dateFormat]="LOCALE_ID === 'en' ? 'm/d/yy' : 'd/m/yy'"
+        [dateFormat]="LOCALE_ID === 'en' ? 'mm/dd/yy' : 'dd/mm/yy'"
         [readonlyInput]="true"
         [showButtonBar]="true"
         (ngModelChange)="sendComposeValue()"

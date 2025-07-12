@@ -15,7 +15,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class HeaderComponent implements OnInit {
   toggleMenu = true;
 
-  routes = ['home', 'filters', 'manifest'];
+  routes = ['', 'filters', 'manifest'];
 
   items!: MenuItem[];
 

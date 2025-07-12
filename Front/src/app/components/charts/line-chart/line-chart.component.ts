@@ -14,7 +14,7 @@ import {
   ChartComponent,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { CHART_THEME, COUNT, NONE } from '../../../utils/constants';
+import { CHART_THEME, NONE } from '../../../utils/constants';
 import { DataChart } from '../../../models/chart.model';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -69,19 +69,15 @@ export class LineChartComponent implements OnInit, OnDestroy {
       this.translateType = this.dataLineChart()?.translate || '';
     }
     this.setTranslateChart();
-    const yTitle = this.trans.instant('chart.' + COUNT);
     const maxValues: number[] = [];
     this.chartSeries.forEach((item) => {
       maxValues.push(Math.max(...(item.data as number[])));
     });
     this.maxYValue = maxValues.length > 0 ? Math.max(...maxValues) : undefined;
-    this.chartOptionsUpdate(this.chartSeries, yTitle);
+    this.chartOptionsUpdate(this.chartSeries);
   }
 
-  private chartOptionsUpdate(
-    series: ApexAxisChartSeries,
-    yTitle: string
-  ): void {
+  private chartOptionsUpdate(series: ApexAxisChartSeries): void {
     this.chartOptions = {
       series: series,
       theme: {
@@ -98,6 +94,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       },
       xaxis: {
         labels: {
+          show:
+            (this.dataLineChart()?.xLabels?.length ?? 0) > 100 ? false : true,
           style: {
             fontSize: '16px',
           },
@@ -114,13 +112,6 @@ export class LineChartComponent implements OnInit, OnDestroy {
           formatter: (val) => (val ? Math.round(val).toString() : '-'),
           style: {
             fontSize: '16px',
-          },
-        },
-        title: {
-          text: yTitle,
-          style: {
-            fontSize: '18px',
-            fontWeight: 'semi-bold',
           },
         },
       },
@@ -173,8 +164,7 @@ export class LineChartComponent implements OnInit, OnDestroy {
       if (this.dataLineChart()?.translate !== NONE) {
         this.setTranslate();
       }
-      const yTitle = this.trans.instant('chart.' + COUNT);
-      this.chartOptionsUpdate(this.chartSeries, yTitle);
+      this.chartOptionsUpdate(this.chartSeries);
     });
     this.subscriptions.push(langChangeSub);
   }

@@ -41,8 +41,8 @@ export class GeneralService {
       const date = new Date(item);
       return date.toLocaleDateString(this.localeId, {
         year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
       });
     });
     return new DataChart(xlabels, data, 'line');

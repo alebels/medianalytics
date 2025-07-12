@@ -26,9 +26,11 @@ export class FiltersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.filtersSrv.getTranslatedMediaCompose();
+    this.filtersSrv.getTranslatedSentimentsIdeologies();
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.filtersSrv.getTranslatedSentimentsIdeologies();
       this.filtersSrv.getTranslatedMediaCompose();
+      this.filtersSrv.getTranslatedSentimentsIdeologies();
     });
     this.subscriptions.push(langChangeSub);
   }
