@@ -44,7 +44,7 @@
   <div
     class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
-    {{ "home.subtitle_ratings_day" | translate }}: <b>{{ maxDate }}</b>
+    {{ "home.subtitle_ratings_day" | translate }}: <b>{{ maxDate | date: 'EEEE, d MMMM y': '' : currentLang }}</b>
   </div>
   <div
     class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
@@ -208,8 +208,8 @@
         'home.subtitle_general_values'
           | translate
             : {
-                minDate: '<b>' + minDate + '</b>',
-                maxDate: '<b>' + maxDate + '</b>'
+                minDate: '<b>' + (minDate | date: 'd MMMM y': '' : currentLang) + '</b>',
+                maxDate: '<b>' + (maxDate | date: 'd MMMM y': '' : currentLang) + '</b>'
               }
       "
     ></span>

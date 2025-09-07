@@ -5,7 +5,7 @@
   <app-filter (composeValues)="getComposeValues($event)"></app-filter>
   <p-floatlabel variant="on">
     <p-multiselect
-      [id]="ideologies.type"
+      [id]="'ideology-' + ideologies.type"
       [options]="ideologies.data()"
       [(ngModel)]="ideologies.value"
       [group]="true"
@@ -29,7 +29,7 @@
         </div>
       </ng-template>
     </p-multiselect>
-    <label [for]="ideologies.type">{{
+    <label [for]="'ideology-' + ideologies.type">{{
       "filters." + ideologies.type | translate
     }}</label>
     <i

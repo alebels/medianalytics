@@ -46,6 +46,7 @@ export class LineChartComponent implements OnInit, OnDestroy {
   chartOptions!: ChartOptions;
 
   chartSeries!: ApexAxisChartSeries;
+  chartLabels!: string[];
   translateType!: string;
 
   maxYValue: number | undefined;
@@ -68,16 +69,20 @@ export class LineChartComponent implements OnInit, OnDestroy {
     if (this.dataLineChart()?.translate !== NONE) {
       this.translateType = this.dataLineChart()?.translate || '';
     }
+    this.chartLabels = this.dataLineChart()?.xLabels || [];
     this.setTranslateChart();
     const maxValues: number[] = [];
     this.chartSeries.forEach((item) => {
       maxValues.push(Math.max(...(item.data as number[])));
     });
     this.maxYValue = maxValues.length > 0 ? Math.max(...maxValues) : undefined;
-    this.chartOptionsUpdate(this.chartSeries);
+    this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
   }
 
-  private chartOptionsUpdate(series: ApexAxisChartSeries): void {
+  private chartOptionsUpdate(
+    series: ApexAxisChartSeries,
+    xlabels: string[]
+  ): void {
     this.chartOptions = {
       series: series,
       theme: {
@@ -95,13 +100,13 @@ export class LineChartComponent implements OnInit, OnDestroy {
       xaxis: {
         labels: {
           show:
-            (this.dataLineChart()?.xLabels?.length ?? 0) > 100 ? false : true,
+            (this.dataLineChart()?.xLabels?.length ?? 0) > 80 ? false : true,
           style: {
             fontSize: '16px',
           },
           rotate: -45,
         },
-        categories: this.dataLineChart()?.xLabels || [],
+        categories: xlabels || [],
       },
       yaxis: {
         show: true,
@@ -164,12 +169,25 @@ export class LineChartComponent implements OnInit, OnDestroy {
       if (this.dataLineChart()?.translate !== NONE) {
         this.setTranslate();
       }
-      this.chartOptionsUpdate(this.chartSeries);
+      this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
     });
     this.subscriptions.push(langChangeSub);
   }
 
   private setTranslate(): void {
+    this.chartLabels =
+      this.dataLineChart()?.xLabels?.map((label) => {
+        const date = new Date(label);
+        const day = date.getDate();
+        const month = date
+          .toLocaleString(this.trans.currentLang, { month: 'short' })
+          .replace(/\.$/, '')
+          .trim()
+          .replace(/^(.)(.*)$/, (_, first, rest) => first.toUpperCase() + rest);
+        const year = (date.getFullYear() % 100).toString().padStart(2, '0');
+        return `${day} ${month} ${year}`;
+      }) || [];
+
     // It's ApexAxisChartSeries - translate the name property
     this.chartSeries = this.dataLineChart()?.series.map((item) => {
       if (typeof item === 'object' && 'name' in item && item.name) {

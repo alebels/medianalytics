@@ -30,29 +30,35 @@ export const MEDIA_GROUP = {
 
 export const GITHUB_REPO = 'https://github.com/alebels/medianalytics';
 export const CONTACT_EMAIL = 'contact@medianalytics.org';
+export const X_ACCOUNT = 'https://x.com/medianalytics_';
 
 export const WORD = 'word';
 export const COUNT = 'count';
 
 export const DATE = 'date';
-export const COUNTRIES = 'countries';
-export const REGIONS = 'regions';
-export const TYPES = 'types';
+export const FILTERS = {
+  COUNTRIES: 'countries',
+  REGIONS: 'regions',
+  TYPES: 'types',
+};
 export const GRAMMAR = 'grammar';
 
 export const TO_API = {
   [MEDIAS]: 'media_id',
-  [TYPES]: 'type',
-  [COUNTRIES]: 'country',
-  [REGIONS]: 'region',
+  [FILTERS.TYPES]: 'type',
+  [FILTERS.COUNTRIES]: 'country',
+  [FILTERS.REGIONS]: 'region',
   [DATE]: 'dates',
 };
 
-export const ASCENDING = 'asc';
-export const DESCENDING = 'desc';
-export const MAX_RANGE = 'max_range';
-export const MIN_RANGE = 'min_range';
-export const ORDER_BY_DESC = 'order_by_desc';
+
+export const SORTING = {
+  ASCENDING: 'asc',
+  DESCENDING: 'desc',
+  MAX_RANGE: 'max_range',
+  MIN_RANGE: 'min_range',
+  ORDER_BY_DESC: 'order_by_desc',
+};
 
 export const CHART_COLORS = ['var(--color-accent)'];
 

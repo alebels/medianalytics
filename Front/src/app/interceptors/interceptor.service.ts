@@ -82,13 +82,5 @@ export class InterceptorService implements HttpInterceptor {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
     });
-
-    // In production, you might want to send errors to a monitoring service
-    // this.sendToMonitoringService(error);
   }
-
-  // Uncomment and implement for production monitoring
-  // private sendToMonitoringService(error: HttpErrorResponse): void {
-  //   // Send error details to your monitoring service (e.g., Sentry, LogRocket)
-  // }
 }

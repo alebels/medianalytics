@@ -116,7 +116,7 @@
   },
   "manifest": {
     "description1": "Medianalytics is an",
-    "description2": "project designed to analyze and openly present data collected from various sources whose content is publicly displayed. It offers a tool that allows users to approach its information from a broader and more objective perspective.",
+    "description2": "project designed to analyze and openly present data collected from various sources whose content is publicly displayed. It offers a tool that allows users to approach its information from a broader perspective.",
     "how_works_title": "How does Medianalytics work?",
     "how_works1": "Medianalytics collects daily the 5 main articles from each of the sources registered on the platform. This number of articles is completely arbitrary, but we understand that it's enough amount to get an idea of the general vision that each source exposes that day.",
     "how_works2": "Each article is analyzed using natural language processing (NLP) techniques to separate the entities, words, and grammar that compose it. Additionally, it is processed by an artificial intelligence model",

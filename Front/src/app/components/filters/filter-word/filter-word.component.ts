@@ -1,15 +1,11 @@
+import { BehaviorSubject, Subscription } from 'rxjs';
 import {
-  ASCENDING,
   COUNT,
   DATE,
-  DESCENDING,
-  MAX_RANGE,
-  MIN_RANGE,
-  ORDER_BY_DESC,
+  SORTING,
   TO_API,
   WORD,
 } from '../../../utils/constants';
-import { BehaviorSubject, Subscription } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -50,7 +46,7 @@ import { ToastModule } from 'primeng/toast';
   providers: [MessageService],
 })
 export class FilterWordComponent implements OnInit, OnDestroy {
-  order = DESCENDING;
+  order = SORTING.DESCENDING;
 
   noData: NoData = {
     isLoading: new BehaviorSubject<boolean>(false),
@@ -81,6 +77,7 @@ export class FilterWordComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
       this.composeValues = [];
+      this.dataWordsTable = null;
     });
     this.subscriptions.push(langChangeSub);
   }
@@ -136,19 +133,19 @@ export class FilterWordComponent implements OnInit, OnDestroy {
         }
       });
       if (this.minRange !== null) {
-        composeObj[MIN_RANGE] = this.minRange;
+        composeObj[SORTING.MIN_RANGE] = this.minRange;
       }
       if (this.maxRange !== null) {
-        composeObj[MAX_RANGE] = this.maxRange;
+        composeObj[SORTING.MAX_RANGE] = this.maxRange;
       }
-      if (this.order === ASCENDING) {
-        composeObj[ORDER_BY_DESC] = false;
+      if (this.order === SORTING.ASCENDING) {
+        composeObj[SORTING.ORDER_BY_DESC] = false;
       }
       this.dataWordsTable = null;
       this.filtersSrv
         .setFilterWord(composeObj)
         .then((data) => {
-          const sortOrder = this.order === DESCENDING ? -1 : 1;
+          const sortOrder = this.order === SORTING.DESCENDING ? -1 : 1;
           this.dataWordsTable = new DataCountTable(
             data,
             WORD,

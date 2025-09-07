@@ -1,8 +1,8 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { ItemRead, ItemSerie, MinMaxDateRead } from '../models/items.model';
 import { DataChart } from '../models/chart.model';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -17,8 +17,7 @@ export class GeneralService {
   public readonly minMaxDate$ = this.minMaxDateSub.asObservable();
 
   constructor(
-    private http: HttpClient,
-    @Inject(LOCALE_ID) private localeId: string
+    private http: HttpClient
   ) {
     this.isMobile$.next(this.checkIfMobile());
     this.initialize();
@@ -37,15 +36,7 @@ export class GeneralService {
   }
 
   setToLineChart(data: ItemSerie[], labels: string[]): DataChart {
-    const xlabels = labels.map((item) => {
-      const date = new Date(item);
-      return date.toLocaleDateString(this.localeId, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-    });
-    return new DataChart(xlabels, data, 'line');
+    return new DataChart(labels, data, 'line');
   }
 
   setToPieChart(data: ItemRead[]): DataChart {
@@ -71,7 +62,6 @@ export class GeneralService {
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         userAgent
       );
-    console.log('Is mobile:', isMobile);
     return isMobile;
   }
 }

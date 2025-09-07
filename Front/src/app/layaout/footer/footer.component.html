@@ -1,4 +1,6 @@
-<footer class="w-full bg-miscellany text-cText font-sans font-medium pt-[var(--margin-header-footer)] pb-[20px] h-[var(--height-footer)]">
+<footer
+  class="w-full bg-miscellany text-cText font-sans font-medium pt-[var(--margin-header-footer)] pb-[20px] h-[var(--height-footer)]"
+>
   <div class="flex flex-wrap items-center justify-around">
     <a
       [href]="githubLink"
@@ -9,7 +11,15 @@
       GitHub
       <i class="bi bi-github ml-1"></i
     ></a>
-    <div class="px-2">{{contactEmail}}</div>
-    <div>v{{projectVersion}}</div>
+    <!-- <a
+      [href]="xAccount"
+      class="block min-w-[78px]"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <i class="bi bi-twitter-x"></i
+    ></a> -->
+    <div class="px-2">{{ contactEmail }}</div>
+    <div>v{{ projectVersion }}</div>
   </div>
 </footer>

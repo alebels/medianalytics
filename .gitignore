@@ -380,10 +380,8 @@ htmls/
 .venv/
 alembic.ini
 alembic/
-Medianalytics.code-workspace
-Back-ai/ai_models
 db/password.txt
 miscelany/
-ssl/
-hetzner-config.yaml
 Media-DEV.code-workspace
+.editorconfig
+.github/

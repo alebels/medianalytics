@@ -7,10 +7,10 @@
       min="0"
       max="100000"
       [(ngModel)]="minRange"
-      inputId="minRange"
+      inputId="word-minRange"
       [locale]="LOCALE_ID === 'en' ? 'en' : 'es'"
     />
-    <label for="sentiments.type">{{ "filters.min_range" | translate }}</label>
+    <label for="word-minRange">{{ "filters.min_range" | translate }}</label>
   </p-floatlabel>
   <p-floatlabel variant="on">
     <p-inputnumber
@@ -18,24 +18,24 @@
       min="1"
       max="100000"
       [(ngModel)]="maxRange"
-      inputId="maxRange"
+      inputId="word-maxRange"
       [locale]="LOCALE_ID === 'en' ? 'en' : 'es'"
       allowEmpty="false"
     />
-    <label for="sentiments.type">{{ "filters.max_range" | translate }}</label>
+    <label for="word-maxRange">{{ "filters.max_range" | translate }}</label>
   </p-floatlabel>
   <div>
     <p-radiobutton
       name="desc"
       value="desc"
       [(ngModel)]="order"
-      inputId="desc"
+      inputId="word-desc"
     />
-    <label class="ml-2" for="desc">{{ "filters.desc" | translate }}</label>
+    <label class="ml-2" for="word-desc">{{ "filters.desc" | translate }}</label>
   </div>
   <div>
-    <p-radiobutton name="asc" value="asc" [(ngModel)]="order" inputId="asc" />
-    <label class="ml-2" for="asc">{{ "filters.asc" | translate }}</label>
+    <p-radiobutton name="asc" value="asc" [(ngModel)]="order" inputId="word-asc" />
+    <label class="ml-2" for="word-asc">{{ "filters.asc" | translate }}</label>
   </div>
   <div>
     <p-button (onClick)="onClickFilter()" [raised]="true" size="small">{{

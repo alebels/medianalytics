@@ -1,20 +1,15 @@
 import {
-  COUNTRIES,
-  DATE,
-  MEDIAS,
-  REGIONS,
-  TYPES,
-} from '../../../utils/constants';
-import {
   Component,
-  Inject,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  LOCALE_ID,
   OnDestroy,
   OnInit,
   output,
   signal,
 } from '@angular/core';
+import {
+  DATE,
+  FILTERS,
+  MEDIAS
+} from '../../../utils/constants';
 import {
   FilterItem,
   SelectGroupSimple,
@@ -57,19 +52,19 @@ export class FilterComponent implements OnInit, OnDestroy {
       disabled: signal<boolean>(false),
     },
     {
-      type: TYPES,
+      type: FILTERS.TYPES,
       data: signal<SelectItem2[]>([]),
       value: signal<SelectItem2 | null>(null),
       disabled: signal<boolean>(false),
     },
     {
-      type: COUNTRIES,
+      type: FILTERS.COUNTRIES,
       data: signal<SelectItem2[]>([]),
       value: signal<SelectItem2 | null>(null),
       disabled: signal<boolean>(false),
     },
     {
-      type: REGIONS,
+      type: FILTERS.REGIONS,
       data: signal<SelectItem2[]>([]),
       value: signal<SelectItem2 | null>(null),
       disabled: signal<boolean>(false),
@@ -90,8 +85,7 @@ export class FilterComponent implements OnInit, OnDestroy {
 
   constructor(
     private filtersSrv: FiltersService,
-    private generalSrv: GeneralService,
-    @Inject(LOCALE_ID) public LOCALE_ID: string
+    private generalSrv: GeneralService
   ) {}
 
   ngOnInit(): void {
@@ -113,16 +107,16 @@ export class FilterComponent implements OnInit, OnDestroy {
           item.disabled.set(!!event.value());
         }
       });
-    } else if (event.type === TYPES) {
+    } else if (event.type === FILTERS.TYPES) {
       // When TYPE is selected or cleared, check other selections
       this.mediaCompose.forEach((item) => {
         if (item.type === MEDIAS) {
           // Check if any region or country is selected
           const regionSelected = this.mediaCompose
-            .find((i) => i.type === REGIONS)
+            .find((i) => i.type === FILTERS.REGIONS)
             ?.value();
           const countrySelected = this.mediaCompose
-            .find((i) => i.type === COUNTRIES)
+            .find((i) => i.type === FILTERS.COUNTRIES)
             ?.value();
 
           // Disable MEDIAS if TYPE has value OR if REGION/COUNTRY has value
@@ -139,12 +133,12 @@ export class FilterComponent implements OnInit, OnDestroy {
         if (item.type === MEDIAS) {
           // Disable MEDIAS if either this item has value OR if TYPE has value
           const typeHasValue = !!this.mediaCompose
-            .find((i) => i.type === TYPES)
+            .find((i) => i.type === FILTERS.TYPES)
             ?.value();
           item.value.set(null);
           item.disabled.set(!!event.value() || typeHasValue);
         } else if (
-          (item.type === REGIONS || item.type === COUNTRIES) &&
+          (item.type === FILTERS.REGIONS || item.type === FILTERS.COUNTRIES) &&
           item.type !== event.type
         ) {
           // Clear and disable the other geographic filter (REGION/COUNTRY)
@@ -235,6 +229,7 @@ export class FilterComponent implements OnInit, OnDestroy {
         mediaItem.disabled.set(false);
         mediaItem.value.set(null);
       }
+      this.rangeDates = null;
     });
     this.subscriptions.push(mediaComposeSub);
   }

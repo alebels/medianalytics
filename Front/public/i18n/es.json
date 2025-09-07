@@ -88,7 +88,7 @@
     "ratings_day": "Valoraciones del día",
     "subtitle_ratings_day": "Resultado de las valoraciones extraídas de los artículos publicados en las fuentes integradas en la plataforma para el día",
     "subtitle_general_table": "Tabla resumen con las estadísticas más relevantes de cada una de las fuentes integradas en la plataforma",
-    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de sus artículos desde {{ minDate }} hasta {{ maxDate }}"
+    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de sus artículos desde el {{ minDate }} hasta el {{ maxDate }}"
   },
   "filters": {
     "description": "Filtra y compara los datos recopilados por la plataforma sobre sus fuentes según sus sentimientos, orientaciones ideológicas o palabras",
@@ -116,7 +116,7 @@
   },
   "manifest": {
     "description1": "Medianalytics es un proyecto",
-    "description2": "pensado para analizar y presentar de forma abierta datos recopilados a lo largo de diversas fuentes cuyo contenido sea de exposición pública, ofreciendo una herramienta que permita al usuario aproximarse a su información desde una perspectiva más amplia y objetiva.",
+    "description2": "pensado para analizar y presentar de forma abierta datos recopilados a lo largo de diversas fuentes cuyo contenido sea de exposición pública, ofreciendo una herramienta que permita al usuario aproximarse a su información desde una perspectiva más amplia.",
     "how_works_title": "¿Cómo funciona Medianalytics?",
     "how_works1": "Medianalytics recoge cada día los 5 principales artículos de cada una de las fuentes dadas de alta en la plataforma. Este número de artículos es completamente arbitrario pero entendemos que es una cantidad suficiente para hacerse una idea de la visión general que expone cada fuente ese día.",
     "how_works2": "Cada artículo es analizado por medio de técnicas de procesamiento de lenguaje natural (NLP) para separar las entidades, palabras y gramática que lo componen. Además, es procesado por un modelo de inteligencia artificial",

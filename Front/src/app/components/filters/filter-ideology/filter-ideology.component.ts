@@ -84,6 +84,9 @@ export class FilterIdeologyComponent implements OnInit, OnDestroy {
     this.setIdeologies();
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
       this.composeValues = [];
+      this.pieChart = null;
+      this.barChart = null;
+      this.lineChart = null;
     });
     this.subscriptions.push(langChangeSub);
     this.isMobile = this.generalSrv.isMobile$.getValue();

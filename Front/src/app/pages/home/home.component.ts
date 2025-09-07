@@ -1,7 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 import { Card } from 'primeng/card';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,6 @@ import { PieChartComponent } from '../../components/charts/pie-chart/pie-chart.c
 import { SortTableComponent } from '../../components/tables/sort-table/sort-table.component';
 import { Subscription } from 'rxjs';
 import { Tooltip } from 'primeng/tooltip';
-import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -42,8 +41,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   generalAverageWords = 0;
   generalTotalWords = 0;
 
-  minDate!: string;
-  maxDate!: string;
+  minDate: Date | null = null;
+  maxDate: Date | null = null;
+  currentLang!: string;
 
   generalDayTopWords!: DataChart;
   generalDaySentiments!: CompoundDataCharts;
@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private homeSrv: HomeService,
     private generalSrv: GeneralService,
-    @Inject(LOCALE_ID) public LOCALE_ID: string
+    private trans: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -146,16 +146,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   private getMinMaxDate(): void {
     const minMaxDateSub = this.generalSrv.minMaxDate$.subscribe((data) => {
       if (data) {
-        this.minDate = new Date(data.min_date).toLocaleDateString(this.LOCALE_ID || 'en', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
+        const minDateParsed = new Date(data.min_date);
+        const maxDateParsed = new Date(data.max_date);
+        
+        this.minDate = isNaN(minDateParsed.getTime()) ? null : minDateParsed;
+        this.maxDate = isNaN(maxDateParsed.getTime()) ? null : maxDateParsed;
+        
+        this.currentLang = this.trans.currentLang || 'en';
+        const langChangeSub = this.trans.onLangChange.subscribe((lang) => {
+          this.currentLang = lang.lang;
         });
-        this.maxDate = new Date(data.max_date).toLocaleDateString(this.LOCALE_ID || 'en', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
+        this.subscriptions.push(langChangeSub);
       }
     });
     this.subscriptions.push(minMaxDateSub);

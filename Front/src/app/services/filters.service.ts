@@ -1,16 +1,14 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import {
-  COUNTRIES,
-  IDEOLOGIES,
-  REGIONS,
-  SENTIMENTS,
-  TYPES,
-} from '../utils/constants';
-import {
   CategoryValues,
   FilterChartsRead,
   ItemRead,
 } from '../models/items.model';
+import {
+  FILTERS,
+  IDEOLOGIES,
+  SENTIMENTS,
+} from '../utils/constants';
 import {
   IDEOLOGIES_GROUPS,
   MEDIA_GROUPS,
@@ -79,15 +77,15 @@ export class FiltersService {
     const sendMediaCompose = new MediaCompose();
     sendMediaCompose.countries = translateAndSortItems(
       this.mediaCompose.countries,
-      COUNTRIES
+      FILTERS.COUNTRIES
     );
     sendMediaCompose.regions = translateAndSortItems(
       this.mediaCompose.regions,
-      REGIONS
+      FILTERS.REGIONS
     );
     sendMediaCompose.types = translateAndSortItems(
       this.mediaCompose.types,
-      TYPES
+      FILTERS.TYPES
     );
     this.mediaComposeSub.next(sendMediaCompose);
   }

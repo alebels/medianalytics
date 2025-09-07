@@ -84,6 +84,9 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
     this.setSentiments();
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
       this.composeValues = [];
+      this.pieChart = null;
+      this.barChart = null;
+      this.lineChart = null;
     });
     this.subscriptions.push(langChangeSub);
     this.isMobile = this.generalSrv.isMobile$.getValue();
