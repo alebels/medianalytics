@@ -22,10 +22,22 @@ export const IDEOLOGY_GROUP = {
 
 export const MEDIAS = 'medias';
 export const MEDIA_GROUP = {
-  MEDIA: 'MEDIA',
-  ORGANIZATION: 'ORGANIZATION',
-  GOVERNMENT: 'GOVERNMENT',
-  COMPANY: 'COMPANY',
+  MEDIA: {
+    text: 'MEDIA',
+    icon: 'newspaper',
+  },
+  ORGANIZATION: {
+    text: 'ORGANIZATION',
+    icon: 'globe-americas',
+  },
+  GOVERNMENT: {
+    text: 'GOVERNMENT',
+    icon: 'bank2',
+  },
+  COMPANY: {
+    text: 'COMPANY',
+    icon: 'buildings',
+  },
 };
 
 export const GITHUB_REPO = 'https://github.com/alebels/medianalytics';
@@ -40,6 +52,7 @@ export const FILTERS = {
   COUNTRIES: 'countries',
   REGIONS: 'regions',
   TYPES: 'types',
+  MEDIA_GROUP: 'media_group',
 };
 export const GRAMMAR = 'grammar';
 
@@ -51,6 +64,11 @@ export const TO_API = {
   [DATE]: 'dates',
 };
 
+export const NO_DATA = {
+  NO_DATA: 'no_data',
+  LOADING_HOME: 'loading_data_home',
+  NO_DATA_FILTERS: 'no_data_filters',
+};
 
 export const SORTING = {
   ASCENDING: 'asc',
@@ -94,4 +112,3 @@ export const CHART_THEME = {
     allowMouseWheelZoom: false,
   },
 };
-

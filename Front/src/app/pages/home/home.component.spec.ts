@@ -8,6 +8,7 @@ import { HomeComponent } from './home.component';
 import { HomeService } from '../../services/home.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MinMaxDateRead } from '../../models/items.model';
+import { NO_DATA } from '../../utils/constants';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -168,7 +169,7 @@ describe('HomeComponent', () => {
 
   it('should initialize noData object correctly', () => {
     expect(component.noData).toBeDefined();
-    expect(component.noData.type).toBe('loading_data_home');
+    expect(component.noData.type).toBe(NO_DATA.LOADING_HOME);
   });
 
   it('should handle null minMaxDate from service', () => {

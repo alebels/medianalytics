@@ -78,10 +78,10 @@
           <th>
             {{ "general_table." + labelTopGrammar | translate }}
             <i
-              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              class="bi bi-info-circle info-size absolute mt-[-5px] ml-[2px] z-10"
               [pTooltip]="'general_table.top_grammar_tooltip' | translate"
               [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-              tabindex="0"
+              tabindex="10"
             ></i>
           </th>
           <th>
@@ -111,10 +111,10 @@
             <b>{{ item.name }}</b>
             @if (item.full_name) {
             <i
-              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              class="bi bi-info-circle info-size absolute mt-[-5px] ml-[2px] z-10"
               [pTooltip]="item.full_name"
               [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-              tabindex="0"
+              tabindex="11"
             ></i>
             }
           </td>
@@ -205,7 +205,7 @@
                 [pTooltip]="item.url"
                 tooltipPosition="left"
                 [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-                tabindex="0"
+                tabindex="12"
               >
                 <i class="bi bi-box-arrow-up-right"></i>
               </button>
@@ -235,10 +235,10 @@
             <b>{{ item.name }}</b>
             @if (item.full_name) {
             <i
-              class="bi bi-info-circle text-sm absolute mt-[-5px] ml-[2px] z-10"
+              class="bi bi-info-circle info-size absolute mt-[-5px] ml-[2px] z-10"
               [pTooltip]="item.full_name"
               [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-              tabindex="0"
+              tabindex="13"
             ></i>
             }
           </td>
@@ -329,7 +329,7 @@
                 [pTooltip]="item.url"
                 tooltipPosition="left"
                 [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-                tabindex="0"
+                tabindex="14"
               >
                 <i class="bi bi-box-arrow-up-right"></i>
               </button>

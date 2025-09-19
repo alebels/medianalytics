@@ -4,7 +4,8 @@ This module contains the controller for handling media-related API endpoints.
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-import models.py_schemas as schemas
+import models.home as schemas
+from models.utils import CompoundRead
 import repository.home as repo
 import services.home as srv
 from repository.database import get_session
@@ -16,24 +17,24 @@ HOME_ROUTER = APIRouter(prefix=f"/{API_VERSION}/home", tags=["Home"])
 NUM_REQUESTS = 30
 
 
-@HOME_ROUTER.get("/generaltotalmedias", response_model=int)
+@HOME_ROUTER.get("/generalmedias", response_model=list[schemas.MediaItemRead])
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
-async def get_general_total_medias(
+async def get_general_medias(
     request: Request, db: AsyncSession = Depends(get_session)
 ):
     """
-    Retrieve the total count of useful medias.
+    Retrieve the list of media items with their details.
     
     Args:
         db (AsyncSession): The database session.
         
     Returns:
-        Total number of useful medias in the database.
+        A list of media items.
     """
-    total = await repo.get_general_total_medias(db)
-    if total is None:
+    db_items = await repo.get_general_medias(db)
+    if not db_items:
         raise HTTPException(status_code=404, detail="No items found")
-    return total
+    return db_items
 
 
 @HOME_ROUTER.get("/generaltotalarticles", response_model=int)
@@ -137,7 +138,7 @@ async def get_general_average_word_count(
     return average
 
 
-@HOME_ROUTER.get("/generalsentiments", response_model=schemas.CompoundRead)
+@HOME_ROUTER.get("/generalsentiments", response_model=CompoundRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def get_general_sentiments(
     request: Request, db: AsyncSession = Depends(get_session)
@@ -157,7 +158,7 @@ async def get_general_sentiments(
     return db_items
 
 
-@HOME_ROUTER.get("/generalideologies", response_model=schemas.CompoundRead)
+@HOME_ROUTER.get("/generalideologies", response_model=CompoundRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def get_general_ideologies(
     request: Request, db: AsyncSession = Depends(get_session)
@@ -237,7 +238,7 @@ async def get_general_day_top_words(
     return db_items
 
 
-@HOME_ROUTER.get("/generaldaysentiments", response_model=schemas.CompoundRead)
+@HOME_ROUTER.get("/generaldaysentiments", response_model=CompoundRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def get_general_day_sentiments(
     request: Request, db: AsyncSession = Depends(get_session)
@@ -257,7 +258,7 @@ async def get_general_day_sentiments(
     return db_items
 
 
-@HOME_ROUTER.get("/generaldayideologies", response_model=schemas.CompoundRead)
+@HOME_ROUTER.get("/generaldayideologies", response_model=CompoundRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def get_general_day_ideologies(
     request: Request, db: AsyncSession = Depends(get_session)

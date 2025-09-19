@@ -55,6 +55,16 @@
     "en": "English",
     "es": "Español"
   },
+  "dialog": {
+    "medias": "Fuentes en la plataforma - {{count}}",
+    "types": "Tipos de fuentes - {{count}}",
+    "countries": "Países de las fuentes - {{count}}",
+    "regions": "Regiones de las fuentes - {{count}}",
+    "sentiments": "Clasificación de sentimientos - {{count}}",
+    "ideologies": "Clasificación de ideologías - {{count}}",
+    "sentiments_info": "Según los filtros seleccionados, puede que no haya datos para un sentimiento concreto",
+    "ideologies_info": "Según los filtros seleccionados, puede que no haya datos para una ideología concreta"
+  },
   "messages": {
     "error": "Error",
     "success": "Éxito",
@@ -110,18 +120,16 @@
     "filter_ideology": "Filtro por orientaciones ideológicas",
     "filter_words": "Filtro por palabras",
     "word": "Palabra",
-    "count": "Contabilizado",
-    "sentiments_info": "Según los filtros seleccionados, puede que no haya datos para un sentimiento concreto.",
-    "ideologies_info": "Según los filtros seleccionados, puede que no haya datos para una ideología concreta."
+    "count": "Contabilizado"
   },
   "manifest": {
     "description1": "Medianalytics es un proyecto",
     "description2": "pensado para analizar y presentar de forma abierta datos recopilados a lo largo de diversas fuentes cuyo contenido sea de exposición pública, ofreciendo una herramienta que permita al usuario aproximarse a su información desde una perspectiva más amplia.",
     "how_works_title": "¿Cómo funciona Medianalytics?",
-    "how_works1": "Medianalytics recoge cada día los 5 principales artículos de cada una de las fuentes dadas de alta en la plataforma. Este número de artículos es completamente arbitrario pero entendemos que es una cantidad suficiente para hacerse una idea de la visión general que expone cada fuente ese día.",
+    "how_works1": "Medianalytics recoge cada día los cinco principales artículos de cada una de las fuentes dadas de alta en la plataforma. Este número de artículos es completamente arbitrario pero entendemos que es una cantidad suficiente para hacerse una idea de la visión general que expone cada fuente ese día.",
     "how_works2": "Cada artículo es analizado por medio de técnicas de procesamiento de lenguaje natural (NLP) para separar las entidades, palabras y gramática que lo componen. Además, es procesado por un modelo de inteligencia artificial",
     "how_works3": "para extraer sentimientos y orientaciones ideológicas.",
-    "how_works4": "Por cada artículo se extraen 6 valoraciones dentro de un rango de clasificaciones; 3 relacionadas con los sentimientos y 3 con las orientaciones ideológicas.",
+    "how_works4": "Por cada artículo se extraen seis valoraciones dentro de un rango predeterminado de clasificaciones; tres relacionadas con los sentimientos y tres con las orientaciones ideológicas.",
     "warning_title": "Advertencia",
     "warning1": "Al estar procesado por un modelo de IA, el resultado de cada valoración puede no ser exacto ni aproximado a la realidad del artículo.",
     "warning2": "Debido a las distintas fechas de alta de cada fuente o al correcto procesamiento de las mismas, es posible que no todas las fuentes tengan el mismo número de artículos procesados, pudiendo dar lugar a desproporciones significativas; sobre todo en las estadísticas generales.",

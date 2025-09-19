@@ -33,11 +33,10 @@
       "filters." + sentiments.type | translate
     }}</label>
     <i
-      class="bi bi-info-circle text-sm absolute mt-[-10px] ml-[-5px] z-10"
-      pTooltip="{{ 'filters.sentiments_info' | translate }}"
-      tooltipPosition="left"
-      [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-      tabindex="0"
+      class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
+      tabindex="7"
+      (click)="sendFiltersDialog(sentiments.type)"
+      (keydown.enter)="sendFiltersDialog(sentiments.type)"
     ></i>
   </p-floatlabel>
   <div>

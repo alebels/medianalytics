@@ -1,15 +1,5 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  output,
-  signal,
-} from '@angular/core';
-import {
-  DATE,
-  FILTERS,
-  MEDIAS
-} from '../../../utils/constants';
+import { Component, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { DATE, FILTERS, MEDIAS } from '../../../utils/constants';
 import {
   FilterItem,
   SelectGroupSimple,
@@ -96,6 +86,10 @@ export class FilterComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  sendFiltersDialog(type: string) {
+    this.generalSrv.filtersTypeDialog$.next(type);
   }
 
   onSelectCompose(event: FilterItem): void {

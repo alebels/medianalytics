@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, input } from '@angular/core';
 import { MessageModule } from 'primeng/message';
+import { NO_DATA } from '../../utils/constants';
 import { NoData } from '../../models/items.model';
 import { ProgressBar } from 'primeng/progressbar';
 import { Subscription } from 'rxjs';
@@ -13,14 +14,15 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class NoDataComponent implements OnInit, OnDestroy {
   readonly noData = input<NoData>();
+  readonly loadingHomeText = NO_DATA.LOADING_HOME;
 
   isLoading = false;
-  type = 'no_data';
+  type!: string;
 
   private subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
-    this.type = this.noData()?.type ?? 'no_data';
+    this.type = this.noData()?.type ?? NO_DATA.NO_DATA;
     const loadingSub = this.noData()?.isLoading?.subscribe((loading) => {
       this.isLoading = loading;
     });

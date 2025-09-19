@@ -13,6 +13,7 @@ import {
   GeneralMediaRead,
   GeneralMediaTable,
 } from '../models/table.model';
+import { GeneralMedia } from '../models/media.model';
 import { GeneralService } from './general.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -23,9 +24,9 @@ import { environment } from '../../environments/environment';
 })
 export class HomeService {
 
-  private readonly generalTotalMediasSub = new BehaviorSubject<number>(0);
-  public readonly generalTotalMedias$ =
-    this.generalTotalMediasSub.asObservable();
+  private readonly generalMediasSub = new BehaviorSubject<GeneralMedia[]>([]);
+  public readonly generalMedias$ =
+    this.generalMediasSub.asObservable();
   
   private readonly generalTotalArticlesSub = new BehaviorSubject<number>(0);
   public readonly generalTotalArticles$ =
@@ -88,7 +89,7 @@ export class HomeService {
 
   private async initialize(): Promise<void> {
     await Promise.all([
-      this.getGeneralTotalMedias(),
+      this.getGeneralMedias(),
       this.getGeneralTotalArticles(),
       this.getGeneralAverageWordCount(),
       this.getGeneralTotalWords(),
@@ -104,11 +105,11 @@ export class HomeService {
     ]);
   }
 
-  private async getGeneralTotalMedias(): Promise<void> {
+  private async getGeneralMedias(): Promise<void> {
     const data = await firstValueFrom(
-      this.http.get<number>(`${this.apiUrl}/generaltotalmedias`)
+      this.http.get<GeneralMedia[]>(`${this.apiUrl}/generalmedias`)
     );
-    this.generalTotalMediasSub.next(data);
+    this.generalMediasSub.next(data);
   }
 
   private async getGeneralTotalArticles(): Promise<void> {

@@ -4,11 +4,7 @@ import {
   FilterChartsRead,
   ItemRead,
 } from '../models/items.model';
-import {
-  FILTERS,
-  IDEOLOGIES,
-  SENTIMENTS,
-} from '../utils/constants';
+import { FILTERS, IDEOLOGIES, SENTIMENTS } from '../utils/constants';
 import {
   IDEOLOGIES_GROUPS,
   MEDIA_GROUPS,
@@ -53,6 +49,9 @@ export class FiltersService {
 
   private readonly mediasSub = new BehaviorSubject<SelectGroupSimple[]>([]);
   public readonly medias$ = this.mediasSub.asObservable();
+
+  private readonly mediaReadSub = new BehaviorSubject<MediaRead[]>([]);
+  public readonly mediaRead$ = this.mediaReadSub.asObservable();
 
   private apiUrl = environment.apiUrl + '/filters';
 
@@ -141,6 +140,7 @@ export class FiltersService {
     const data = await firstValueFrom(
       this.http.get<MediaRead[]>(`${this.apiUrl}/medias`)
     );
+    this.mediaReadSub.next(data);
     const countries = new Set<string>(),
       regions = new Set<string>(),
       types = new Set<string>();

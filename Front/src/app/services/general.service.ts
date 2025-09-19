@@ -1,4 +1,4 @@
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Subject, firstValueFrom } from 'rxjs';
 import { ItemRead, ItemSerie, MinMaxDateRead } from '../models/items.model';
 import { DataChart } from '../models/chart.model';
 import { HttpClient } from '@angular/common/http';
@@ -10,16 +10,19 @@ import { environment } from '../../environments/environment';
 })
 export class GeneralService {
   public readonly isMobile$ = new BehaviorSubject<boolean>(false);
+  
+  public readonly isShowMediasDialog$ = new Subject<boolean>();
+
+  public readonly isShowFiltersDialog$ = new Subject<boolean>();
+  public readonly filtersTypeDialog$ = new Subject<string>();
 
   private readonly minMaxDateSub = new BehaviorSubject<MinMaxDateRead>(
     new MinMaxDateRead()
   );
   public readonly minMaxDate$ = this.minMaxDateSub.asObservable();
 
-  constructor(
-    private http: HttpClient
-  ) {
-    this.isMobile$.next(this.checkIfMobile());
+  constructor(private http: HttpClient) {
+    this.isMobile$.next(this.checkIsMobile());
     this.initialize();
   }
 
@@ -56,7 +59,7 @@ export class GeneralService {
     this.minMaxDateSub.next(data);
   }
 
-  private checkIfMobile(): boolean {
+  private checkIsMobile(): boolean {
     const userAgent = navigator.userAgent;
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

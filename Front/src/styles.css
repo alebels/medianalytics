@@ -36,15 +36,16 @@
   --height-table-home: 639px;
   --height-table-general: 1018px;
   --height-chart-home-res: auto;
-  --min-height-chart: 280px;
   --margin-standard: 20px;
   --margin-header-divider: 3rem;
   --margin-header-footer: 12px;
   --margin-title-lines: 20px;
+  --border-radius-standard: 0.25rem;
+  --tooltip-size: 16px;
 
   /* PrimeNG values overrides */
   --p-toast-detail-font-size: 1rem;
-  --p-tooltip-border-radius: 3px;
+  --p-tooltip-border-radius: var(--border-radius-standard);
 }
 
 /* Dark mode */
@@ -194,6 +195,33 @@ p {
 
   .p-card-content {
     height: 100% !important;
+  }
+
+  .p-dialog-header {
+    padding: 15px !important;
+    padding-bottom: 0 !important;
+    cursor: pointer !important;
+    align-items: start !important;
+  }
+
+  @media screen and (min-width:900px) {
+    .p-dialog-header:hover {
+      background-color: var(--color-accent-background) !important;
+    }
+  }
+
+  .p-dialog-content {
+    padding: 15px !important;
+    padding-bottom: 0 !important;
+  }
+
+  .p-dialog-title {
+    font-family: "Rasa", "serif" !important;
+    font-size: 1.5rem !important;
+    font-weight: 500 !important;
+    color: var(--color-text) !important;
+    margin-right: 12px !important;
+    margin-top: 3px !important;
   }
 
   .p-accordionheader {

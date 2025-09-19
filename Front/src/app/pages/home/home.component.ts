@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
+import { MEDIAS, NO_DATA } from '../../utils/constants';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 import { Card } from 'primeng/card';
@@ -8,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { GeneralService } from '../../services/general.service';
 import { GeneralTableComponent } from '../../components/tables/general-table/general-table.component';
 import { HomeService } from '../../services/home.service';
+import { MediaDialog } from '../../models/dialog.model';
+import { MediasDialogComponent } from '../../components/dialogs/medias-dialog/medias-dialog.component';
 import { NoData } from '../../models/items.model';
 import { NoDataComponent } from '../../components/no-data/no-data.component';
 import { PieChartComponent } from '../../components/charts/pie-chart/pie-chart.component';
@@ -27,13 +30,14 @@ import { Tooltip } from 'primeng/tooltip';
     GeneralTableComponent,
     NoDataComponent,
     Tooltip,
-  ],
+    MediasDialogComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit, OnDestroy {
   noData: NoData = {
-    type: 'loading_data_home',
+    type: NO_DATA.LOADING_HOME,
   };
 
   generalTotalMedias = 0;
@@ -43,23 +47,25 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   minDate: Date | null = null;
   maxDate: Date | null = null;
-  currentLang!: string;
 
   generalDayTopWords!: DataChart;
   generalDaySentiments!: CompoundDataCharts;
   generalDayIdeologies!: CompoundDataCharts;
-
+  
   generalTopWords!: DataChart;
   generalBottomWords!: DataCountTable;
 
   generalSentiments!: CompoundDataCharts;
   generalIdeologies!: CompoundDataCharts;
-
+  
   generalTopGrammar!: DataChart;
-
   generalTable!: GeneralMediaTable;
-
+  
+  currentLang!: string;
   isMobile = false;
+
+  dataMediasDialog!: MediaDialog;
+  isShowMediasDialog = false;
 
   private subscriptions: Subscription[] = [];
 
@@ -75,7 +81,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.setGeneralDaySentiments();
     this.setGeneralDayIdeologies();
     this.setGeneralTable();
-    this.setGeneralTotalMedias();
+    this.setGeneralMedias();
     this.setGeneralTotalArticles();
     this.setGeneralAverageWords();
     this.setGeneralTotalWords();
@@ -85,19 +91,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.setGeneralBottomWords();
     this.setGeneralTopGrammar();
     this.isMobile = this.generalSrv.isMobile$.getValue();
+    const isShowDialogSub = this.generalSrv.isShowMediasDialog$.subscribe((data) => {
+      this.isShowMediasDialog = data;
+    });
+    this.subscriptions.push(isShowDialogSub);
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  private setGeneralTotalMedias(): void {
-    const totalMediasSub = this.homeSrv.generalTotalMedias$.subscribe(
+  showMediasDialog() {
+    this.isShowMediasDialog = !this.isShowMediasDialog;
+  }
+
+  private setGeneralMedias(): void {
+    const mediasSub = this.homeSrv.generalMedias$.subscribe(
       (data) => {
-        this.generalTotalMedias = data;
+        this.generalTotalMedias = data.length ? data.length : 0;
+        this.dataMediasDialog = new MediaDialog(MEDIAS, data);
       }
     );
-    this.subscriptions.push(totalMediasSub);
+    this.subscriptions.push(mediasSub);
   }
 
   private setGeneralTotalArticles(): void {
@@ -148,10 +163,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (data) {
         const minDateParsed = new Date(data.min_date);
         const maxDateParsed = new Date(data.max_date);
-        
+
         this.minDate = isNaN(minDateParsed.getTime()) ? null : minDateParsed;
         this.maxDate = isNaN(maxDateParsed.getTime()) ? null : maxDateParsed;
-        
+
         this.currentLang = this.trans.currentLang || 'en';
         const langChangeSub = this.trans.onLangChange.subscribe((lang) => {
           this.currentLang = lang.lang;

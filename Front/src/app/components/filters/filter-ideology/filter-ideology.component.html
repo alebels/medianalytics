@@ -33,11 +33,10 @@
       "filters." + ideologies.type | translate
     }}</label>
     <i
-      class="bi bi-info-circle text-sm absolute mt-[-10px] ml-[-5px] z-10"
-      pTooltip="{{ 'filters.ideologies_info' | translate }}"
-      tooltipPosition="left"
-      [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-      tabindex="0"
+      class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
+      tabindex="8"
+      (click)="sendFiltersDialog(ideologies.type)"
+      (keydown.enter)="sendFiltersDialog(ideologies.type)"
     ></i>
   </p-floatlabel>
   <div>

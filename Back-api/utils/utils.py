@@ -1,7 +1,8 @@
-import models.py_schemas as schemas
+import models.utils as schemas
+from models.filters import CategoryValues
 
 
-def categorize_items(items: list[schemas.ItemRead], category_groups: list[schemas.CategoryValues]) -> list[schemas.ItemRead]:
+def categorize_items(items: list[schemas.ItemRead], category_groups: list[CategoryValues]) -> list[schemas.ItemRead]:
     """
     Categorize items based on category groups.
     

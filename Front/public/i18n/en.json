@@ -55,6 +55,16 @@
     "en": "English",
     "es": "Español"
   },
+  "dialog": {
+    "medias": "Platform sources - {{count}}",
+    "types": "Source types - {{count}}",
+    "regions": "Source regions - {{count}}",
+    "countries": "Source countries - {{count}}",
+    "sentiments": "Classification of sentiments - {{count}}",
+    "ideologies": "Classification of ideologies - {{count}}",
+    "sentiments_info": "Based on the selected filters, there may not be data for a specific sentiment",
+    "ideologies_info": "Based on the selected filters, there may not be data for a specific ideology"
+  },
   "messages": {
     "error": "Error",
     "success": "Success",
@@ -110,18 +120,16 @@
     "filter_ideology": "Filter by ideological orientations",
     "filter_words": "Filter by words",
     "word": "Word",
-    "count": "Count",
-    "sentiments_info": "Based on the selected filters, there may not be data for a specific sentiment.",
-    "ideologies_info": "Based on the selected filters, there may not be data for a specific ideology."
+    "count": "Count"
   },
   "manifest": {
     "description1": "Medianalytics is an",
     "description2": "project designed to analyze and openly present data collected from various sources whose content is publicly displayed. It offers a tool that allows users to approach its information from a broader perspective.",
     "how_works_title": "How does Medianalytics work?",
-    "how_works1": "Medianalytics collects daily the 5 main articles from each of the sources registered on the platform. This number of articles is completely arbitrary, but we understand that it's enough amount to get an idea of the general vision that each source exposes that day.",
+    "how_works1": "Medianalytics collects daily the five main articles from each of the sources registered on the platform. This number of articles is completely arbitrary, but we understand that it's enough amount to get an idea of the general vision that each source exposes that day.",
     "how_works2": "Each article is analyzed using natural language processing (NLP) techniques to separate the entities, words, and grammar that compose it. Additionally, it is processed by an artificial intelligence model",
     "how_works3": "to extract sentiments and ideological orientations.",
-    "how_works4": "For each article, 6 ratings are extracted within a range of classifications; 3 related to sentiments and 3 to ideological orientations.",
+    "how_works4": "For each article, six ratings are extracted within a predetermined range of classifications: three related to sentiments and three to ideological orientations.",
     "warning_title": "Warning",
     "warning1": "As it is processed by an AI model, the result of each rating may not be exact or approximate to the reality of the article.",
     "warning2": "Due to the different registration dates of each source or their correct processing, not all sources may have the same number of processed articles, which could lead to significant disproportions, especially in general statistics.",

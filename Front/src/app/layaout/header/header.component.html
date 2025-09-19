@@ -21,14 +21,14 @@
                         <a class="hover-settings" role="button" tabindex="0" (click)="toggleMenu = !toggleMenu"
                             (keydown.enter)="toggleMenu = false"><i class="bi bi-gear-fill text-xl"></i></a>
                         <div class="menu" [ngClass]="{'menu-hide': toggleMenu}"
-                            tabindex="0">
+                            tabindex="1">
                             <app-settings></app-settings>
                         </div>
                     </li>
                 </ul>
             </div>
             <div class="hidden mym:block">
-                <div role="button" tabindex="0" (click)="menu.toggle($event);toggleMenu = true" (keydown.enter)="menu.toggle($event)">
+                <div role="button" tabindex="2" (click)="menu.toggle($event);toggleMenu = true" (keydown.enter)="menu.toggle($event)">
                     <i class="bi text-3xl"
                     [ngClass]="menu.visible ? 'bi-three-dots' : 'bi-three-dots-vertical'"></i>
                 </div>
@@ -39,10 +39,10 @@
                         </a>
                     </ng-template>
                     <ng-template #end>
-                        <a class="flex items-center p-menu-item-link hover-settings ml-[12px]" role="button" tabindex="0" (click)="toggleMenu = !toggleMenu"
+                        <a class="flex items-center p-menu-item-link hover-settings ml-[12px]" role="button" tabindex="3" (click)="toggleMenu = !toggleMenu"
                             (keydown.enter)="toggleMenu = false">{{ 'header.settings' | translate }}</a>
                         <div class="menu-res" [ngClass]="{'menu-hide': toggleMenu}"
-                            tabindex="0">
+                            tabindex="4">
                             <app-settings></app-settings>
                         </div>
                     </ng-template>

@@ -8,6 +8,14 @@ export interface MediaRead {
   readonly type: string;
 }
 
+export interface GeneralMedia {
+  readonly name: string;
+  readonly full_name?: string;
+  readonly type: string;
+  readonly country: string;
+  readonly url: string;
+}
+
 export class MediaCompose {
   constructor(
     public types: SelectItem2[] = [],

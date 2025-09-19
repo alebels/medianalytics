@@ -1,5 +1,3 @@
-import { Component, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
-
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -15,6 +13,7 @@ import {
   COUNT,
   NONE,
 } from '../../../utils/constants';
+import { Component, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
 import { DataChart } from '../../../models/chart.model';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -106,7 +105,7 @@ export class BarChartComponent implements OnInit, OnDestroy {
         tickAmount: this.maxYValue ? 8 : undefined,
         min: 0,
         labels: {
-          formatter: (val) => Math.round(val).toString(),
+          formatter: (val) => Math.round(val).toLocaleString(),
           style: {
             fontSize: '16px',
           },

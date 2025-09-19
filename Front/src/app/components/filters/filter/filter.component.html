@@ -29,7 +29,17 @@
         </ng-template>
         }
       </p-select>
-      <label [for]="'filter-' + item.type + '-' + i">{{ "filters." + item.type | translate }}</label>
+      <label [for]="'filter-' + item.type + '-' + i">{{
+        "filters." + item.type | translate
+      }}</label>
+      @if(item.type !== MEDIAS) {
+      <i
+        class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
+        tabindex="6"
+        (click)="sendFiltersDialog(item.type)"
+        (keydown.enter)="sendFiltersDialog(item.type)"
+      ></i>
+      }
     </p-floatlabel>
   </div>
   }

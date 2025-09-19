@@ -1,5 +1,11 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { COUNT, DATE, IDEOLOGIES, TO_API } from '../../../utils/constants';
+import {
+  COUNT,
+  DATE,
+  IDEOLOGIES,
+  NO_DATA,
+  TO_API,
+} from '../../../utils/constants';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   FilterItem,
@@ -23,7 +29,6 @@ import { NoData } from '../../../models/items.model';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
 import { ToastModule } from 'primeng/toast';
-import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-filter-ideology',
@@ -40,7 +45,6 @@ import { Tooltip } from 'primeng/tooltip';
     PieChartComponent,
     LineChartComponent,
     NoDataComponent,
-    Tooltip,
   ],
   templateUrl: './filter-ideology.component.html',
   styleUrl: './filter-ideology.component.css',
@@ -51,7 +55,7 @@ export class FilterIdeologyComponent implements OnInit, OnDestroy {
 
   noData: NoData = {
     isLoading: new BehaviorSubject<boolean>(false),
-    type: 'no_data_filters',
+    type: NO_DATA.NO_DATA_FILTERS,
   };
 
   ideologies: FilterItem = {
@@ -94,6 +98,10 @@ export class FilterIdeologyComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  sendFiltersDialog(type: string) {
+    this.generalSrv.filtersTypeDialog$.next(type);
   }
 
   getComposeValues(

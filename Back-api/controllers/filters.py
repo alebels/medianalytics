@@ -4,9 +4,10 @@ This module contains the controller for handling media-related API endpoints.
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-import models.py_schemas as schemas
+import models.filters as schemas
 import repository.filters as repo
 import services.filters as srv
+from utils.constants import C_IDEOLOGIES, C_SENTIMENTS
 from repository.database import get_session
 from utils.limiter import LIMITER
 
@@ -84,7 +85,7 @@ async def post_sentiments_filter(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, schemas.SENTIMENTS_FIELD)
+    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_SENTIMENTS)
     
     if not db_items:
         return schemas.FilterChartsRead(
@@ -114,7 +115,7 @@ async def post_ideologies_filter(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, schemas.IDEOLOGIES_FIELD)
+    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_IDEOLOGIES)
     
     if not db_items:
         return schemas.FilterChartsRead(

@@ -41,7 +41,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(
     lifespan=lifespan,
     title="Medianalytics API",
-    version="1.0.0"
+    version="1.0.5"
 )
 
 # Add CORS middleware first

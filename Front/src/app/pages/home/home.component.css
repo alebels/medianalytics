@@ -1,5 +1,22 @@
 .title-nums {
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-left: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.title-sources {
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 0 6px;
+  border: 1px solid var(--color-text);
+  border-radius: var(--border-radius-standard);
+}
+
+.title-sources:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.info-size {
+  font-size: var(--tooltip-size);
 }

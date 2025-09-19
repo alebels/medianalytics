@@ -1,11 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-import models.py_schemas as schemas
+import models.home as schemas
 import repository.home as repo
+from models.utils import CompoundRead
 from utils.utils import categorize_items
 from utils.constants import C_SENTIMENTS, C_IDEOLOGIES, C_GENERAL, C_DAY
 import asyncio
 
-async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: str) -> schemas.CompoundRead:
+async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: str) -> CompoundRead:
     """Get compound sentiments with both plain and categorized data."""
     from services.filters import SENTIMENTS_IDEOLOGIES_CATEGORIZED
     
@@ -28,7 +29,7 @@ async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: 
         categorized_values
     )
     
-    return schemas.CompoundRead(
+    return CompoundRead(
         plain=plain,
         categorized=categorized
     )

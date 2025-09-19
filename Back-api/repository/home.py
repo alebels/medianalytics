@@ -3,7 +3,7 @@ from sqlalchemy import func, text, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from utils.constants import C_SENTIMENTS, C_IDEOLOGIES
-import models.py_schemas as schemas
+import models.home as schemas
 import config.db_models as models
 
 
@@ -54,20 +54,27 @@ async def get_general_total_articles(db: AsyncSession) -> int:
     return result.scalar()
 
 
-async def get_general_total_medias(db: AsyncSession) -> int:
+async def get_general_medias(db: AsyncSession) -> list[schemas.MediaItemRead]:
     """
-    Get the total count of useful medias in the database.
+    Get the media items with their most revelevant details.
     Args:
         db (AsyncSession): The database session.
     Returns:
-        int: The total number of useful medias.
+        list[schemas.MediaItemRead]: A list of media items with their details.
     """
     result = await db.execute(
-        select(func.count(models.Media.id)).where(
+        select(
+            models.Media.name,
+            models.Media.full_name,
+            models.Media.type,
+            models.Media.country,
+            models.Media.url
+        ).where(
             exists().where(models.Article.media_id == models.Media.id)
         )
     )
-    return result.scalar()
+    medias = result.mappings().all()
+    return [schemas.MediaItemRead.model_validate(media) for media in medias]
 
 
 async def get_general_total_words(db: AsyncSession) -> int:

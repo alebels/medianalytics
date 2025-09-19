@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FilterIdeologyComponent } from './filter-ideology.component';
+import { FiltersDialogComponent } from './filters-dialog.component';
 
-describe('FilterIdeologyComponent', () => {
-  let component: FilterIdeologyComponent;
-  let fixture: ComponentFixture<FilterIdeologyComponent>;
+
+describe('FiltersDialogComponent', () => {
+  let component: FiltersDialogComponent;
+  let fixture: ComponentFixture<FiltersDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FilterIdeologyComponent]
+      imports: [FiltersDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FilterIdeologyComponent);
+    fixture = TestBed.createComponent(FiltersDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

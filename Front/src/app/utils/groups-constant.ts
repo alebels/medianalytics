@@ -2,10 +2,10 @@ import { IDEOLOGY_GROUP, MEDIA_GROUP, SENTIMENT_GROUP } from "./constants";
 import { SelectGroupItem2, SelectGroupSimple } from "../models/primeng.model";
 
 export const MEDIA_GROUPS: SelectGroupSimple[] = [
-    new SelectGroupSimple(MEDIA_GROUP.MEDIA, 'newspaper'),
-    new SelectGroupSimple(MEDIA_GROUP.ORGANIZATION, 'globe-americas'),
-    new SelectGroupSimple(MEDIA_GROUP.GOVERNMENT, 'bank2'),
-    new SelectGroupSimple(MEDIA_GROUP.COMPANY, 'buildings')
+    new SelectGroupSimple(MEDIA_GROUP.MEDIA.text, MEDIA_GROUP.MEDIA.icon),
+    new SelectGroupSimple(MEDIA_GROUP.ORGANIZATION.text, MEDIA_GROUP.ORGANIZATION.icon),
+    new SelectGroupSimple(MEDIA_GROUP.GOVERNMENT.text, MEDIA_GROUP.GOVERNMENT.icon),
+    new SelectGroupSimple(MEDIA_GROUP.COMPANY.text, MEDIA_GROUP.COMPANY.icon)
 ];
 
 export const SENTIMENTS_GROUPS: SelectGroupItem2[] = [

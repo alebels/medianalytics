@@ -65,12 +65,6 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             if hasattr(request.state, 'rate_limit_remaining'):
                 response.headers["X-RateLimit-Remaining"] = str(request.state.rate_limit_remaining)
             
-            # Cache control for API responses
-            if request.url.path.startswith('/v1/'):
-                response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-                response.headers["Pragma"] = "no-cache"
-                response.headers["Expires"] = "0"
-            
             # Log slow requests
             processing_time = time.time() - start_time
             if processing_time > 6.0:  # 6 seconds

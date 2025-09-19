@@ -2,6 +2,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   COUNT,
   DATE,
+  NO_DATA,
   SORTING,
   TO_API,
   WORD,
@@ -50,7 +51,7 @@ export class FilterWordComponent implements OnInit, OnDestroy {
 
   noData: NoData = {
     isLoading: new BehaviorSubject<boolean>(false),
-    type: 'no_data_filters',
+    type: NO_DATA.NO_DATA_FILTERS,
   };
 
   minRange: number | null = null;

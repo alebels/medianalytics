@@ -1,0 +1,4 @@
+/* PrimeNG component overrides for filters */
+::ng-deep .p-dialog-title {
+  max-width: 200px !important;
+}

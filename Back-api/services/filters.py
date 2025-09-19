@@ -1,5 +1,6 @@
-import models.py_schemas as schemas
+import models.filters as schemas
 from config.sentiments_ideologies_compound import SENTIMENTS, IDEOLOGIES
+from utils.constants import C_SENTIMENTS, C_IDEOLOGIES
 from sqlalchemy.ext.asyncio import AsyncSession
 import repository.filters as repo
 from utils.utils import categorize_items, normalize_data_item_dates, set_to_chart_normalized_data
@@ -119,8 +120,8 @@ def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode
         - (other potential filters handled by set_conditions_query)
     mode : str
         Specifies which field to analyze, must be either:
-        - schemas.SENTIMENTS_FIELD: to analyze sentiment data
-        - schemas.IDEOLOGIES_FIELD: to analyze ideology data
+        - C_SENTIMENTS: to analyze sentiment data
+        - C_IDEOLOGIES: to analyze ideology data
     Returns:
     -------
     schemas.FillQuery
@@ -137,10 +138,10 @@ def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode
     filter_values = []
     
     # If specific sentiments or ideologies are selected for filtering
-    if mode == schemas.SENTIMENTS_FIELD and filters.sentiments is not None:
+    if mode == C_SENTIMENTS and filters.sentiments is not None:
         # Store enum values for parameterized query
         filter_values = [s.value for s in filters.sentiments]
-    elif mode == schemas.IDEOLOGIES_FIELD and filters.ideologies is not None:
+    elif mode == C_IDEOLOGIES and filters.ideologies is not None:
         # Store enum values for parameterized query
         filter_values = [i.value for i in filters.ideologies]
     
@@ -175,11 +176,11 @@ def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode
     
     # Add the sentiment or ideology filter using the array overlap operator &&
     # Pass the list of enum values directly; the driver should handle it.
-    if mode == schemas.SENTIMENTS_FIELD and filters.sentiments:
+    if mode == C_SENTIMENTS and filters.sentiments:
         base_query += f" AND a.{mode} && :filter_sentiments"
         # Convert enum values to their string representation for the parameter
         params["filter_sentiments"] = filter_values
-    elif mode == schemas.IDEOLOGIES_FIELD and filters.ideologies:
+    elif mode == C_IDEOLOGIES and filters.ideologies:
         base_query += f" AND a.{mode} && :filter_ideologies"
         # Convert enum values to their string representation for the parameter
         params["filter_ideologies"] = filter_values
@@ -265,9 +266,10 @@ async def get_sentiments_ideologies_filter(
     result: schemas.FilterChartsRead = schemas.FilterChartsRead()
     if is_categorized:
         # If the db_data is categorized, we need to return it in a specific format
-        categorized_data = SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
-        if mode == schemas.SENTIMENTS_FIELD:
+        if mode == C_SENTIMENTS:
             categorized_data = SENTIMENTS_IDEOLOGIES_CATEGORIZED.sentiments
+        else:
+            categorized_data = SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
             
         categorized = categorize_items(
             db_data.plain, 

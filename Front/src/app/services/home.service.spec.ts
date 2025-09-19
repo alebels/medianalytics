@@ -56,10 +56,6 @@ describe('HomeService', () => {
   });
 
   it('should initialize all observables with correct data', () => {
-    service.generalTotalMedias$.subscribe(value => {
-      expect(value).toBe(5);
-    });
-
     service.generalTotalArticles$.subscribe(value => {
       expect(value).toBe(100);
     });
@@ -163,17 +159,14 @@ describe('HomeService', () => {
     expect(service).toBeTruthy();
     
     // Verify that all observables have been initialized
-    let totalMediasValue: number;
     let totalArticlesValue: number;
     let totalWordsValue: number;
     let averageWordValue: number;
 
-    service.generalTotalMedias$.subscribe(value => totalMediasValue = value);
     service.generalTotalArticles$.subscribe(value => totalArticlesValue = value);
     service.generalTotalWords$.subscribe(value => totalWordsValue = value);
     service.generalAverageWord$.subscribe(value => averageWordValue = value);
 
-    expect(totalMediasValue!).toBeGreaterThanOrEqual(0);
     expect(totalArticlesValue!).toBeGreaterThanOrEqual(0);
     expect(totalWordsValue!).toBeGreaterThanOrEqual(0);
     expect(averageWordValue!).toBeGreaterThanOrEqual(0);
