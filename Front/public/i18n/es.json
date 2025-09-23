@@ -3,6 +3,7 @@
     "accept": "Aceptar",
     "reject": "Rechazar",
     "emptyMessage": "No hay registros que mostrar",
+    "emptyFilterMessage": "No se han encontrado resultados",
     "dayNamesMin": ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
     "monthNames": [
       "Enero",
@@ -375,7 +376,6 @@
     "URUGUAY": "Uruguay"
   },
   "sentiments": {
-    "count": "Contabilizado",
     "POSITIVES": "Positivos",
     "NEGATIVES": "Negativos",
     "NEUTRALS": "Neutrales",
@@ -441,7 +441,6 @@
     "STEADY": "Estable"
   },
   "ideologies": {
-    "count": "Contabilizado",
     "POLITICAL_SPECTRUM": "Espectro político",
     "ECONOMIC_ORIENTATIONS": "Orientaciones económicas",
     "POLITICAL_SYSTEMS": "Sistemas políticos",

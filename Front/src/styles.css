@@ -41,7 +41,7 @@
   --margin-header-footer: 12px;
   --margin-title-lines: 20px;
   --border-radius-standard: 0.25rem;
-  --tooltip-size: 16px;
+  --tooltip-size: 15px;
 
   /* PrimeNG values overrides */
   --p-toast-detail-font-size: 1rem;
@@ -88,6 +88,10 @@ html {
 }
 .apexcharts-menu-item:hover {
   background-color: var(--color-accent-background) !important;
+}
+.apexcharts-pie-area,
+.apexcharts-bar-area {
+  cursor: pointer;
 }
 
 /* ApexCharts dark mode styling */
@@ -204,7 +208,7 @@ p {
     align-items: start !important;
   }
 
-  @media screen and (min-width:900px) {
+  @media screen and (min-width: 900px) {
     .p-dialog-header:hover {
       background-color: var(--color-accent-background) !important;
     }

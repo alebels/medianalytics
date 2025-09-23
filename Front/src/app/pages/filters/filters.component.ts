@@ -36,6 +36,8 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeDialogs();
+    this.filtersSrv.getTranslatedMediaCompose();
+    this.filtersSrv.getTranslatedSentimentsIdeologies();
     // Subscribe to language change to update translations
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
       this.filtersSrv.getTranslatedMediaCompose();

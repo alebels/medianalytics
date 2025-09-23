@@ -42,7 +42,9 @@ export class BarChartComponent implements OnInit, OnDestroy {
 
   chartSeries!: ApexAxisChartSeries;
   chartLabels!: string[];
-  translateType!: string;
+  chartMode!: string;
+
+  yTitle!: string;
 
   maxYValue: number | undefined;
 
@@ -61,28 +63,23 @@ export class BarChartComponent implements OnInit, OnDestroy {
   }
 
   private initialize(): void {
-    if (this.dataBarChart()?.translate !== NONE) {
-      this.translateType = this.dataBarChart()?.translate || '';
-    } else {
-      this.chartLabels = this.dataBarChart()?.xLabels || [];
-      this.translateType = 'chart';
-    }
+    this.chartMode = this.dataBarChart()?.translate || '';
     this.setTranslateChart();
-    const yTitle = this.trans.instant('chart.' + COUNT);
-    this.maxYValue = Array.isArray(this.chartSeries[0].data) ? Math.max(...this.chartSeries[0].data as number[]) : undefined;
-    this.chartOptionsUpdate(this.chartSeries, this.chartLabels, yTitle);
+    this.maxYValue = Array.isArray(this.chartSeries[0].data)
+      ? Math.max(...(this.chartSeries[0].data as number[]))
+      : undefined;
+    this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
   }
 
   private chartOptionsUpdate(
     series: ApexAxisChartSeries,
-    xlabels: string[],
-    yTitle: string
+    xlabels: string[]
   ): void {
     this.chartOptions = {
       series: series || [],
       chart: {
         ...CHART_THEME,
-        type: this.dataBarChart()?.type || 'bar',
+        type: 'bar',
         height: 400,
         width: '100%',
       },
@@ -111,7 +108,7 @@ export class BarChartComponent implements OnInit, OnDestroy {
           },
         },
         title: {
-          text: yTitle,
+          text: this.yTitle,
           style: {
             fontSize: '18px',
             fontWeight: 'semi-bold',
@@ -125,29 +122,30 @@ export class BarChartComponent implements OnInit, OnDestroy {
   private setTranslateChart(): void {
     // Initial translation
     this.setTranslate();
+    this.yTitle = this.trans.instant('chart.' + COUNT);
     // Update translations when language changes
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      if (this.dataBarChart()?.translate !== NONE) {
-        this.setTranslate();
-      }
-      const yTitle = this.trans.instant('chart.' + COUNT);
-      this.chartOptionsUpdate(this.chartSeries, this.chartLabels, yTitle);
+      this.setTranslate();
+      this.yTitle = this.trans.instant('chart.' + COUNT);
+      this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
     });
     this.subscriptions.push(langChangeSub);
   }
 
   private setTranslate(): void {
-    if (this.dataBarChart()?.translate !== NONE) {
+    if (this.chartMode !== NONE) {
       this.chartLabels =
         this.dataBarChart()?.xLabels?.map((label) =>
-          this.trans.instant(this.translateType + '.' + label)
+          this.trans.instant(this.chartMode + '.' + label)
         ) || [];
+    } else if (this.chartLabels === undefined) {
+      this.chartLabels = this.dataBarChart()?.xLabels || [];
     }
     this.chartSeries = this.dataBarChart()?.series.map((item) => {
       if (typeof item === 'object' && 'name' in item && item.name) {
         return {
           ...item,
-          name: this.trans.instant(this.translateType + '.' + item.name),
+          name: this.trans.instant('chart.count'),
         };
       }
       return item;
