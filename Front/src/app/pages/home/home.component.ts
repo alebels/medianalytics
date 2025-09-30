@@ -1,19 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
-import { MEDIAS, NO_DATA } from '../../utils/constants';
+import { IDEOLOGIES, MEDIAS, NO_DATA, SENTIMENTS } from '../../utils/constants';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 import { Card } from 'primeng/card';
 import { CommonModule } from '@angular/common';
+import { FilterDialog } from '../../models/dialog.model';
+import { FiltersDialogComponent } from '../../components/dialogs/filters-dialog/filters-dialog.component';
 import { GeneralService } from '../../services/general.service';
 import { GeneralTableComponent } from '../../components/tables/general-table/general-table.component';
 import { HomeService } from '../../services/home.service';
-import { MediaDialog } from '../../models/dialog.model';
-import { MediasDialogComponent } from '../../components/dialogs/medias-dialog/medias-dialog.component';
 import { NoData } from '../../models/items.model';
 import { NoDataComponent } from '../../components/no-data/no-data.component';
 import { PieChartComponent } from '../../components/charts/pie-chart/pie-chart.component';
+import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
 import { SortTableComponent } from '../../components/tables/sort-table/sort-table.component';
 import { Subscription } from 'rxjs';
 import { Tooltip } from 'primeng/tooltip';
@@ -30,8 +31,8 @@ import { Tooltip } from 'primeng/tooltip';
     GeneralTableComponent,
     NoDataComponent,
     Tooltip,
-    MediasDialogComponent
-],
+    FiltersDialogComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -51,32 +52,38 @@ export class HomeComponent implements OnInit, OnDestroy {
   generalDayTopWords!: DataChart;
   generalDaySentiments!: CompoundDataCharts;
   generalDayIdeologies!: CompoundDataCharts;
-  
+
   generalTopWords!: DataChart;
   generalBottomWords!: DataCountTable;
 
   generalSentiments!: CompoundDataCharts;
   generalIdeologies!: CompoundDataCharts;
-  
+
   generalTopGrammar!: DataChart;
   generalTable!: GeneralMediaTable;
-  
+
   currentLang!: string;
   isMobile = false;
 
-  dataMediasDialog!: MediaDialog;
-  isShowMediasDialog = false;
+  dataFiltersDialog = new FilterDialog([], []);
+  isShowFiltersDialog = false;
+
+  readonly GENERAL_MEDIAS = MEDIAS;
+  readonly SENTIMENTS = SENTIMENTS;
+  readonly IDEOLOGIES = IDEOLOGIES;
 
   private subscriptions: Subscription[] = [];
 
   constructor(
     private homeSrv: HomeService,
     private generalSrv: GeneralService,
-    private trans: TranslateService
+    private trans: TranslateService,
+    private sentimentIdeologySrv: SentimentIdeologyService
   ) {}
 
   ngOnInit(): void {
     this.getMinMaxDate();
+    this.initializeDialogs();
     this.setGeneralDayTopWords();
     this.setGeneralDaySentiments();
     this.setGeneralDayIdeologies();
@@ -91,27 +98,54 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.setGeneralBottomWords();
     this.setGeneralTopGrammar();
     this.isMobile = this.generalSrv.isMobile$.getValue();
-    const isShowDialogSub = this.generalSrv.isShowMediasDialog$.subscribe((data) => {
-      this.isShowMediasDialog = data;
-    });
-    this.subscriptions.push(isShowDialogSub);
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  showMediasDialog() {
-    this.isShowMediasDialog = !this.isShowMediasDialog;
+  showFiltersDialog(type: string) {
+    if (type === this.dataFiltersDialog?.header()) {
+      // Same type clicked - toggle visibility
+      this.isShowFiltersDialog = !this.isShowFiltersDialog;
+    } else {
+      // Different type - set new type and show dialog
+      this.dataFiltersDialog.header.set(type);
+      this.isShowFiltersDialog = true;
+    }
+  }
+
+  private initializeDialogs(): void {
+    this.setFiltersDialog();
+    // Subscribe to dialog visibility changes
+    const isShowDialogSub = this.generalSrv.isShowFiltersDialog$.subscribe(
+      (data) => {
+        this.isShowFiltersDialog = data;
+      }
+    );
+    this.subscriptions.push(isShowDialogSub);
+  }
+
+  private setFiltersDialog(): void {
+    const sentimentDataSub = this.sentimentIdeologySrv.sentiments$.subscribe(
+      (sentimentData) => {
+        this.dataFiltersDialog.sentiments = sentimentData.sentiments;
+      }
+    );
+    this.subscriptions.push(sentimentDataSub);
+    const ideologiesDataSub = this.sentimentIdeologySrv.ideologies$.subscribe(
+      (ideologyData) => {
+        this.dataFiltersDialog.ideologies = ideologyData.ideologies;
+      }
+    );
+    this.subscriptions.push(ideologiesDataSub);
   }
 
   private setGeneralMedias(): void {
-    const mediasSub = this.homeSrv.generalMedias$.subscribe(
-      (data) => {
-        this.generalTotalMedias = data.length ? data.length : 0;
-        this.dataMediasDialog = new MediaDialog(MEDIAS, data);
-      }
-    );
+    const mediasSub = this.homeSrv.generalMedias$.subscribe((data) => {
+      this.generalTotalMedias = data.length ? data.length : 0;
+      this.dataFiltersDialog.generalMedias = data;
+    });
     this.subscriptions.push(mediasSub);
   }
 

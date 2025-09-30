@@ -82,6 +82,28 @@ export class BarChartComponent implements OnInit, OnDestroy {
         type: 'bar',
         height: 400,
         width: '100%',
+        // events: {
+        //   click: (_event, _chartContext, config) => {
+        //     if (
+        //       config.seriesIndex !== undefined &&
+        //       config.dataPointIndex !== undefined
+        //     ) {
+        //       const value =
+        //         this.chartSeries[config.seriesIndex].data[
+        //           config.dataPointIndex
+        //         ];
+        //       const category =
+        //         this.dataBarChart()?.xLabels?.[config.dataPointIndex] || '';
+        //       console.log(`Clicked on ${category}: ${value}`);
+        //     }
+        //   },
+        //   // dataPointMouseEnter: (event, chartContext, config) => {
+        //   //   console.log('on mouse enter', event, chartContext, config);
+        //   // },
+        //   // dataPointMouseLeave: (event, chartContext, config) => {
+        //   //   console.log('on mouse leave', event, chartContext, config);
+        //   // },
+        // },
       },
       dataLabels: {
         enabled: false,

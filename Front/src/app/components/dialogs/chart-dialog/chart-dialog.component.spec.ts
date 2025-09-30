@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MediasDialogComponent } from './medias-dialog.component';
+import { ChartDialogComponent } from './chart-dialog.component';
 
 
-describe('MediasDialogComponent', () => {
-  let component: MediasDialogComponent;
-  let fixture: ComponentFixture<MediasDialogComponent>;
+describe('ChartDialogComponent', () => {
+  let component: ChartDialogComponent;
+  let fixture: ComponentFixture<ChartDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MediasDialogComponent]
+      imports: [ChartDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MediasDialogComponent);
+    fixture = TestBed.createComponent(ChartDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -8,6 +8,7 @@ import { FiltersDialogComponent } from '../../components/dialogs/filters-dialog/
 import { FiltersService } from '../../services/filters.service';
 import { GeneralService } from '../../services/general.service';
 import { MediaRead } from '../../models/media.model';
+import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -30,6 +31,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   constructor(
     private filtersSrv: FiltersService,
+    private sentimentIdeologySrv: SentimentIdeologyService,
     private generalSrv: GeneralService,
     private trans: TranslateService
   ) {}
@@ -37,11 +39,11 @@ export class FiltersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeDialogs();
     this.filtersSrv.getTranslatedMediaCompose();
-    this.filtersSrv.getTranslatedSentimentsIdeologies();
+    this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
     // Subscribe to language change to update translations
     const langChangeSub = this.trans.onLangChange.subscribe(() => {
       this.filtersSrv.getTranslatedMediaCompose();
-      this.filtersSrv.getTranslatedSentimentsIdeologies();
+      this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
     });
     this.subscriptions.push(langChangeSub);
   }
@@ -82,20 +84,20 @@ export class FiltersComponent implements OnInit, OnDestroy {
   }
 
   private setFiltersDialog(): void {
-    this.dataFiltersDialog = new FilterDialog([], [], []);
+    this.dataFiltersDialog = new FilterDialog([], []);
     const mediaDataSub = this.filtersSrv.mediaRead$.subscribe(
       (data: MediaRead[]) => {
         this.dataFiltersDialog.medias = data;
       }
     );
     this.subscriptions.push(mediaDataSub);
-    const sentimentDataSub = this.filtersSrv.sentiments$.subscribe(
+    const sentimentDataSub = this.sentimentIdeologySrv.sentiments$.subscribe(
       (sentimentData) => {
         this.dataFiltersDialog.sentiments = sentimentData.sentiments;
       }
     );
     this.subscriptions.push(sentimentDataSub);
-    const ideologiesDataSub = this.filtersSrv.ideologies$.subscribe(
+    const ideologiesDataSub = this.sentimentIdeologySrv.ideologies$.subscribe(
       (ideologyData) => {
         this.dataFiltersDialog.ideologies = ideologyData.ideologies;
       }

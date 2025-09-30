@@ -63,8 +63,10 @@
     "regions": "Regiones de las fuentes - {{count}}",
     "sentiments": "Clasificación de sentimientos - {{count}}",
     "ideologies": "Clasificación de ideologías - {{count}}",
-    "sentiments_info": "Según los filtros seleccionados, puede que no haya datos para un sentimiento concreto",
-    "ideologies_info": "Según los filtros seleccionados, puede que no haya datos para una ideología concreta"
+    "sentiments_filter": "Según los filtros seleccionados, puede que no haya datos para un sentimiento concreto",
+    "ideologies_filter": "Según los filtros seleccionados, puede que no haya datos para una ideología concreta",
+    "ideologies_home": "Por cada artículo se extraen 3 orientaciones ideológicas diferentes",
+    "sentiments_home": "Por cada artículo se extraen 3 sentimientos diferentes"
   },
   "messages": {
     "error": "Error",
@@ -87,10 +89,8 @@
     "general_values": "Estadísticas generales",
     "general_table": "Tabla general de fuentes",
     "ideologies": "Orientaciones ideológicas valoradas",
-    "ideologies_info": "Por cada artículo se extraen 3 orientaciones ideológicas diferentes",
     "ideologies_categorized": "Orientaciones ideológicas valoradas por categoría",
     "sentiments": "Sentimientos valorados",
-    "sentiments_info": "Por cada artículo se extraen 3 sentimientos diferentes",
     "sentiments_categorized": "Sentimientos valorados por categoría",
     "top_words": "Las {{num}} palabras más frecuentes",
     "bottom_words": "Las 100 palabras menos frecuentes",

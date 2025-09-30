@@ -1,5 +1,8 @@
-@if (isShowMediasDialog && dataMediasDialog.items.length > 0) {
-<app-medias-dialog [dataMediasDialog]="dataMediasDialog"></app-medias-dialog>
+@if (isShowFiltersDialog && dataFiltersDialog.generalMedias &&
+dataFiltersDialog.generalMedias.length > 0) {
+<app-filters-dialog
+  [dataFiltersDialog]="dataFiltersDialog"
+></app-filters-dialog>
 }
 <div class="w-full font-serif text-2xl mb-6 text-center">
   {{ "home.description" | translate }}
@@ -13,8 +16,8 @@
         {{ "home.total_sources" | translate }}:
         <span
           class="title-nums title-sources hover:text-accent"
-          (click)="showMediasDialog()"
-          (keydown.enter)="showMediasDialog()"
+          (click)="showFiltersDialog(GENERAL_MEDIAS)"
+          (keydown.enter)="showFiltersDialog(GENERAL_MEDIAS)"
           tabindex="5"
         >
           {{ generalTotalMedias | number : "1.0-0" }}
@@ -71,9 +74,9 @@
         <div class="mb-[10px]">
           {{ "home.sentiments" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px]"
-            pTooltip="{{ 'home.sentiments_info' | translate }}"
-            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            (click)="showFiltersDialog(SENTIMENTS)"
+            (keydown.enter)="showFiltersDialog(SENTIMENTS)"
             tabindex="7"
           ></i>
         </div>
@@ -119,9 +122,9 @@
         <div class="mb-[10px]">
           {{ "home.ideologies" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px]"
-            pTooltip="{{ 'home.ideologies_info' | translate }}"
-            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            (click)="showFiltersDialog(IDEOLOGIES)"
+            (keydown.enter)="showFiltersDialog(IDEOLOGIES)"
             tabindex="8"
           ></i>
         </div>
@@ -245,9 +248,9 @@
         <div class="mb-[10px]">
           {{ "home.sentiments" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px]"
-            pTooltip="{{ 'home.sentiments_info' | translate }}"
-            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            (click)="showFiltersDialog(SENTIMENTS)"
+            (keydown.enter)="showFiltersDialog(SENTIMENTS)"
             tabindex="15"
           ></i>
         </div>
@@ -291,9 +294,9 @@
         <div class="mb-[10px]">
           {{ "home.ideologies" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px]"
-            pTooltip="{{ 'home.ideologies_info' | translate }}"
-            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            (click)="showFiltersDialog(IDEOLOGIES)"
+            (keydown.enter)="showFiltersDialog(IDEOLOGIES)"
             tabindex="16"
           ></i>
         </div>

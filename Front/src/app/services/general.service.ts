@@ -10,8 +10,6 @@ import { environment } from '../../environments/environment';
 })
 export class GeneralService {
   public readonly isMobile$ = new BehaviorSubject<boolean>(false);
-  
-  public readonly isShowMediasDialog$ = new Subject<boolean>();
 
   public readonly isShowFiltersDialog$ = new Subject<boolean>();
   public readonly filtersTypeDialog$ = new Subject<string>();

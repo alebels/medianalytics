@@ -63,8 +63,10 @@
     "countries": "Source countries - {{count}}",
     "sentiments": "Classification of sentiments - {{count}}",
     "ideologies": "Classification of ideologies - {{count}}",
-    "sentiments_info": "Based on the selected filters, there may not be data for a specific sentiment",
-    "ideologies_info": "Based on the selected filters, there may not be data for a specific ideology"
+    "sentiments_filter": "Based on the selected filters, there may not be data for a specific sentiment",
+    "ideologies_filter": "Based on the selected filters, there may not be data for a specific ideology",
+    "sentiments_home": "For each article, 3 different sentiments are extracted",
+    "ideologies_home": "For each article, 3 different ideological orientations are extracted"
   },
   "messages": {
     "error": "Error",
@@ -87,10 +89,8 @@
     "general_values": "General statistics",
     "general_table": "General source table",
     "ideologies": "Rated ideological orientations",
-    "ideologies_info": "For each article, 3 different ideological orientations are extracted",
     "ideologies_categorized": "Rated ideological orientations by category",
     "sentiments": "Rated sentiments",
-    "sentiments_info": "For each article, 3 different sentiments are extracted",
     "sentiments_categorized": "Rated sentiments by category",
     "top_words": "The {{num}} most frequent words",
     "bottom_words": "The 100 least frequent words",

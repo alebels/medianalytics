@@ -1,0 +1,15 @@
+<p-dialog
+  header="'Chart Information'"
+  [(visible)]="isVisible"
+  [style]="{
+    maxWidth: '90vw',
+    borderRadius: 'var(--border-radius-standard)',
+    background: 'var(--color-miscellany)'
+  }"
+  [keepInViewport]="true"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [draggable]="true"
+  (onHide)="onClose()"
+>
+</p-dialog>

@@ -2,6 +2,7 @@
   [header]="'dialog.' + header() | translate : { count: count() }"
   [(visible)]="isVisible"
   [style]="{
+    width: header() !== GENERAL_MEDIAS ? '295px' : 'auto',
     maxWidth: '90vw',
     minWidth: '16vw',
     borderRadius: 'var(--border-radius-standard)',
@@ -13,16 +14,55 @@
   [draggable]="true"
   (onHide)="onClose()"
 >
-  @if (header() === TYPES) { @for (type of getUniqueTypes(); track type) {
+  @if (header() === GENERAL_MEDIAS) { @for (type of getUniqueGeneralTypes();
+  track type) {
+  <div class="mb-6">
+    <h3 class="text-xl font-semibold text-accent mb-4">
+      <i [class]="'icon mr-2 bi bi-' + getMediaIcon(type)"></i>
+      {{ MEDIA_GROUP + "." + type | translate }}
+    </h3>
+    @for (country of getCountriesForType(type); track country) {
+    <div class="ml-3 mb-4">
+      <h4 class="text-xl font-serif font-semibold text-cText mb-2">
+        {{ COUNTRIES + "." + country | translate }}
+      </h4>
+      <ul class="list-disc list-inside space-y-1">
+        @for (media of getMediasForTypeAndCountry(type, country); track
+        media.name) {
+        <li class="text-base text-cText">
+          @if(media.full_name) {
+          <i
+            class="bi bi-info-circle info-size z-100"
+            [pTooltip]="media.full_name"
+            [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+            tabindex="0"
+          ></i>
+          }
+          <span class="font-semibold"> {{ media.name }}: </span>
+          <a
+            *ngIf="media.url"
+            [href]="media.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline ml-2 text-cText hover:text-accent"
+            >{{ media.url }}</a
+          >
+        </li>
+        }
+      </ul>
+    </div>
+    }
+  </div>
+  } } @if (header() === TYPES) { @for (type of getUniqueTypes(); track type) {
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
       <i [class]="'icon mr-2 bi bi-' + getMediaIcon(type)"></i>
       {{ MEDIA_GROUP + "." + type | translate }}
     </h3>
     <ul class="list-disc list-inside space-y-1 ml-4">
-      @for (item of getItemsForType(type); track item.name) {
+      @for (media of getMediaForType(type); track media.name) {
       <li class="text-base text-cText">
-        <span class="font-semibold">{{ item.name }}</span>
+        <span class="font-semibold">{{ media.name }}</span>
       </li>
       }
     </ul>
@@ -34,9 +74,9 @@
       {{ COUNTRIES + "." + country | translate }}
     </h3>
     <ul class="list-disc list-inside space-y-1 ml-4">
-      @for (item of getItemsForCountry(country); track item.name) {
+      @for (media of getMediaForCountry(country); track media.name) {
       <li class="text-base text-cText">
-        <span class="font-semibold">{{ item.name }}</span>
+        <span class="font-semibold">{{ media.name }}</span>
       </li>
       }
     </ul>
@@ -53,10 +93,10 @@
         {{ COUNTRIES + "." + country | translate }}
       </h4>
       <ul class="list-disc list-inside space-y-1">
-        @for (item of getItemsForRegionAndCountry(region, country); track
-        item.name) {
+        @for (media of getMediaForRegionAndCountry(region, country); track
+        media.name) {
         <li class="text-base text-cText">
-          <span class="font-semibold">{{ item.name }}</span>
+          <span class="font-semibold">{{ media.name }}</span>
         </li>
         }
       </ul>
@@ -65,7 +105,11 @@
   </div>
   } } @if (header() === SENTIMENTS) {
   <div class="mb-5 mt-1 text-base text-cText max-w-[250px] text-center mx-auto">
-    {{ "dialog.sentiments_info" | translate }}
+    @if(dataFiltersDialog()?.generalMedias) {
+    {{ "dialog.sentiments_home" | translate }}
+    } @else {
+    {{ "dialog.sentiments_filter" | translate }}
+    }
   </div>
   @for (sentiment of getSentimentsSorted(); track sentiment.label) {
   <div class="mb-4">
@@ -88,7 +132,11 @@
   </div>
   } } @if (header() === IDEOLOGIES) {
   <div class="mb-5 mt-1 text-base text-cText max-w-[250px] text-center mx-auto">
-    {{ "dialog.ideologies_info" | translate }}
+    @if(dataFiltersDialog()?.generalMedias) {
+    {{ "dialog.ideologies_home" | translate }}
+    } @else {
+    {{ "dialog.ideologies_filter" | translate }}
+    }
   </div>
   @for (ideology of getIdeologiesSorted(); track ideology.label) {
   <div class="mb-4">

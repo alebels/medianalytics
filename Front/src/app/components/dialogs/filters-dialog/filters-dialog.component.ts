@@ -1,14 +1,21 @@
 import { Component, OnInit, computed, input } from '@angular/core';
-import { FILTERS, IDEOLOGIES, MEDIA_GROUP, SENTIMENTS } from '../../../utils/constants';
+import {
+  FILTERS,
+  IDEOLOGIES,
+  MEDIAS,
+  MEDIA_GROUP,
+  SENTIMENTS,
+} from '../../../utils/constants';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { FilterDialog } from '../../../models/dialog.model';
 import { GeneralService } from '../../../services/general.service';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-filters-dialog',
-  imports: [CommonModule, DialogModule, TranslatePipe],
+  imports: [CommonModule, DialogModule, TranslatePipe, Tooltip],
   templateUrl: './filters-dialog.component.html',
   styleUrl: './filters-dialog.component.css',
 })
@@ -21,7 +28,7 @@ export class FiltersDialogComponent implements OnInit {
   readonly MEDIA_GROUP = FILTERS.MEDIA_GROUP;
   readonly SENTIMENTS = SENTIMENTS;
   readonly IDEOLOGIES = IDEOLOGIES;
-  readonly MEDIAS = MEDIA_GROUP;
+  readonly GENERAL_MEDIAS = MEDIAS;
 
   header = computed(() => this.dataFiltersDialog()?.header() || '');
 
@@ -29,6 +36,7 @@ export class FiltersDialogComponent implements OnInit {
   count = computed(() => {
     const header = this.dataFiltersDialog()?.header();
     const medias = this.dataFiltersDialog()?.medias || [];
+    const generalMedias = this.dataFiltersDialog()?.generalMedias || [];
     const sentiments = this.dataFiltersDialog()?.sentiments || [];
     const ideologies = this.dataFiltersDialog()?.ideologies || [];
 
@@ -52,6 +60,8 @@ export class FiltersDialogComponent implements OnInit {
       return ideologies.reduce((total, ideology) => {
         return total + (ideology.items?.length || 0);
       }, 0);
+    } else if (header === this.GENERAL_MEDIAS) {
+      return generalMedias.length;
     } else {
       return medias.length; // For 'medias' or default case
     }
@@ -77,13 +87,40 @@ export class FiltersDialogComponent implements OnInit {
     return MEDIA_GROUP[type as keyof typeof MEDIA_GROUP]?.icon || 'newspaper';
   }
 
+  getUniqueGeneralTypes() {
+    const types =
+      this.dataFiltersDialog()?.generalMedias?.map((media) => media.type) || [];
+    return Array.from(new Set(types)).sort((a, b) => a.localeCompare(b));
+  }
+
+  getCountriesForType(type: string) {
+    const medias = this.dataFiltersDialog()?.generalMedias || [];
+    const countries = medias
+      .filter((media) => media.type === type)
+      .map((media) => media.country);
+    const uniqueCountries = Array.from(new Set(countries));
+    return uniqueCountries.sort((a, b) => {
+      const transA = this.translate.instant(this.COUNTRIES + '.' + a);
+      const transB = this.translate.instant(this.COUNTRIES + '.' + b);
+      return transA.localeCompare(transB);
+    });
+  }
+
+  getMediasForTypeAndCountry(type: string, country: string) {
+    const filteredItems =
+      this.dataFiltersDialog()?.generalMedias?.filter(
+        (media) => media.type === type && media.country === country
+      ) || [];
+    return filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   getUniqueTypes() {
     const types =
       this.dataFiltersDialog()?.medias?.map((media) => media.type) || [];
     return Array.from(new Set(types)).sort((a, b) => a.localeCompare(b));
   }
 
-  getItemsForType(type: string) {
+  getMediaForType(type: string) {
     const medias = this.dataFiltersDialog()?.medias || [];
     return medias
       .filter((media) => media.type === type)
@@ -100,7 +137,7 @@ export class FiltersDialogComponent implements OnInit {
     });
   }
 
-  getItemsForCountry(country: string) {
+  getMediaForCountry(country: string) {
     const medias = this.dataFiltersDialog()?.medias || [];
     return medias
       .filter((media) => media.country === country)
@@ -129,7 +166,7 @@ export class FiltersDialogComponent implements OnInit {
     });
   }
 
-  getItemsForRegionAndCountry(region: string, country: string) {
+  getMediaForRegionAndCountry(region: string, country: string) {
     const medias = this.dataFiltersDialog()?.medias || [];
     return medias
       .filter((media) => media.region === region && media.country === country)

@@ -18,7 +18,6 @@ import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { DataChart } from '../../../models/chart.model';
 import { FilterComponent } from '../filter/filter.component';
-import { FiltersService } from '../../../services/filters.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { GeneralService } from '../../../services/general.service';
@@ -28,6 +27,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { NoData } from '../../../models/items.model';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
+import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
 import { ToastModule } from 'primeng/toast';
 
 @Component({
@@ -78,7 +78,7 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private filtersSrv: FiltersService,
+    private sentimentIdeologySrv: SentimentIdeologyService,
     private messageService: MessageService,
     private trans: TranslateService,
     private generalSrv: GeneralService
@@ -144,7 +144,7 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
       this.barChart = null;
       this.pieChart = null;
       this.lineChart = null;
-      this.filtersSrv
+      this.sentimentIdeologySrv
         .setFilterSentiment(composeObj)
         .then((data) => {
           if (data.plain) {
@@ -170,10 +170,12 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
   }
 
   private setSentiments(): void {
-    const sentimentsSub = this.filtersSrv.sentiments$.subscribe((data) => {
-      this.sentiments.data.set(data.sentiments);
-      this.sentiments.value.set(null);
-    });
+    const sentimentsSub = this.sentimentIdeologySrv.sentiments$.subscribe(
+      (data) => {
+        this.sentiments.data.set(data.sentiments);
+        this.sentiments.value.set(null);
+      }
+    );
     this.subscriptions.push(sentimentsSub);
   }
 }

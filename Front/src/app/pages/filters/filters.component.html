@@ -1,59 +1,52 @@
-@if (isShowFiltersDialog && dataFiltersDialog && dataFiltersDialog.medias.length > 0) {
+@if (isShowFiltersDialog && dataFiltersDialog.medias &&
+dataFiltersDialog.medias.length > 0) {
 <app-filters-dialog
   [dataFiltersDialog]="dataFiltersDialog"
 ></app-filters-dialog>
 }
-<div>
-  <div class="w-full font-serif text-2xl mb-6 text-center">
-    {{ "filters.description" | translate }}
+<div class="w-full font-serif text-2xl mb-6 text-center">
+  {{ "filters.description" | translate }}
+</div>
+<div class="flex items-center justify-center mb-[var(--margin-header-divider)]">
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full text-center px-[var(--margin-title-lines)]">
+    <h1>{{ "filters.filter_sentiment" | translate }}</h1>
   </div>
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+</div>
+<div class="mb-[var(--margin-standard)]">
+  <app-filter-sentiment></app-filter-sentiment>
+</div>
+<div class="mb-[var(--margin-standard)]">
+  <app-filter-sentiment></app-filter-sentiment>
+</div>
+<div class="flex items-center justify-center my-[var(--margin-header-divider)]">
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full text-center px-[var(--margin-title-lines)]">
+    <h1>{{ "filters.filter_ideology" | translate }}</h1>
+  </div>
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+</div>
+<div class="mb-[var(--margin-standard)]">
+  <app-filter-ideology></app-filter-ideology>
+</div>
+<div class="mb-[var(--margin-standard)]">
+  <app-filter-ideology></app-filter-ideology>
+</div>
+<div class="flex items-center justify-center my-[var(--margin-header-divider)]">
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full text-center px-[var(--margin-title-lines)]">
+    <h1>{{ "filters.filter_words" | translate }}</h1>
+  </div>
+  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+</div>
+<div class="flex flex-wrap justify-between items-center">
   <div
-    class="flex items-center justify-center mb-[var(--margin-header-divider)]"
+    class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full lym:mb-[var(--margin-standard)]"
   >
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
-    <div class="w-full text-center px-[var(--margin-title-lines)]">
-      <h1>{{ "filters.filter_sentiment" | translate }}</h1>
-    </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <app-filter-word></app-filter-word>
   </div>
-  <div class="mb-[var(--margin-standard)]">
-    <app-filter-sentiment></app-filter-sentiment>
-  </div>
-  <div class="mb-[var(--margin-standard)]">
-    <app-filter-sentiment></app-filter-sentiment>
-  </div>
-  <div
-    class="flex items-center justify-center my-[var(--margin-header-divider)]"
-  >
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
-    <div class="w-full text-center px-[var(--margin-title-lines)]">
-      <h1>{{ "filters.filter_ideology" | translate }}</h1>
-    </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
-  </div>
-  <div class="mb-[var(--margin-standard)]">
-    <app-filter-ideology></app-filter-ideology>
-  </div>
-  <div class="mb-[var(--margin-standard)]">
-    <app-filter-ideology></app-filter-ideology>
-  </div>
-  <div
-    class="flex items-center justify-center my-[var(--margin-header-divider)]"
-  >
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
-    <div class="w-full text-center px-[var(--margin-title-lines)]">
-      <h1>{{ "filters.filter_words" | translate }}</h1>
-    </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
-  </div>
-  <div class="flex flex-wrap justify-between items-center">
-    <div
-      class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full lym:mb-[var(--margin-standard)]"
-    >
-      <app-filter-word></app-filter-word>
-    </div>
-    <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
-      <app-filter-word></app-filter-word>
-    </div>
+  <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
+    <app-filter-word></app-filter-word>
   </div>
 </div>
