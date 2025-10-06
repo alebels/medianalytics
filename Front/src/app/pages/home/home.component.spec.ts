@@ -183,16 +183,4 @@ describe('HomeComponent', () => {
     expect(newComponent.currentLang).toBeUndefined();
   });
 
-  it('should unsubscribe from all subscriptions on destroy', () => {
-    const unsubscribeSpies = component['subscriptions'].map((sub) =>
-      jest.spyOn(sub, 'unsubscribe')
-    );
-    
-    component.ngOnDestroy();
-    
-    unsubscribeSpies.forEach((spy) => {
-      expect(spy).toHaveBeenCalled();
-    });
-  });
-
 });

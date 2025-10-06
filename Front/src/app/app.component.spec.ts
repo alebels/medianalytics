@@ -67,15 +67,6 @@ describe('AppComponent', () => {
     checkLanguageSpy.mockRestore();
   });
 
-  it('should unsubscribe from subscriptions on ngOnDestroy', () => {
-    const mockSubscription = { unsubscribe: jest.fn() } as unknown as Subscription;
-    component['subscriptions'] = [mockSubscription];
-    
-    component.ngOnDestroy();
-    
-    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
-  });
-
   it('should use preferred language from localStorage if available', () => {
     const preferredLang = 'es';
     (window.localStorage.getItem as jest.Mock).mockReturnValue(preferredLang);

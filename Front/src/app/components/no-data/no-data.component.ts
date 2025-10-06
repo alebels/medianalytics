@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit, input } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
 import { MessageModule } from 'primeng/message';
 import { NO_DATA } from '../../utils/constants';
 import { NoData } from '../../models/items.model';
 import { ProgressBar } from 'primeng/progressbar';
-import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-no-data',
@@ -12,26 +12,21 @@ import { TranslatePipe } from '@ngx-translate/core';
   templateUrl: './no-data.component.html',
   styleUrl: './no-data.component.css',
 })
-export class NoDataComponent implements OnInit, OnDestroy {
+export class NoDataComponent implements OnInit {
   readonly noData = input<NoData>();
   readonly loadingHomeText = NO_DATA.LOADING_HOME;
 
   isLoading = false;
   type!: string;
 
-  private subscriptions: Subscription[] = [];
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.type = this.noData()?.type ?? NO_DATA.NO_DATA;
-    const loadingSub = this.noData()?.isLoading?.subscribe((loading) => {
-      this.isLoading = loading;
-    });
-    if (loadingSub) {
-      this.subscriptions.push(loadingSub);
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.noData()
+      ?.isLoading?.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((loading) => {
+        this.isLoading = loading;
+      });
   }
 }

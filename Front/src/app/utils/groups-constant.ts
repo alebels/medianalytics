@@ -6,13 +6,13 @@ export const MEDIA_GROUPS: SelectGroupSimple[] = [
     new SelectGroupSimple(MEDIA_GROUP.ORGANIZATION.text, MEDIA_GROUP.ORGANIZATION.icon),
     new SelectGroupSimple(MEDIA_GROUP.GOVERNMENT.text, MEDIA_GROUP.GOVERNMENT.icon),
     new SelectGroupSimple(MEDIA_GROUP.COMPANY.text, MEDIA_GROUP.COMPANY.icon)
-];
+] as const;
 
 export const SENTIMENTS_GROUPS: SelectGroupItem2[] = [
     new SelectGroupItem2(SENTIMENT_GROUP.POSITIVES, 'emoji-smile', 'var(--color-positive)'),
     new SelectGroupItem2(SENTIMENT_GROUP.NEGATIVES, 'emoji-frown', 'var(--color-negative)'),
     new SelectGroupItem2(SENTIMENT_GROUP.NEUTRALS, 'emoji-neutral', 'var(--color-neutral)')
-];
+] as const;
 
 export const IDEOLOGIES_GROUPS: SelectGroupItem2[] = [
     new SelectGroupItem2(IDEOLOGY_GROUP.POLITICAL_SPECTRUM, 'journal-medical', 'var(--color-political-spectrum)'),
@@ -24,4 +24,4 @@ export const IDEOLOGIES_GROUPS: SelectGroupItem2[] = [
     new SelectGroupItem2(IDEOLOGY_GROUP.SOCIAL_MOVEMENTS, 'people', 'var(--color-social-movements)'),
     new SelectGroupItem2(IDEOLOGY_GROUP.PHILOSOPHICAL_ORIENTATIONS, 'chat-text', 'var(--color-philosophical-orientations)'),
     new SelectGroupItem2(IDEOLOGY_GROUP.EPISTEMOLOGICAL_ORIENTATIONS, 'pencil', 'var(--color-epistemological-orientations)')
-];
+] as const;

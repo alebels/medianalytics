@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, input } from '@angular/core';
+import { Component, OnInit, computed, inject, input } from '@angular/core';
 import {
   FILTERS,
   IDEOLOGIES,
@@ -12,6 +12,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FilterDialog } from '../../../models/dialog.model';
 import { GeneralService } from '../../../services/general.service';
 import { Tooltip } from 'primeng/tooltip';
+import { isShowFiltersDialog$ } from '../../../utils/dialog-subjects';
 
 @Component({
   selector: 'app-filters-dialog',
@@ -70,17 +71,15 @@ export class FiltersDialogComponent implements OnInit {
   isVisible = true;
   isMobile = false;
 
-  constructor(
-    private generalSrv: GeneralService,
-    private translate: TranslateService
-  ) {}
+  private generalSrv = inject(GeneralService);
+  private translate = inject(TranslateService);
 
   ngOnInit() {
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
   onClose() {
-    this.generalSrv.isShowFiltersDialog$.next(false);
+    isShowFiltersDialog$.next(false);
   }
 
   getMediaIcon(type: string) {

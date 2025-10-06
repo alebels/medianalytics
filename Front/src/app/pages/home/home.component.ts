@@ -1,23 +1,32 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChartDialog, FilterDialog } from '../../models/dialog.model';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
 import { IDEOLOGIES, MEDIAS, NO_DATA, SENTIMENTS } from '../../utils/constants';
+import { Ideologies, Sentiments } from '../../models/sentiment-ideology.model';
+import { MinMaxDateRead, NoData } from '../../models/items.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  dataChartDialog$,
+  isShowChartDialog$,
+  isShowFiltersDialog$,
+} from '../../utils/dialog-subjects';
 import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 import { Card } from 'primeng/card';
+import { ChartDialogComponent } from '../../components/dialogs/chart-dialog/chart-dialog.component';
 import { CommonModule } from '@angular/common';
-import { FilterDialog } from '../../models/dialog.model';
 import { FiltersDialogComponent } from '../../components/dialogs/filters-dialog/filters-dialog.component';
+import { GeneralMedia } from '../../models/media.model';
 import { GeneralService } from '../../services/general.service';
 import { GeneralTableComponent } from '../../components/tables/general-table/general-table.component';
 import { HomeService } from '../../services/home.service';
-import { NoData } from '../../models/items.model';
 import { NoDataComponent } from '../../components/no-data/no-data.component';
+import { Observable } from 'rxjs';
 import { PieChartComponent } from '../../components/charts/pie-chart/pie-chart.component';
 import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
 import { SortTableComponent } from '../../components/tables/sort-table/sort-table.component';
-import { Subscription } from 'rxjs';
 import { Tooltip } from 'primeng/tooltip';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-home',
@@ -32,19 +41,20 @@ import { Tooltip } from 'primeng/tooltip';
     NoDataComponent,
     Tooltip,
     FiltersDialogComponent,
+    ChartDialogComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit {
   noData: NoData = {
     type: NO_DATA.LOADING_HOME,
   };
 
   generalTotalMedias = 0;
-  generalTotalArticles = 0;
-  generalAverageWords = 0;
-  generalTotalWords = 0;
+  generalTotalArticles!: Observable<number>;
+  generalAverageWords!: Observable<number>;
+  generalTotalWords!: Observable<number>;
 
   minDate: Date | null = null;
   maxDate: Date | null = null;
@@ -66,207 +76,192 @@ export class HomeComponent implements OnInit, OnDestroy {
   isMobile = false;
 
   dataFiltersDialog = new FilterDialog([], []);
-  isShowFiltersDialog = false;
+  isShowFiltersDialog = signal(false);
+
+  isShowChartDialog = signal(false);
+  dataChartDialog = signal(new ChartDialog());
 
   readonly GENERAL_MEDIAS = MEDIAS;
   readonly SENTIMENTS = SENTIMENTS;
   readonly IDEOLOGIES = IDEOLOGIES;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private homeSrv: HomeService,
-    private generalSrv: GeneralService,
-    private trans: TranslateService,
-    private sentimentIdeologySrv: SentimentIdeologyService
-  ) {}
+  private homeSrv = inject(HomeService);
+  private generalSrv = inject(GeneralService);
+  private trans = inject(TranslateService);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.getMinMaxDate();
-    this.initializeDialogs();
+    this.generalTotalArticles = this.homeSrv.generalTotalArticles$;
+    this.generalAverageWords = this.homeSrv.generalAverageWord$;
+    this.generalTotalWords = this.homeSrv.generalTotalWords$;
+    this.isMobile = this.generalSrv.isMobile$.getValue();
+    this.setGeneralTable();
     this.setGeneralDayTopWords();
     this.setGeneralDaySentiments();
     this.setGeneralDayIdeologies();
-    this.setGeneralTable();
+    this.getMinMaxDate();
     this.setGeneralMedias();
-    this.setGeneralTotalArticles();
-    this.setGeneralAverageWords();
-    this.setGeneralTotalWords();
     this.setGeneralIdeologies();
     this.setGeneralSentiments();
     this.setGeneralTopWords();
     this.setGeneralBottomWords();
     this.setGeneralTopGrammar();
-    this.isMobile = this.generalSrv.isMobile$.getValue();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.initializeDialogs();
   }
 
   showFiltersDialog(type: string) {
+    this.isShowChartDialog.set(false);
     if (type === this.dataFiltersDialog?.header()) {
       // Same type clicked - toggle visibility
-      this.isShowFiltersDialog = !this.isShowFiltersDialog;
+      this.isShowFiltersDialog.set(!this.isShowFiltersDialog());
     } else {
       // Different type - set new type and show dialog
       this.dataFiltersDialog.header.set(type);
-      this.isShowFiltersDialog = true;
+      this.isShowFiltersDialog.set(true);
     }
   }
 
   private initializeDialogs(): void {
     this.setFiltersDialog();
     // Subscribe to dialog visibility changes
-    const isShowDialogSub = this.generalSrv.isShowFiltersDialog$.subscribe(
-      (data) => {
-        this.isShowFiltersDialog = data;
-      }
-    );
-    this.subscriptions.push(isShowDialogSub);
+    isShowFiltersDialog$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: boolean) => {
+        this.isShowFiltersDialog.set(data);
+        this.isShowChartDialog.set(false);
+      });
+    isShowChartDialog$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: boolean) => {
+        this.isShowChartDialog.set(data);
+        this.isShowFiltersDialog.set(false);
+      });
+    dataChartDialog$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: ChartDialog) => {
+        this.dataChartDialog.set(data);
+      });
   }
 
   private setFiltersDialog(): void {
-    const sentimentDataSub = this.sentimentIdeologySrv.sentiments$.subscribe(
-      (sentimentData) => {
+    this.sentimentIdeologySrv.sentiments$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((sentimentData: Sentiments) => {
         this.dataFiltersDialog.sentiments = sentimentData.sentiments;
-      }
-    );
-    this.subscriptions.push(sentimentDataSub);
-    const ideologiesDataSub = this.sentimentIdeologySrv.ideologies$.subscribe(
-      (ideologyData) => {
+      });
+    this.sentimentIdeologySrv.ideologies$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ideologyData: Ideologies) => {
         this.dataFiltersDialog.ideologies = ideologyData.ideologies;
-      }
-    );
-    this.subscriptions.push(ideologiesDataSub);
+      });
   }
 
   private setGeneralMedias(): void {
-    const mediasSub = this.homeSrv.generalMedias$.subscribe((data) => {
-      this.generalTotalMedias = data.length ? data.length : 0;
-      this.dataFiltersDialog.generalMedias = data;
-    });
-    this.subscriptions.push(mediasSub);
-  }
-
-  private setGeneralTotalArticles(): void {
-    const totalArticlesSub = this.homeSrv.generalTotalArticles$.subscribe(
-      (data) => {
-        this.generalTotalArticles = data;
-      }
-    );
-    this.subscriptions.push(totalArticlesSub);
-  }
-
-  private setGeneralTotalWords(): void {
-    const totalWordsSub = this.homeSrv.generalTotalWords$.subscribe((data) => {
-      this.generalTotalWords = data;
-    });
-    this.subscriptions.push(totalWordsSub);
+    this.homeSrv.generalMedias$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: GeneralMedia[]) => {
+        this.generalTotalMedias = data.length ? data.length : 0;
+        this.dataFiltersDialog.generalMedias = data;
+      });
   }
 
   private setGeneralDayTopWords(): void {
-    const dayTopWordsSub = this.homeSrv.generalDayTopWords$.subscribe(
-      (data) => {
+    this.homeSrv.generalDayTopWords$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: DataChart) => {
         this.generalDayTopWords = data;
-      }
-    );
-    this.subscriptions.push(dayTopWordsSub);
+      });
   }
 
   private setGeneralDaySentiments(): void {
-    const daySentimentsSub = this.homeSrv.generalDaySentiments$.subscribe(
-      (data) => {
+    this.homeSrv.generalDaySentiments$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: CompoundDataCharts) => {
         this.generalDaySentiments = data;
-      }
-    );
-    this.subscriptions.push(daySentimentsSub);
+        // this.generalDaySentiments.plain.filterDialogChart = new FilterDialogChart(undefined, undefined, undefined, undefined, undefined, undefined, true);
+      });
   }
 
   private setGeneralDayIdeologies(): void {
-    const dayIdeologiesSub = this.homeSrv.generalDayIdeologies$.subscribe(
-      (data) => {
+    this.homeSrv.generalDayIdeologies$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: CompoundDataCharts) => {
         this.generalDayIdeologies = data;
-      }
-    );
-    this.subscriptions.push(dayIdeologiesSub);
+      });
   }
 
   private getMinMaxDate(): void {
-    const minMaxDateSub = this.generalSrv.minMaxDate$.subscribe((data) => {
-      if (data) {
-        const minDateParsed = new Date(data.min_date);
-        const maxDateParsed = new Date(data.max_date);
+    this.generalSrv.minMaxDate$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: MinMaxDateRead) => {
+        if (data) {
+          const minDateParsed = new Date(data.min_date);
+          const maxDateParsed = new Date(data.max_date);
 
-        this.minDate = isNaN(minDateParsed.getTime()) ? null : minDateParsed;
-        this.maxDate = isNaN(maxDateParsed.getTime()) ? null : maxDateParsed;
+          this.minDate = isNaN(minDateParsed.getTime()) ? null : minDateParsed;
+          this.maxDate = isNaN(maxDateParsed.getTime()) ? null : maxDateParsed;
 
-        this.currentLang = this.trans.currentLang || 'en';
-        const langChangeSub = this.trans.onLangChange.subscribe((lang) => {
-          this.currentLang = lang.lang;
-        });
-        this.subscriptions.push(langChangeSub);
-      }
-    });
-    this.subscriptions.push(minMaxDateSub);
+          this.currentLang = this.trans.currentLang || 'en';
+          this.trans.onLangChange
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((lang) => {
+              this.currentLang = lang.lang;
+            });
+        }
+      });
   }
 
+  // private setGeneralChartDataFilter(minDate: Date, maxDate: Date): void {
+  //   this.generalDaySentiments.plain.filterDialogChart = new ChartDialog();
+  //   this.generalDaySentiments.plain.filterDialogChart.rangeDates = [maxDate];
+  // }
+
   private setGeneralTopWords(): void {
-    const top30GeneralWordsSub = this.homeSrv.generalTopWords$.subscribe(
-      (data) => {
+    this.homeSrv.generalTopWords$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: DataChart) => {
         this.generalTopWords = data;
-      }
-    );
-    this.subscriptions.push(top30GeneralWordsSub);
+      });
   }
 
   private setGeneralBottomWords(): void {
-    const bottom30GeneralWordsSub = this.homeSrv.generalBottomWords$.subscribe(
-      (data) => {
+    this.homeSrv.generalBottomWords$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: DataCountTable) => {
         this.generalBottomWords = data;
-      }
-    );
-    this.subscriptions.push(bottom30GeneralWordsSub);
-  }
-
-  private setGeneralAverageWords(): void {
-    const averageWordsSub = this.homeSrv.generalAverageWord$.subscribe(
-      (data) => {
-        this.generalAverageWords = data;
-      }
-    );
-    this.subscriptions.push(averageWordsSub);
+      });
   }
 
   private setGeneralSentiments(): void {
-    const topSentimentsSub = this.homeSrv.generalSentiments$.subscribe(
-      (data) => {
+    this.homeSrv.generalSentiments$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: CompoundDataCharts) => {
         this.generalSentiments = data;
-      }
-    );
-    this.subscriptions.push(topSentimentsSub);
+      });
   }
 
   private setGeneralIdeologies(): void {
-    const topIdeologiesSub = this.homeSrv.generalIdeologies$.subscribe(
-      (data) => {
+    this.homeSrv.generalIdeologies$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: CompoundDataCharts) => {
         this.generalIdeologies = data;
-      }
-    );
-    this.subscriptions.push(topIdeologiesSub);
+      });
   }
 
   private setGeneralTopGrammar(): void {
-    const topGrammarSub = this.homeSrv.generalTopGrammar$.subscribe((data) => {
-      this.generalTopGrammar = data;
-    });
-    this.subscriptions.push(topGrammarSub);
+    this.homeSrv.generalTopGrammar$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: DataChart) => {
+        this.generalTopGrammar = data;
+      });
   }
 
   private setGeneralTable(): void {
-    const generalTableSub = this.homeSrv.generalTableSub$.subscribe((data) => {
-      this.generalTable = data;
-    });
-    this.subscriptions.push(generalTableSub);
+    this.homeSrv.generalTableSub$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: GeneralMediaTable) => {
+        this.generalTable = data;
+      });
   }
 }

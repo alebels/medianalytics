@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit, output, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { DATE, FILTERS, MEDIAS } from '../../../utils/constants';
 import {
   FilterItem,
@@ -14,8 +21,9 @@ import { GeneralService } from '../../../services/general.service';
 import { MinMaxDateRead } from '../../../models/items.model';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
-import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-filter',
@@ -31,7 +39,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   styleUrl: './filter.component.css',
   standalone: true,
 })
-export class FilterComponent implements OnInit, OnDestroy {
+export class FilterComponent implements OnInit {
   readonly MEDIAS = MEDIAS;
 
   mediaCompose: FilterItem[] = [
@@ -71,12 +79,9 @@ export class FilterComponent implements OnInit, OnDestroy {
   absoluteMinDate: Date | null = null;
   absoluteMaxDate: Date | null = null;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private filtersSrv: FiltersService,
-    private generalSrv: GeneralService
-  ) {}
+  private filtersSrv = inject(FiltersService);
+  private generalSrv = inject(GeneralService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.setMedias();
@@ -84,12 +89,8 @@ export class FilterComponent implements OnInit, OnDestroy {
     this.getMinMaxDate();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
   sendFiltersDialog(type: string) {
-    this.generalSrv.filtersTypeDialog$.next(type);
+    filtersTypeDialog$.next(type);
   }
 
   onSelectCompose(event: FilterItem): void {
@@ -185,46 +186,47 @@ export class FilterComponent implements OnInit, OnDestroy {
   }
 
   private getMinMaxDate(): void {
-    const minMaxDateSub = this.generalSrv.minMaxDate$.subscribe(
-      (data: MinMaxDateRead) => {
+    this.generalSrv.minMaxDate$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: MinMaxDateRead) => {
         this.absoluteMinDate = new Date(data.min_date);
         this.absoluteMaxDate = new Date(data.max_date);
-      }
-    );
-    this.subscriptions.push(minMaxDateSub);
+      });
   }
 
   private setMedias(): void {
-    const mediaSub = this.filtersSrv.medias$.subscribe(
-      (data: SelectGroupSimple[]) => {
+    this.filtersSrv.medias$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: SelectGroupSimple[]) => {
         const item = this.mediaCompose.find((item) => item.type === MEDIAS);
         if (item) {
           item.data.set(data);
           item.value.set(null);
           item.disabled.set(false);
         }
-      }
-    );
-    this.subscriptions.push(mediaSub);
+      });
   }
 
   private setMediaCompose(): void {
-    const mediaComposeSub = this.filtersSrv.mediaCompose$.subscribe((data) => {
-      Object.keys(data).forEach((key) => {
-        const item = this.mediaCompose.find((item) => item.type === key);
-        if (item && key in data) {
-          item.data.set(data[key as keyof typeof data]);
-          item.value.set(null);
-          item.disabled.set(false);
+    this.filtersSrv.mediaCompose$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        Object.keys(data).forEach((key) => {
+          const item = this.mediaCompose.find((item) => item.type === key);
+          if (item && key in data) {
+            item.data.set(data[key as keyof typeof data]);
+            item.value.set(null);
+            item.disabled.set(false);
+          }
+        });
+        const mediaItem = this.mediaCompose.find(
+          (item) => item.type === MEDIAS
+        );
+        if (mediaItem) {
+          mediaItem.disabled.set(false);
+          mediaItem.value.set(null);
         }
+        this.rangeDates = null;
       });
-      const mediaItem = this.mediaCompose.find((item) => item.type === MEDIAS);
-      if (mediaItem) {
-        mediaItem.disabled.set(false);
-        mediaItem.value.set(null);
-      }
-      this.rangeDates = null;
-    });
-    this.subscriptions.push(mediaComposeSub);
   }
 }

@@ -2,19 +2,6 @@ import { GeneralMedia, MediaRead } from './media.model';
 import { SelectGroupItem2 } from './primeng.model';
 import { signal } from '@angular/core';
 
-export class FilterDialogChart {
-  constructor(
-    public readonly mediaId?: string,
-    public readonly type?: string,
-    public readonly country?: string,
-    public readonly region?: string,
-    public readonly fromDate?: Date,
-    public readonly toDate?: Date,
-    public readonly sentiment?: boolean,
-    public readonly ideology?: boolean
-  ) {}
-}
-
 export class FilterDialog {
   header = signal<string | undefined>(undefined);
 
@@ -27,4 +14,17 @@ export class FilterDialog {
   ) {
     this.header.set(header);
   }
+}
+
+export class ChartDialog {
+  constructor(
+    public value = signal<string>(''),
+    public count = signal<number>(0),
+    public mediaId?: string,
+    public type?: string,
+    public country?: string,
+    public region?: string,
+    public rangeDates?: Date[],
+    public valuation?: string
+  ) {}
 }

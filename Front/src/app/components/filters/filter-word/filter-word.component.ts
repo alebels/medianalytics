@@ -1,4 +1,3 @@
-import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   COUNT,
   DATE,
@@ -7,9 +6,15 @@ import {
   TO_API,
   WORD,
 } from '../../../utils/constants';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  LOCALE_ID,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { DataCountTable } from '../../../models/table.model';
@@ -25,6 +30,7 @@ import { NoDataComponent } from '../../no-data/no-data.component';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SortTableComponent } from '../../tables/sort-table/sort-table.component';
 import { ToastModule } from 'primeng/toast';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-filter-word',
@@ -46,8 +52,8 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './filter-word.component.css',
   providers: [MessageService],
 })
-export class FilterWordComponent implements OnInit, OnDestroy {
-  order = SORTING.DESCENDING;
+export class FilterWordComponent implements OnInit {
+  order: string = SORTING.DESCENDING;
 
   noData: NoData = {
     isLoading: new BehaviorSubject<boolean>(false),
@@ -59,6 +65,8 @@ export class FilterWordComponent implements OnInit, OnDestroy {
 
   dataWordsTable: DataCountTable | null = null;
 
+  LOCALE_ID = inject(LOCALE_ID);
+
   private readonly maxRangeCount = 200;
 
   private composeValues: {
@@ -66,21 +74,18 @@ export class FilterWordComponent implements OnInit, OnDestroy {
     key: string | number | string[] | null;
   }[] = [];
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private filtersSrv: FiltersService,
-    private messageService: MessageService,
-    private trans: TranslateService,
-    @Inject(LOCALE_ID) public LOCALE_ID: string
-  ) {}
+  private filtersSrv = inject(FiltersService);
+  private messageService = inject(MessageService);
+  private trans = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.composeValues = [];
-      this.dataWordsTable = null;
-    });
-    this.subscriptions.push(langChangeSub);
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.composeValues = [];
+        this.dataWordsTable = null;
+      });
   }
 
   getComposeValues(
@@ -158,9 +163,5 @@ export class FilterWordComponent implements OnInit, OnDestroy {
           this.noData.isLoading?.next(false);
         });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

@@ -13,8 +13,8 @@ import {
   GeneralMediaRead,
   GeneralMediaTable,
 } from '../models/table.model';
+import { setToBarChart, setToPieChart } from '../utils/set-chart';
 import { GeneralMedia } from '../models/media.model';
-import { GeneralService } from './general.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
@@ -23,11 +23,9 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class HomeService {
-
   private readonly generalMediasSub = new BehaviorSubject<GeneralMedia[]>([]);
-  public readonly generalMedias$ =
-    this.generalMediasSub.asObservable();
-  
+  public readonly generalMedias$ = this.generalMediasSub.asObservable();
+
   private readonly generalTotalArticlesSub = new BehaviorSubject<number>(0);
   public readonly generalTotalArticles$ =
     this.generalTotalArticlesSub.asObservable();
@@ -71,19 +69,22 @@ export class HomeService {
   private readonly generalDayTopWordsSub = new BehaviorSubject<DataChart>(
     new DataChart()
   );
-  public readonly generalDayTopWords$ = this.generalDayTopWordsSub.asObservable();
+  public readonly generalDayTopWords$ =
+    this.generalDayTopWordsSub.asObservable();
 
   private readonly generalDaySentimentsSub =
     new BehaviorSubject<CompoundDataCharts>(new CompoundDataCharts());
-  public readonly generalDaySentiments$ = this.generalDaySentimentsSub.asObservable();
+  public readonly generalDaySentiments$ =
+    this.generalDaySentimentsSub.asObservable();
 
   private readonly generalDayIdeologiesSub =
     new BehaviorSubject<CompoundDataCharts>(new CompoundDataCharts());
-  public readonly generalDayIdeologies$ = this.generalDayIdeologiesSub.asObservable();
+  public readonly generalDayIdeologies$ =
+    this.generalDayIdeologiesSub.asObservable();
 
   private apiUrl = environment.apiUrl + '/home';
 
-  constructor(private http: HttpClient, private generalSrv: GeneralService) {
+  constructor(private http: HttpClient) {
     this.initialize();
   }
 
@@ -130,7 +131,7 @@ export class HomeService {
     const data = await firstValueFrom(
       this.http.get<ItemRead[]>(`${this.apiUrl}/generaldaytopwords`)
     );
-    const sendData: DataChart = this.generalSrv.setToBarChart(data, COUNT);
+    const sendData: DataChart = setToBarChart(data, COUNT);
     this.generalDayTopWordsSub.next(sendData);
   }
 
@@ -139,8 +140,8 @@ export class HomeService {
       this.http.get<CompoundRead>(`${this.apiUrl}/generaldaysentiments`)
     );
     const sendData: CompoundDataCharts = new CompoundDataCharts(
-      this.generalSrv.setToBarChart(data.plain, COUNT),
-      this.generalSrv.setToPieChart(data.categorized)
+      setToBarChart(data.plain, COUNT),
+      setToPieChart(data.categorized)
     );
     sendData.plain.translate = SENTIMENTS;
     sendData.categorized.translate = SENTIMENTS;
@@ -152,8 +153,8 @@ export class HomeService {
       this.http.get<CompoundRead>(`${this.apiUrl}/generaldayideologies`)
     );
     const sendData: CompoundDataCharts = new CompoundDataCharts(
-      this.generalSrv.setToBarChart(data.plain, COUNT),
-      this.generalSrv.setToPieChart(data.categorized)
+      setToBarChart(data.plain, COUNT),
+      setToPieChart(data.categorized)
     );
     sendData.plain.translate = IDEOLOGIES;
     sendData.categorized.translate = IDEOLOGIES;
@@ -164,7 +165,7 @@ export class HomeService {
     const data = await firstValueFrom(
       this.http.get<ItemRead[]>(`${this.apiUrl}/generaltopwords`)
     );
-    const sendData: DataChart = this.generalSrv.setToBarChart(data, COUNT);
+    const sendData: DataChart = setToBarChart(data, COUNT);
     this.generalTopWordsSub.next(sendData);
   }
 
@@ -188,8 +189,8 @@ export class HomeService {
       this.http.get<CompoundRead>(`${this.apiUrl}/generalsentiments`)
     );
     const sendData: CompoundDataCharts = new CompoundDataCharts(
-      this.generalSrv.setToBarChart(data.plain, COUNT),
-      this.generalSrv.setToPieChart(data.categorized)
+      setToBarChart(data.plain, COUNT),
+      setToPieChart(data.categorized)
     );
     sendData.plain.translate = SENTIMENTS;
     sendData.categorized.translate = SENTIMENTS;
@@ -201,8 +202,8 @@ export class HomeService {
       this.http.get<CompoundRead>(`${this.apiUrl}/generalideologies`)
     );
     const sendData: CompoundDataCharts = new CompoundDataCharts(
-      this.generalSrv.setToBarChart(data.plain, COUNT),
-      this.generalSrv.setToPieChart(data.categorized)
+      setToBarChart(data.plain, COUNT),
+      setToPieChart(data.categorized)
     );
     sendData.plain.translate = IDEOLOGIES;
     sendData.categorized.translate = IDEOLOGIES;
@@ -213,7 +214,7 @@ export class HomeService {
     const data = await firstValueFrom(
       this.http.get<ItemRead[]>(`${this.apiUrl}/generaltopgrammar`)
     );
-    const sendData: DataChart = this.generalSrv.setToPieChart(data);
+    const sendData: DataChart = setToPieChart(data);
     sendData.translate = GRAMMAR;
     this.generalTopGrammarSub.next(sendData);
   }

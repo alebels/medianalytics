@@ -1,20 +1,23 @@
-import { Component, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
-
 import {
   ApexChart,
   ApexResponsive,
   ApexStroke,
   ApexTheme,
   ApexYAxis,
-  ChartComponent,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { CHART_THEME, IDEOLOGIES, NONE, SENTIMENTS } from '../../../utils/constants';
+import {
+  CHART_THEME,
+  IDEOLOGIES,
+  NONE,
+  SENTIMENTS,
+} from '../../../utils/constants';
+import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
 import { DataChart } from '../../../models/chart.model';
-import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export interface ChartOptions {
+interface ChartOptions {
   series: number[];
   chart: ApexChart;
   labels: string[];
@@ -32,28 +35,19 @@ export interface ChartOptions {
   templateUrl: './pie-chart.component.html',
   styleUrl: './pie-chart.component.css',
 })
-export class PieChartComponent implements OnInit, OnDestroy {
+export class PieChartComponent implements OnInit {
   readonly dataPieChart = input<DataChart>();
-
-  @ViewChild('chart') chart: ChartComponent = new ChartComponent();
 
   chartOptions!: ChartOptions;
 
-  chartLabels!: string[];
-  translateType!: string;
+  private chartLabels!: string[];
+  private translateType!: string;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(private trans: TranslateService) {}
+  private trans = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.initialize();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription: Subscription) =>
-      subscription.unsubscribe()
-    );
   }
 
   private initialize(): void {
@@ -177,7 +171,7 @@ export class PieChartComponent implements OnInit, OnDestroy {
       RELIGIOUS_ORIENTATIONS: 'var(--color-religious-orientations)',
       SOCIAL_MOVEMENTS: 'var(--color-social-movements)',
       PHILOSOPHICAL_ORIENTATIONS: 'var(--color-philosophical-orientations)',
-      EPISTEMOLOGICAL_ORIENTATIONS: 'var(--color-epistemological-orientations)'
+      EPISTEMOLOGICAL_ORIENTATIONS: 'var(--color-epistemological-orientations)',
     };
     // Set colors array in the same order as the labels
     this.chartOptions.colors =
@@ -194,13 +188,14 @@ export class PieChartComponent implements OnInit, OnDestroy {
       ) || [];
 
     // Update translations when language changes
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.chartLabels =
-        this.dataPieChart()?.xLabels?.map((label) =>
-          this.trans.instant(this.translateType + '.' + label)
-        ) || [];
-      this.chartOptionsUpdate(this.chartLabels);
-    });
-    this.subscriptions.push(langChangeSub);
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.chartLabels =
+          this.dataPieChart()?.xLabels?.map((label) =>
+            this.trans.instant(this.translateType + '.' + label)
+          ) || [];
+        this.chartOptionsUpdate(this.chartLabels);
+      });
   }
 }

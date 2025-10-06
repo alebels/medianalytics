@@ -1,8 +1,11 @@
-@if (isShowFiltersDialog && dataFiltersDialog.generalMedias &&
-dataFiltersDialog.generalMedias.length > 0) {
+@if (isShowFiltersDialog() && !isShowChartDialog() &&
+dataFiltersDialog.generalMedias && dataFiltersDialog.generalMedias.length > 0) {
 <app-filters-dialog
   [dataFiltersDialog]="dataFiltersDialog"
 ></app-filters-dialog>
+} @if (isShowChartDialog() && !isShowFiltersDialog() &&
+dataChartDialog().value()) {
+<app-chart-dialog [dataChartDialog]="dataChartDialog()"></app-chart-dialog>
 }
 <div class="w-full font-serif text-2xl mb-6 text-center">
   {{ "home.description" | translate }}
@@ -30,19 +33,19 @@ dataFiltersDialog.generalMedias.length > 0) {
       <div class="flex justify-left align-center">
         {{ "home.total_articles" | translate }}:
         <span class="title-nums">{{
-          generalTotalArticles | number : "1.0-0"
+          generalTotalArticles | async | number : "1.0-0"
         }}</span>
       </div>
       <div class="flex justify-left align-center">
         {{ "home.average_words" | translate }}:
         <span class="title-nums">{{
-          generalAverageWords | number : "1.0-0"
+          generalAverageWords | async | number : "1.0-0"
         }}</span>
       </div>
       <div class="flex justify-left align-center">
         {{ "home.total_words" | translate }}:
         <span class="title-nums">{{
-          generalTotalWords | number : "1.0-0"
+          generalTotalWords | async | number : "1.0-0"
         }}</span>
       </div>
     </div>

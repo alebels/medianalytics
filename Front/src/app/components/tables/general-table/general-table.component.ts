@@ -1,4 +1,4 @@
-import { Component, OnInit, input } from '@angular/core';
+import { Component, OnInit, inject, input } from '@angular/core';
 import {
   GeneralMediaRead,
   GeneralMediaTable,
@@ -63,7 +63,7 @@ export class GeneralTableComponent implements OnInit {
   private staticDataTable!: GeneralMediaRead[];
   private currentFilterValue = '';
 
-  constructor(private generalSrv: GeneralService) {}
+  private generalSrv = inject(GeneralService);
 
   ngOnInit() {
     this.dataTableLocked = [];

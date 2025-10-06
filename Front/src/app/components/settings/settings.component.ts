@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AccordionModule } from 'primeng/accordion';
 import { CardModule } from 'primeng/card';
@@ -27,9 +27,7 @@ export class SettingsComponent implements OnInit {
   isDark!: boolean;
   toggleAccordion = true;
 
-  constructor(
-    private trans: TranslateService,
-  ) {}
+  private trans = inject(TranslateService);
 
   ngOnInit(): void {
     this.checkTheme();

@@ -1,8 +1,7 @@
-import { BehaviorSubject, Subject, firstValueFrom } from 'rxjs';
-import { ItemRead, ItemSerie, MinMaxDateRead } from '../models/items.model';
-import { DataChart } from '../models/chart.model';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MinMaxDateRead } from '../models/items.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,9 +9,6 @@ import { environment } from '../../environments/environment';
 })
 export class GeneralService {
   public readonly isMobile$ = new BehaviorSubject<boolean>(false);
-
-  public readonly isShowFiltersDialog$ = new Subject<boolean>();
-  public readonly filtersTypeDialog$ = new Subject<string>();
 
   private readonly minMaxDateSub = new BehaviorSubject<MinMaxDateRead>(
     new MinMaxDateRead()
@@ -22,28 +18,6 @@ export class GeneralService {
   constructor(private http: HttpClient) {
     this.isMobile$.next(this.checkIsMobile());
     this.initialize();
-  }
-
-  setToBarChart(data: ItemRead[], label: string): DataChart {
-    const labels = data.map((item) => item.name);
-    const counts = data.map((item) => item.count);
-    const series = [
-      {
-        name: label,
-        data: counts,
-      },
-    ];
-    return new DataChart(labels, series, 'bar');
-  }
-
-  setToLineChart(data: ItemSerie[], labels: string[]): DataChart {
-    return new DataChart(labels, data, 'line');
-  }
-
-  setToPieChart(data: ItemRead[]): DataChart {
-    const labels = data.map((item) => item.name);
-    const series = data.map((item) => item.count);
-    return new DataChart(labels, series, 'donut');
   }
 
   private async initialize(): Promise<void> {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
 
 import {
   ApexAxisChartSeries,
@@ -11,15 +11,14 @@ import {
   ApexTheme,
   ApexXAxis,
   ApexYAxis,
-  ChartComponent,
   NgApexchartsModule,
 } from 'ng-apexcharts';
 import { CHART_THEME, NONE } from '../../../utils/constants';
 import { DataChart } from '../../../models/chart.model';
-import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export interface ChartOptions {
+interface ChartOptions {
   series: ApexAxisChartSeries;
   theme: ApexTheme;
   chart: ApexChart;
@@ -38,31 +37,22 @@ export interface ChartOptions {
   templateUrl: './line-chart.component.html',
   styleUrl: './line-chart.component.css',
 })
-export class LineChartComponent implements OnInit, OnDestroy {
+export class LineChartComponent implements OnInit {
   readonly dataLineChart = input<DataChart>();
-
-  @ViewChild('chart') chart: ChartComponent = new ChartComponent();
 
   chartOptions!: ChartOptions;
 
-  chartSeries!: ApexAxisChartSeries;
-  chartLabels!: string[];
-  translateType!: string;
+  private chartSeries!: ApexAxisChartSeries;
+  private chartLabels!: string[];
+  private translateType!: string;
 
-  maxYValue: number | undefined;
+  private maxYValue: number | undefined;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(private trans: TranslateService) {}
+  private trans = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.initialize();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription: Subscription) =>
-      subscription.unsubscribe()
-    );
   }
 
   private initialize(): void {
@@ -166,13 +156,12 @@ export class LineChartComponent implements OnInit, OnDestroy {
     }
 
     // Update translations when language changes
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
+    this.trans.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.dataLineChart()?.translate !== NONE) {
         this.setTranslate();
       }
       this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
     });
-    this.subscriptions.push(langChangeSub);
   }
 
   private setTranslate(): void {

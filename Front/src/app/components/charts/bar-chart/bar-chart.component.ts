@@ -4,7 +4,6 @@ import {
   ApexDataLabels,
   ApexXAxis,
   ApexYAxis,
-  ChartComponent,
   NgApexchartsModule,
 } from 'ng-apexcharts';
 import {
@@ -13,12 +12,17 @@ import {
   COUNT,
   NONE,
 } from '../../../utils/constants';
-import { Component, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
+// import {
+//   dataChartDialog$,
+//   isShowChartDialog$,
+// } from '../../../utils/dialog-subjects';
+import { ChartDialog } from '../../../models/dialog.model';
 import { DataChart } from '../../../models/chart.model';
-import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export interface ChartOptions {
+interface ChartOptions {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
@@ -33,37 +37,33 @@ export interface ChartOptions {
   templateUrl: './bar-chart.component.html',
   styleUrl: './bar-chart.component.css',
 })
-export class BarChartComponent implements OnInit, OnDestroy {
+export class BarChartComponent implements OnInit {
   readonly dataBarChart = input<DataChart>();
-
-  @ViewChild('chart') chart: ChartComponent = new ChartComponent();
 
   chartOptions!: ChartOptions;
 
-  chartSeries!: ApexAxisChartSeries;
-  chartLabels!: string[];
-  chartMode!: string;
+  private chartSeries!: ApexAxisChartSeries;
+  private chartLabels!: string[];
+  private chartMode!: string;
+  private yTitle!: string;
+  private maxYValue: number | undefined;
 
-  yTitle!: string;
+  private chartDialog!: ChartDialog;
 
-  maxYValue: number | undefined;
-
-  private subscriptions: Subscription[] = [];
-
-  constructor(private trans: TranslateService) {}
+  private trans = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.initialize();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription: Subscription) =>
-      subscription.unsubscribe()
-    );
-  }
-
   private initialize(): void {
-    this.chartMode = this.dataBarChart()?.translate || '';
+    this.chartMode = this.dataBarChart()?.translate || NONE;
+    // if (this.chartMode !== NONE) {
+    //   // Determine if this is a sentiment or ideology chart
+    //   this.chartDialog = this.dataBarChart()?.filterDialogChart || new ChartDialog();
+    //   this.chartDialog.valuation = this.chartMode;
+    // }
     this.setTranslateChart();
     this.maxYValue = Array.isArray(this.chartSeries[0].data)
       ? Math.max(...(this.chartSeries[0].data as number[]))
@@ -84,9 +84,14 @@ export class BarChartComponent implements OnInit, OnDestroy {
         width: '100%',
         // events: {
         //   click: (_event, _chartContext, config) => {
+        //     if (this.chartMode === NONE) {
+        //       return; // Do nothing if mode is NONE
+        //     }
         //     if (
         //       config.seriesIndex !== undefined &&
-        //       config.dataPointIndex !== undefined
+        //       config.seriesIndex >= 0 &&
+        //       config.dataPointIndex !== undefined &&
+        //       config.dataPointIndex >= 0
         //     ) {
         //       const value =
         //         this.chartSeries[config.seriesIndex].data[
@@ -94,7 +99,12 @@ export class BarChartComponent implements OnInit, OnDestroy {
         //         ];
         //       const category =
         //         this.dataBarChart()?.xLabels?.[config.dataPointIndex] || '';
-        //       console.log(`Clicked on ${category}: ${value}`);
+
+        //       this.chartDialog.value.set(category);
+        //       this.chartDialog.count.set(Number(value));
+
+        //       dataChartDialog$.next(this.chartDialog);
+        //       isShowChartDialog$.next(true);
         //     }
         //   },
         //   // dataPointMouseEnter: (event, chartContext, config) => {
@@ -146,12 +156,13 @@ export class BarChartComponent implements OnInit, OnDestroy {
     this.setTranslate();
     this.yTitle = this.trans.instant('chart.' + COUNT);
     // Update translations when language changes
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.setTranslate();
-      this.yTitle = this.trans.instant('chart.' + COUNT);
-      this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
-    });
-    this.subscriptions.push(langChangeSub);
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.setTranslate();
+        this.yTitle = this.trans.instant('chart.' + COUNT);
+        this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
+      });
   }
 
   private setTranslate(): void {

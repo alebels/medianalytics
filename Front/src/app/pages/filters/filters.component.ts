@@ -1,15 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  filtersTypeDialog$,
+  isShowFiltersDialog$,
+} from '../../utils/dialog-subjects';
 import { FilterDialog } from '../../models/dialog.model';
 import { FilterIdeologyComponent } from '../../components/filters/filter-ideology/filter-ideology.component';
 import { FilterSentimentComponent } from '../../components/filters/filter-sentiment/filter-sentiment.component';
 import { FilterWordComponent } from '../../components/filters/filter-word/filter-word.component';
 import { FiltersDialogComponent } from '../../components/dialogs/filters-dialog/filters-dialog.component';
 import { FiltersService } from '../../services/filters.service';
-import { GeneralService } from '../../services/general.service';
 import { MediaRead } from '../../models/media.model';
 import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-filters',
@@ -23,53 +26,42 @@ import { Subscription } from 'rxjs';
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css',
 })
-export class FiltersComponent implements OnInit, OnDestroy {
+export class FiltersComponent implements OnInit {
   dataFiltersDialog!: FilterDialog;
   isShowFiltersDialog = false;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private filtersSrv: FiltersService,
-    private sentimentIdeologySrv: SentimentIdeologyService,
-    private generalSrv: GeneralService,
-    private trans: TranslateService
-  ) {}
+  private filtersSrv = inject(FiltersService);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
+  private trans = inject(TranslateService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.initializeDialogs();
     this.filtersSrv.getTranslatedMediaCompose();
     this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
     // Subscribe to language change to update translations
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.filtersSrv.getTranslatedMediaCompose();
-      this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
-    });
-    this.subscriptions.push(langChangeSub);
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription: Subscription) =>
-      subscription.unsubscribe()
-    );
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.filtersSrv.getTranslatedMediaCompose();
+        this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
+      });
   }
 
   private initializeDialogs(): void {
     this.setFiltersDialog();
     // Subscribe to dialog visibility changes
-    const isShowDialogSub = this.generalSrv.isShowFiltersDialog$.subscribe(
-      (data) => {
+    isShowFiltersDialog$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
         this.isShowFiltersDialog = data;
-      }
-    );
-    this.subscriptions.push(isShowDialogSub);
+      });
     // Subscribe to dialog type changes
-    const dialogTypeSub = this.generalSrv.filtersTypeDialog$.subscribe(
-      (type) => {
+    filtersTypeDialog$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((type) => {
         this.showFiltersDialog(type);
-      }
-    );
-    this.subscriptions.push(dialogTypeSub);
+      });
   }
 
   private showFiltersDialog(type: string) {
@@ -85,23 +77,20 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
   private setFiltersDialog(): void {
     this.dataFiltersDialog = new FilterDialog([], []);
-    const mediaDataSub = this.filtersSrv.mediaRead$.subscribe(
-      (data: MediaRead[]) => {
+    this.filtersSrv.mediaRead$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: MediaRead[]) => {
         this.dataFiltersDialog.medias = data;
-      }
-    );
-    this.subscriptions.push(mediaDataSub);
-    const sentimentDataSub = this.sentimentIdeologySrv.sentiments$.subscribe(
-      (sentimentData) => {
+      });
+    this.sentimentIdeologySrv.sentiments$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((sentimentData) => {
         this.dataFiltersDialog.sentiments = sentimentData.sentiments;
-      }
-    );
-    this.subscriptions.push(sentimentDataSub);
-    const ideologiesDataSub = this.sentimentIdeologySrv.ideologies$.subscribe(
-      (ideologyData) => {
+      });
+    this.sentimentIdeologySrv.ideologies$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ideologyData) => {
         this.dataFiltersDialog.ideologies = ideologyData.ideologies;
-      }
-    );
-    this.subscriptions.push(ideologiesDataSub);
+      });
   }
 }

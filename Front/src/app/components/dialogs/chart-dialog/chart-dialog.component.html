@@ -1,5 +1,4 @@
 <p-dialog
-  header="'Chart Information'"
   [(visible)]="isVisible"
   [style]="{
     maxWidth: '90vw',
@@ -12,4 +11,13 @@
   [draggable]="true"
   (onHide)="onClose()"
 >
+  <ng-template #header pTemplate="header" styleClass="p-dialog-header">
+    <span class="p-dialog-title">
+      {{ title() | translate }} - {{ count() }}
+    </span>
+  </ng-template>
+  <div>
+    {{ "dialog.chart" | translate }}
+    {{ dataChartDialog()?.rangeDates?.[0] | date: 'longDate' }}
+  </div>
 </p-dialog>

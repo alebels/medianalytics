@@ -1,4 +1,3 @@
-import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   COUNT,
   DATE,
@@ -6,14 +5,20 @@ import {
   SENTIMENTS,
   TO_API,
 } from '../../../utils/constants';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import {
   FilterItem,
   SelectGroupItem2,
   SelectItem2,
 } from '../../../models/primeng.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  setToBarChart,
+  setToLineChart,
+  setToPieChart,
+} from '../../../utils/set-chart';
 import { BarChartComponent } from '../../charts/bar-chart/bar-chart.component';
+import { BehaviorSubject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { DataChart } from '../../../models/chart.model';
@@ -29,6 +34,8 @@ import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
 import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
 import { ToastModule } from 'primeng/toast';
+import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-filter-sentiment',
@@ -50,7 +57,7 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './filter-sentiment.component.css',
   providers: [MessageService],
 })
-export class FilterSentimentComponent implements OnInit, OnDestroy {
+export class FilterSentimentComponent implements OnInit {
   selectionLimit = 5;
 
   noData: NoData = {
@@ -75,33 +82,27 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
     key: string | number | string[] | null;
   }[] = [];
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(
-    private sentimentIdeologySrv: SentimentIdeologyService,
-    private messageService: MessageService,
-    private trans: TranslateService,
-    private generalSrv: GeneralService
-  ) {}
+  private destroyRef = inject(DestroyRef);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
+  private messageService = inject(MessageService);
+  private trans = inject(TranslateService);
+  private generalSrv = inject(GeneralService);
 
   ngOnInit(): void {
     this.setSentiments();
-    const langChangeSub = this.trans.onLangChange.subscribe(() => {
-      this.composeValues = [];
-      this.pieChart = null;
-      this.barChart = null;
-      this.lineChart = null;
-    });
-    this.subscriptions.push(langChangeSub);
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.composeValues = [];
+        this.pieChart = null;
+        this.barChart = null;
+        this.lineChart = null;
+      });
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
   sendFiltersDialog(type: string) {
-    this.generalSrv.filtersTypeDialog$.next(type);
+    filtersTypeDialog$.next(type);
   }
 
   getComposeValues(
@@ -148,15 +149,15 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
         .setFilterSentiment(composeObj)
         .then((data) => {
           if (data.plain) {
-            this.barChart = this.generalSrv.setToBarChart(data.plain, COUNT);
+            this.barChart = setToBarChart(data.plain, COUNT);
             this.barChart.translate = SENTIMENTS;
           }
           if (data.categorized) {
-            this.pieChart = this.generalSrv.setToPieChart(data.categorized);
+            this.pieChart = setToPieChart(data.categorized);
             this.pieChart.translate = SENTIMENTS;
           }
           if (data.date_chart) {
-            this.lineChart = this.generalSrv.setToLineChart(
+            this.lineChart = setToLineChart(
               data.date_chart.items,
               data.date_chart.labels
             );
@@ -170,12 +171,11 @@ export class FilterSentimentComponent implements OnInit, OnDestroy {
   }
 
   private setSentiments(): void {
-    const sentimentsSub = this.sentimentIdeologySrv.sentiments$.subscribe(
-      (data) => {
+    this.sentimentIdeologySrv.sentiments$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
         this.sentiments.data.set(data.sentiments);
         this.sentiments.value.set(null);
-      }
-    );
-    this.subscriptions.push(sentimentsSub);
+      });
   }
 }
