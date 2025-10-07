@@ -6,6 +6,7 @@ import {
   TO_API,
 } from '../../../utils/constants';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { FilterChartsRead, NoData } from '../../../models/items.model';
 import {
   FilterItem,
   SelectGroupItem2,
@@ -29,10 +30,10 @@ import { GeneralService } from '../../../services/general.service';
 import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
 import { MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { NoData } from '../../../models/items.model';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
 import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
+import { Sentiments } from '../../../models/sentiment-ideology.model';
 import { ToastModule } from 'primeng/toast';
 import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -90,6 +91,7 @@ export class FilterSentimentComponent implements OnInit {
 
   ngOnInit(): void {
     this.setSentiments();
+
     this.trans.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -98,20 +100,21 @@ export class FilterSentimentComponent implements OnInit {
         this.barChart = null;
         this.lineChart = null;
       });
+
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
-  sendFiltersDialog(type: string) {
+  sendFiltersDialog(type: string): void {
     filtersTypeDialog$.next(type);
   }
 
   getComposeValues(
     e: { type: string; key: string | number | string[] | null }[]
-  ) {
+  ): void {
     this.composeValues = e;
   }
 
-  showWarn() {
+  showWarn(): void {
     this.messageService.clear();
     this.messageService.add({
       severity: 'warn',
@@ -122,7 +125,7 @@ export class FilterSentimentComponent implements OnInit {
     });
   }
 
-  onClickFilter() {
+  onClickFilter(): void {
     if (
       this.composeValues.length == 0 ||
       !this.composeValues.some((item) => item.type !== DATE)
@@ -131,31 +134,37 @@ export class FilterSentimentComponent implements OnInit {
       return;
     } else {
       this.noData.isLoading?.next(true);
+
       const composeObj: Record<string, string | number | string[] | null> = {};
       this.composeValues.forEach((item) => {
         if (item.type in TO_API) {
           composeObj[TO_API[item.type as keyof typeof TO_API]] = item.key;
         }
       });
+
       if (this.sentiments.value()) {
         composeObj[SENTIMENTS] = this.sentiments
           .value()
           .map((item: SelectItem2) => item.key);
       }
+
       this.barChart = null;
       this.pieChart = null;
       this.lineChart = null;
+
       this.sentimentIdeologySrv
         .setFilterSentiment(composeObj)
-        .then((data) => {
+        .then((data: FilterChartsRead) => {
           if (data.plain) {
             this.barChart = setToBarChart(data.plain, COUNT);
             this.barChart.translate = SENTIMENTS;
           }
+
           if (data.categorized) {
             this.pieChart = setToPieChart(data.categorized);
             this.pieChart.translate = SENTIMENTS;
           }
+
           if (data.date_chart) {
             this.lineChart = setToLineChart(
               data.date_chart.items,
@@ -173,7 +182,7 @@ export class FilterSentimentComponent implements OnInit {
   private setSentiments(): void {
     this.sentimentIdeologySrv.sentiments$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
+      .subscribe((data: Sentiments) => {
         this.sentiments.data.set(data.sentiments);
         this.sentiments.value.set(null);
       });

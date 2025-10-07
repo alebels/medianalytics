@@ -45,6 +45,7 @@
       </th>
     </tr>
   </ng-template>
+
   <ng-template pTemplate="body" let-item let-i="rowIndex">
     <tr [pSelectableRow]="item">
       <td>{{ i + 1 }}</td>
@@ -52,6 +53,7 @@
       <td>{{ item.count }}</td>
     </tr>
   </ng-template>
+
   <ng-template #emptymessage>
     <tr>
       <td colspan="3">{{ "messages.no_data" | translate }}</td>

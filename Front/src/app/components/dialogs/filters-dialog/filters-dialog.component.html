@@ -21,11 +21,13 @@
       <i [class]="'icon mr-2 bi bi-' + getMediaIcon(type)"></i>
       {{ MEDIA_GROUP + "." + type | translate }}
     </h3>
+
     @for (country of getCountriesForType(type); track country) {
     <div class="ml-3 mb-4">
       <h4 class="text-xl font-serif font-semibold text-cText mb-2">
         {{ COUNTRIES + "." + country | translate }}
       </h4>
+
       <ul class="list-disc list-inside space-y-1">
         @for (media of getMediasForTypeAndCountry(type, country); track
         media.name) {
@@ -53,12 +55,14 @@
     </div>
     }
   </div>
+
   } } @if (header() === TYPES) { @for (type of getUniqueTypes(); track type) {
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
       <i [class]="'icon mr-2 bi bi-' + getMediaIcon(type)"></i>
       {{ MEDIA_GROUP + "." + type | translate }}
     </h3>
+
     <ul class="list-disc list-inside space-y-1 ml-4">
       @for (media of getMediaForType(type); track media.name) {
       <li class="text-base text-cText">
@@ -67,12 +71,14 @@
       }
     </ul>
   </div>
+
   } } @if (header() === COUNTRIES) { @for (country of getUniqueCountries();
   track country) {
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
       {{ COUNTRIES + "." + country | translate }}
     </h3>
+
     <ul class="list-disc list-inside space-y-1 ml-4">
       @for (media of getMediaForCountry(country); track media.name) {
       <li class="text-base text-cText">
@@ -81,12 +87,14 @@
       }
     </ul>
   </div>
+
   } } @if (header() === REGIONS) { @for (region of getUniqueRegions(); track
   region) {
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
       {{ REGIONS + "." + region | translate }}
     </h3>
+
     @for (country of getCountriesForRegion(region); track country) {
     <div class="ml-4 mb-2">
       <h4 class="text-xl font-serif font-semibold text-cText mb-2">
@@ -103,6 +111,7 @@
     </div>
     }
   </div>
+
   } } @if (header() === SENTIMENTS) {
   <div class="mb-5 mt-1 text-base text-cText max-w-[250px] text-center mx-auto">
     @if(dataFiltersDialog()?.generalMedias) {
@@ -111,6 +120,7 @@
     {{ "dialog.sentiments_filter" | translate }}
     }
   </div>
+
   @for (sentiment of getSentimentsSorted(); track sentiment.label) {
   <div class="mb-4">
     <h3
@@ -120,6 +130,7 @@
       <i [class]="'icon mr-2 bi bi-' + sentiment.icon"></i
       >{{ SENTIMENTS + "." + sentiment.label | translate }}
     </h3>
+
     <ul class="list-disc list-inside space-y-1 ml-4">
       @for (option of sentiment.items; track option.key) {
       <li class="text-base text-cText">
@@ -130,6 +141,7 @@
       }
     </ul>
   </div>
+
   } } @if (header() === IDEOLOGIES) {
   <div class="mb-5 mt-1 text-base text-cText max-w-[250px] text-center mx-auto">
     @if(dataFiltersDialog()?.generalMedias) {
@@ -138,6 +150,7 @@
     {{ "dialog.ideologies_filter" | translate }}
     }
   </div>
+
   @for (ideology of getIdeologiesSorted(); track ideology.label) {
   <div class="mb-4">
     <h3
@@ -147,6 +160,7 @@
       <i [class]="'icon mr-2 bi bi-' + ideology.icon"></i
       >{{ IDEOLOGIES + "." + ideology.label | translate }}
     </h3>
+
     <ul class="list-disc list-inside space-y-1 ml-4">
       @for (option of ideology.items; track option.key) {
       <li class="text-base text-cText">

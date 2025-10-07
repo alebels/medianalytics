@@ -29,9 +29,11 @@
         </ng-template>
         }
       </p-select>
+
       <label [for]="'filter-' + item.type + '-' + i">{{
         "filters." + item.type | translate
       }}</label>
+
       @if(item.type !== MEDIAS) {
       <i
         class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
@@ -61,6 +63,7 @@
         styleClass="w-[215px]"
         [yearRange]="minDate?.getFullYear() + ':' + maxDate?.getFullYear()"
       />
+
       <label for="filter-date">{{ "filters.date" | translate }}</label>
     </p-floatlabel>
   </div>

@@ -1,4 +1,5 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Ideologies, Sentiments } from '../../models/sentiment-ideology.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   filtersTypeDialog$,
@@ -39,6 +40,7 @@ export class FiltersComponent implements OnInit {
     this.initializeDialogs();
     this.filtersSrv.getTranslatedMediaCompose();
     this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
+
     // Subscribe to language change to update translations
     this.trans.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -50,21 +52,23 @@ export class FiltersComponent implements OnInit {
 
   private initializeDialogs(): void {
     this.setFiltersDialog();
+
     // Subscribe to dialog visibility changes
     isShowFiltersDialog$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
+      .subscribe((data: boolean) => {
         this.isShowFiltersDialog = data;
       });
+
     // Subscribe to dialog type changes
     filtersTypeDialog$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((type) => {
+      .subscribe((type: string) => {
         this.showFiltersDialog(type);
       });
   }
 
-  private showFiltersDialog(type: string) {
+  private showFiltersDialog(type: string): void {
     if (type === this.dataFiltersDialog?.header()) {
       // Same type clicked - toggle visibility
       this.isShowFiltersDialog = !this.isShowFiltersDialog;
@@ -82,14 +86,16 @@ export class FiltersComponent implements OnInit {
       .subscribe((data: MediaRead[]) => {
         this.dataFiltersDialog.medias = data;
       });
+
     this.sentimentIdeologySrv.sentiments$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((sentimentData) => {
+      .subscribe((sentimentData: Sentiments) => {
         this.dataFiltersDialog.sentiments = sentimentData.sentiments;
       });
+
     this.sentimentIdeologySrv.ideologies$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((ideologyData) => {
+      .subscribe((ideologyData: Ideologies) => {
         this.dataFiltersDialog.ideologies = ideologyData.ideologies;
       });
   }

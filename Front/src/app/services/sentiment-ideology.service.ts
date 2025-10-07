@@ -34,14 +34,16 @@ export class SentimentIdeologyService {
   }
 
   getTranslatedSentimentsIdeologies(): void {
-    const sentiments = this.translateAndSortGroups(
+    const sentiments: SelectGroupItem2[] = this.translateAndSortGroups(
       SENTIMENTS_GROUPS,
       SENTIMENTS
     );
-    const ideologies = this.translateAndSortGroups(
+
+    const ideologies: SelectGroupItem2[] = this.translateAndSortGroups(
       IDEOLOGIES_GROUPS,
       IDEOLOGIES
     );
+
     this.sentimentsSub.next({ sentiments });
     this.ideologiesSub.next({ ideologies });
   }
@@ -78,18 +80,19 @@ export class SentimentIdeologyService {
         `${this.apiUrl}/sentimentsideologies`
       )
     );
+
     // Helper function to process groups and items
     const processGroups = (
       groups: SelectGroupItem2[],
       sourceCategories: CategoryValues[]
-    ) => {
-      groups.forEach((group) => {
+    ): void => {
+      groups.forEach((group: SelectGroupItem2) => {
         const categoryData = sourceCategories.find(
-          (cat) => cat.category === group.label
+          (cat: CategoryValues) => cat.category === group.label
         );
         if (categoryData) {
           group.items = categoryData.values.map(
-            (value) => new SelectItem2(value)
+            (value: string) => new SelectItem2(value)
           );
         } else {
           group.items = [];
@@ -108,14 +111,16 @@ export class SentimentIdeologyService {
     groups: SelectGroupItem2[],
     type: string
   ): SelectGroupItem2[] {
-    return groups.map((group) => ({
+    return groups.map((group: SelectGroupItem2) => ({
       ...group, // Spread to keep other properties
       items: group.items
-        .map((item) => {
+        .map((item: SelectItem2) => {
           item.updateTranslation(this.trans.instant(`${type}.${item.key}`));
           return { ...item };
         })
-        .sort((a, b) => a.label.localeCompare(b.label)), // Sort the new array
+        .sort((a: SelectItem2, b: SelectItem2) =>
+          a.label.localeCompare(b.label)
+        ), // Sort the new array
     }));
   }
 }

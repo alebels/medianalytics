@@ -18,6 +18,7 @@ import { FiltersService } from '../../../services/filters.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { GeneralService } from '../../../services/general.service';
+import { MediaCompose } from '../../../models/media.model';
 import { MinMaxDateRead } from '../../../models/items.model';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
@@ -89,14 +90,14 @@ export class FilterComponent implements OnInit {
     this.getMinMaxDate();
   }
 
-  sendFiltersDialog(type: string) {
+  sendFiltersDialog(type: string): void {
     filtersTypeDialog$.next(type);
   }
 
   onSelectCompose(event: FilterItem): void {
     if (event.type === MEDIAS) {
       // When MEDIAS is selected, disable all others
-      this.mediaCompose.forEach((item) => {
+      this.mediaCompose.forEach((item: FilterItem) => {
         if (item.type !== MEDIAS) {
           item.value.set(null);
           item.disabled.set(!!event.value());
@@ -104,7 +105,7 @@ export class FilterComponent implements OnInit {
       });
     } else if (event.type === FILTERS.TYPES) {
       // When TYPE is selected or cleared, check other selections
-      this.mediaCompose.forEach((item) => {
+      this.mediaCompose.forEach((item: FilterItem) => {
         if (item.type === MEDIAS) {
           // Check if any region or country is selected
           const regionSelected = this.mediaCompose
@@ -124,11 +125,11 @@ export class FilterComponent implements OnInit {
       });
     } else {
       // When COUNTRY or REGION is selected, disable MEDIAS and the other one between COUNTRY/REGION
-      this.mediaCompose.forEach((item) => {
+      this.mediaCompose.forEach((item: FilterItem) => {
         if (item.type === MEDIAS) {
           // Disable MEDIAS if either this item has value OR if TYPE has value
           const typeHasValue = !!this.mediaCompose
-            .find((i) => i.type === FILTERS.TYPES)
+            .find((i: FilterItem) => i.type === FILTERS.TYPES)
             ?.value();
           item.value.set(null);
           item.disabled.set(!!event.value() || typeHasValue);
@@ -149,7 +150,7 @@ export class FilterComponent implements OnInit {
     const values: { type: string; key: string | number | string[] | null }[] =
       [];
 
-    this.mediaCompose.forEach((item) => {
+    this.mediaCompose.forEach((item: FilterItem) => {
       if (item.value()) {
         values.push({
           type: item.type,
@@ -157,6 +158,7 @@ export class FilterComponent implements OnInit {
         });
       }
     });
+
     if (this.rangeDates) {
       if (
         this.rangeDates.length === 2 &&
@@ -167,8 +169,9 @@ export class FilterComponent implements OnInit {
         this.rangeDates.pop(); // Remove the second date if it's the same as the first
         return;
       }
+
       const dates = this.rangeDates
-        .map((date) => {
+        .map((date: Date) => {
           if (date) {
             return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
               .toISOString()
@@ -177,6 +180,7 @@ export class FilterComponent implements OnInit {
           return '';
         })
         .filter((date) => date); // Filter out any empty strings
+
       values.push({
         type: DATE,
         key: dates,
@@ -210,7 +214,7 @@ export class FilterComponent implements OnInit {
   private setMediaCompose(): void {
     this.filtersSrv.mediaCompose$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
+      .subscribe((data: MediaCompose) => {
         Object.keys(data).forEach((key) => {
           const item = this.mediaCompose.find((item) => item.type === key);
           if (item && key in data) {
@@ -219,9 +223,11 @@ export class FilterComponent implements OnInit {
             item.disabled.set(false);
           }
         });
+
         const mediaItem = this.mediaCompose.find(
           (item) => item.type === MEDIAS
         );
+
         if (mediaItem) {
           mediaItem.disabled.set(false);
           mediaItem.value.set(null);

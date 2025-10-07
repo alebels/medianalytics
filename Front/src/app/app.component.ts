@@ -24,8 +24,9 @@ export class AppComponent implements OnInit {
     this.checkLanguage();
   }
 
-  private checkLanguage() {
+  private checkLanguage(): void {
     const preferredLanguage = localStorage.getItem('preferredLanguage');
+
     if (preferredLanguage) {
       this.trans
         .use(preferredLanguage)
@@ -38,6 +39,7 @@ export class AppComponent implements OnInit {
           : this.trans.getDefaultLang()
       );
     }
+
     this.trans.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {

@@ -3,6 +3,7 @@
   class="flex flex-wrap justify-start items-center gap-[var(--margin-standard)] mb-[var(--margin-standard)]"
 >
   <app-filter (composeValues)="getComposeValues($event)"></app-filter>
+
   <p-floatlabel variant="on">
     <p-multiselect
       [id]="'sentiment-' + sentiments.type"
@@ -29,9 +30,11 @@
         </div>
       </ng-template>
     </p-multiselect>
+
     <label [for]="'sentiment-' + sentiments.type">{{
       "filters." + sentiments.type | translate
     }}</label>
+
     <i
       class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
       tabindex="7"
@@ -39,6 +42,7 @@
       (keydown.enter)="sendFiltersDialog(sentiments.type)"
     ></i>
   </p-floatlabel>
+
   <div>
     <p-button (onClick)="onClickFilter()" [raised]="true" size="small">{{
       "filters.filter" | translate
@@ -58,6 +62,7 @@
       <app-bar-chart [dataBarChart]="barChart"></app-bar-chart>
     </p-card>
   </div>
+
   } @if (pieChart && pieChart.xLabels.length > 0 && !lineChart) {
   <div class="w-[30%] xym:w-full">
     <p-card styleClass="rounded bg-miscellany h-full">
@@ -66,12 +71,14 @@
       </div>
     </p-card>
   </div>
+
   } @if (lineChart && lineChart.xLabels.length > 0 && !pieChart && !barChart) {
   <div class="w-full">
     <p-card styleClass="rounded bg-miscellany h-full">
       <app-line-chart [dataLineChart]="lineChart"></app-line-chart>
     </p-card>
   </div>
+
   } @if ((!barChart || !barChart.xLabels || barChart.xLabels.length < 1) &&
   (!lineChart || !lineChart.xLabels || lineChart.xLabels.length < 1)) {
   <div class="w-full h-full">

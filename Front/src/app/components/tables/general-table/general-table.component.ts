@@ -65,7 +65,7 @@ export class GeneralTableComponent implements OnInit {
 
   private generalSrv = inject(GeneralService);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.dataTableLocked = [];
     this.dataTable = [...(this.dataGeneralTable()?.data ?? [])];
     this.staticDataTable = this.dataTable;
@@ -76,60 +76,65 @@ export class GeneralTableComponent implements OnInit {
     this.labelRegion = this.dataGeneralTable()?.labelRegion ?? '';
     this.labelUrl = this.dataGeneralTable()?.labelUrl ?? '';
     this.labelTotalArticles = this.dataGeneralTable()?.labelTotalArticles ?? '';
+
     this.labelAverageWordsArticle =
       this.dataGeneralTable()?.labelAverageWordsArticle ?? '';
     this.labelTopWords = this.dataGeneralTable()?.labelTopWords ?? '';
     this.labelTopSentiments = this.dataGeneralTable()?.labelTopSentiments ?? '';
+
     this.labelBottomSentiments =
       this.dataGeneralTable()?.labelBottomSentiments ?? '';
     this.labelTopIdeologies = this.dataGeneralTable()?.labelTopIdeologies ?? '';
     this.labelBottomIdeologies =
       this.dataGeneralTable()?.labelBottomIdeologies ?? '';
+
     this.labelTopGrammar = this.labelTopGrammar =
       this.dataGeneralTable()?.labelTopGrammar ?? '';
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
-  toggleLock(data: GeneralMediaRead, frozen: boolean) {
+  toggleLock(data: GeneralMediaRead, frozen: boolean): void {
     if (frozen) {
       // Add to locked if not already present and limit is not reached
-      if (
-        !this.dataTableLocked.some((item) => item.name === data.name) &&
-        this.dataTableLocked.length < 3
-      ) {
+      const isLocked = !this.dataTableLocked.some(
+        (item: GeneralMediaRead) => item.name === data.name
+      );
+
+      if (isLocked && this.dataTableLocked.length < 3) {
         this.dataTableLocked = [...this.dataTableLocked, data]; // Use spread for immutability if preferred
       }
     } else {
       // Remove from locked
       this.dataTableLocked = this.dataTableLocked.filter(
-        (item) => item.name !== data.name
+        (item: GeneralMediaRead) => item.name !== data.name
       );
     }
+
     // Re-apply the current filter to update the visible data table
     this.applyFilter(this.currentFilterValue);
   }
 
-  filterGlobal(value: string) {
+  filterGlobal(value: string): void {
     this.currentFilterValue = value; // Store current filter value
     this.applyFilter(value); // Apply the filter
   }
 
-  private applyFilter(value: string) {
-    let filteredData = this.staticDataTable;
+  private applyFilter(value: string): void {
+    let filteredData: GeneralMediaRead[] = this.staticDataTable;
 
     // Apply text filter if value exists
     if (value) {
       const lowerCaseValue = value.toLowerCase();
-      filteredData = filteredData.filter((item) =>
+      filteredData = filteredData.filter((item: GeneralMediaRead) =>
         item.name.toLowerCase().includes(lowerCaseValue)
       );
     }
 
     // Exclude locked items from the result
     this.dataTable = filteredData.filter(
-      (item) =>
+      (item: GeneralMediaRead) =>
         !this.dataTableLocked.some(
-          (lockedItem) => lockedItem.name === item.name
+          (lockedItem: GeneralMediaRead) => lockedItem.name === item.name
         )
     );
   }

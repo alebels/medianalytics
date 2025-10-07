@@ -32,8 +32,8 @@ export class GeneralService {
   }
 
   private checkIsMobile(): boolean {
-    const userAgent = navigator.userAgent;
-    const isMobile =
+    const userAgent: string = navigator.userAgent;
+    const isMobile: boolean =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         userAgent
       );

@@ -23,7 +23,7 @@ export class SortTableComponent implements OnInit {
   label1!: string;
   label2!: string;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.dataTable = [...this.dataSortTable()?.data ?? []];
     this.label1 = this.dataSortTable()?.label1 ?? '';
     this.label2 = this.dataSortTable()?.label2 ?? '';

@@ -1,6 +1,13 @@
-<p-card styleClass="w-[192px] text-cText text-xl rounded font-sans p-1 bg-miscellany mym:text-lg mym:w-[180px]">
+<p-card
+  styleClass="w-[192px] text-cText text-xl rounded font-sans p-1 bg-miscellany mym:text-lg mym:w-[180px]"
+>
   <div class="flex items-center w-full justify-center">
-    <a [href]="githubLink" class="block hover:text-accent" target="_blank" rel="noopener noreferrer">
+    <a
+      [href]="githubLink"
+      class="block hover:text-accent"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <div class="flex items-center w-full">
         <div>GitHub</div>
         <div class="ml-2">
@@ -9,29 +16,44 @@
       </div>
     </a>
   </div>
+
   <p-divider />
+
   <div class="flex items-center justify-between">
     <div>
       {{ "menu.dark" | translate }}
     </div>
     <div>
-      <p-toggleswitch [(ngModel)]="isDark" (onChange)="onChangeDark()" styleClass="flex items-center">
+      <p-toggleswitch
+        [(ngModel)]="isDark"
+        (onChange)="onChangeDark()"
+        styleClass="flex items-center"
+      >
         <ng-template #handle let-checked="isDark">
-          <i [ngClass]="[isDark ? 'bi bi-check' : 'bi bi-x']" class="flex center"></i>
+          <i
+            [ngClass]="[isDark ? 'bi bi-check' : 'bi bi-x']"
+            class="flex center"
+          ></i>
         </ng-template>
       </p-toggleswitch>
     </div>
   </div>
+
   <p-divider />
+
   <div>
     <p-accordion>
       <p-accordion-panel value="0">
         <p-accordion-header (click)="toggleAccordion = !toggleAccordion">{{
           "menu.language" | translate
-          }}</p-accordion-header>
-        <p-accordion-content [ngClass]="{'none': toggleAccordion}">
+        }}</p-accordion-header>
+
+        <p-accordion-content [ngClass]="{ none: toggleAccordion }">
           <div class="flex flex-col justify-items-start">
-            <button (click)="setLanguage('en')" class="my-2 w-min hover:text-accent">
+            <button
+              (click)="setLanguage('en')"
+              class="my-2 w-min hover:text-accent"
+            >
               {{ "menu.en" | translate }}
             </button>
             <button (click)="setLanguage('es')" class="w-min hover:text-accent">

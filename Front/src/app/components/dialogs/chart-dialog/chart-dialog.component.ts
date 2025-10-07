@@ -15,23 +15,26 @@ export class ChartDialogComponent implements OnInit {
   readonly dataChartDialog = input<ChartDialog>();
 
   count = computed(() => this.dataChartDialog()?.count() || 0);
+
   title = computed(() => {
     let title = '';
+
     if (this.dataChartDialog()?.valuation && this.dataChartDialog()?.value()) {
       title = `${
         this.dataChartDialog()?.valuation
       }.${this.dataChartDialog()?.value()}`;
     }
+
     return title;
   });
 
   isVisible = true;
 
-  ngOnInit() {
+  ngOnInit(): void {
     console.log('Chart Dialog Data:');
   }
 
-  onClose() {
+  onClose(): void {
     isShowChartDialog$.next(false);
   }
 }

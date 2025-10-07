@@ -7,9 +7,11 @@ dataFiltersDialog.generalMedias && dataFiltersDialog.generalMedias.length > 0) {
 dataChartDialog().value()) {
 <app-chart-dialog [dataChartDialog]="dataChartDialog()"></app-chart-dialog>
 }
+
 <div class="w-full font-serif text-2xl mb-6 text-center">
   {{ "home.description" | translate }}
 </div>
+
 <div>
   <p-card styleClass="rounded bg-miscellany">
     <div
@@ -30,18 +32,21 @@ dataChartDialog().value()) {
           ></i>
         </span>
       </div>
+
       <div class="flex justify-left align-center">
         {{ "home.total_articles" | translate }}:
         <span class="title-nums">{{
           generalTotalArticles | async | number : "1.0-0"
         }}</span>
       </div>
+
       <div class="flex justify-left align-center">
         {{ "home.average_words" | translate }}:
         <span class="title-nums">{{
           generalAverageWords | async | number : "1.0-0"
         }}</span>
       </div>
+
       <div class="flex justify-left align-center">
         {{ "home.total_words" | translate }}:
         <span class="title-nums">{{
@@ -51,6 +56,7 @@ dataChartDialog().value()) {
     </div>
   </p-card>
 </div>
+
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
@@ -59,12 +65,14 @@ dataChartDialog().value()) {
     </div>
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
   </div>
+
   <div
     class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
     {{ "home.subtitle_ratings_day" | translate }}:
     <b>{{ maxDate | date : "EEEE, d MMMM y" : "" : currentLang }}</b>
   </div>
+
   <div
     class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
   >
@@ -87,6 +95,7 @@ dataChartDialog().value()) {
           [dataBarChart]="generalDaySentiments.plain"
         ></app-bar-chart>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
@@ -106,6 +115,7 @@ dataChartDialog().value()) {
           ></app-pie-chart>
         </div>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
@@ -113,6 +123,7 @@ dataChartDialog().value()) {
       }
     </div>
   </div>
+
   <div
     class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
   >
@@ -135,12 +146,14 @@ dataChartDialog().value()) {
           [dataBarChart]="generalDayIdeologies.plain"
         ></app-bar-chart>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
       </div>
       }
     </div>
+
     <div class="w-[30%] xym:w-full">
       @if (generalDayIdeologies.categorized &&
       generalDayIdeologies.categorized.xLabels.length > 0) {
@@ -154,6 +167,7 @@ dataChartDialog().value()) {
           ></app-pie-chart>
         </div>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
@@ -161,6 +175,7 @@ dataChartDialog().value()) {
       }
     </div>
   </div>
+
   <div
     class="block w-full mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)]"
   >
@@ -171,6 +186,7 @@ dataChartDialog().value()) {
       </div>
       <app-bar-chart [dataBarChart]="generalDayTopWords"></app-bar-chart>
     </p-card>
+
     } @else {
     <div class="w-full h-full">
       <app-no-data [noData]="noData"></app-no-data>
@@ -178,6 +194,7 @@ dataChartDialog().value()) {
     }
   </div>
 </div>
+
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
@@ -194,6 +211,7 @@ dataChartDialog().value()) {
     </div>
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
   </div>
+
   <div
     class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
@@ -204,6 +222,7 @@ dataChartDialog().value()) {
     <div>
       <app-general-table [dataGeneralTable]="generalTable"></app-general-table>
     </div>
+
     } @else {
     <div class="w-full h-full">
       <app-no-data [noData]="noData"></app-no-data>
@@ -211,6 +230,7 @@ dataChartDialog().value()) {
     }
   </div>
 </div>
+
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
@@ -219,6 +239,7 @@ dataChartDialog().value()) {
     </div>
     <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
   </div>
+
   <div
     class="w-full font-serif text-xl mt-[var(--margin-standard)] mb-[var(--margin-header-divider)] text-center"
   >
@@ -239,6 +260,7 @@ dataChartDialog().value()) {
       "
     ></span>
   </div>
+
   <div
     class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
   >
@@ -259,12 +281,14 @@ dataChartDialog().value()) {
         </div>
         <app-bar-chart [dataBarChart]="generalSentiments.plain"></app-bar-chart>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
       </div>
       }
     </div>
+
     <div class="w-[30%] xym:w-full">
       @if (generalSentiments.categorized &&
       generalSentiments.categorized.xLabels.length > 0) {
@@ -278,6 +302,7 @@ dataChartDialog().value()) {
           ></app-pie-chart>
         </div>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
@@ -285,6 +310,7 @@ dataChartDialog().value()) {
       }
     </div>
   </div>
+
   <div
     class="block flex flex-wrap justify-between mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)] xym:h-[var(--height-chart-home-res)]"
   >
@@ -305,12 +331,14 @@ dataChartDialog().value()) {
         </div>
         <app-bar-chart [dataBarChart]="generalIdeologies.plain"></app-bar-chart>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
       </div>
       }
     </div>
+
     <div class="w-[30%] xym:w-full">
       @if (generalIdeologies.categorized &&
       generalIdeologies.categorized.xLabels.length > 0) {
@@ -324,6 +352,7 @@ dataChartDialog().value()) {
           ></app-pie-chart>
         </div>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
@@ -331,6 +360,7 @@ dataChartDialog().value()) {
       }
     </div>
   </div>
+
   <div
     class="block w-full mb-[var(--margin-standard)] text-lg text-center h-[var(--height-chart-home)]"
   >
@@ -341,12 +371,14 @@ dataChartDialog().value()) {
       </div>
       <app-bar-chart [dataBarChart]="generalTopWords"></app-bar-chart>
     </p-card>
+
     } @else {
     <div class="w-full h-full">
       <app-no-data [noData]="noData"></app-no-data>
     </div>
     }
   </div>
+
   <div
     class="block flex flex-wrap justify-between text-lg text-center h-[var(--height-table-home)] lym:h-full"
   >
@@ -358,12 +390,14 @@ dataChartDialog().value()) {
         <div class="mb-[10px]">{{ "home.bottom_words" | translate }}</div>
         <app-sort-table [dataSortTable]="generalBottomWords"></app-sort-table>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>
       </div>
       }
     </div>
+
     <div class="w-[calc(50%-var(--margin-standard)/2)] lym:w-full">
       @if (generalTopGrammar.xLabels.length > 0) {
       <p-card styleClass="rounded bg-miscellany h-full">
@@ -372,6 +406,7 @@ dataChartDialog().value()) {
           <app-pie-chart [dataPieChart]="generalTopGrammar"></app-pie-chart>
         </div>
       </p-card>
+
       } @else {
       <div class="w-full h-full">
         <app-no-data [noData]="noData"></app-no-data>

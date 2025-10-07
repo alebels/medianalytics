@@ -19,9 +19,9 @@ export class HeaderComponent implements OnInit {
 
   items!: MenuItem[];
 
-  ngOnInit() {
+  ngOnInit(): void {
     // Create menu items from routes
-    const routeItems = this.routes.map((route) => ({
+    const routeItems = this.routes.map((route: string) => ({
       label: route,
       routerLink: `/${route}`,
     }));

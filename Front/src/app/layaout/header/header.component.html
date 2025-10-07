@@ -1,53 +1,109 @@
 <header class="w-full bg-cBackground text-cText h-[var(--height-header)]">
-    <div class="py-[var(--margin-header-footer)] mx-auto flex justify-between items-center">
-        <div routerLink="/" class="flex flex-row items-center text-bold cursor-pointer">
-            <div>
-                <img src="assets/medianalytics-header-logo.png" width="35" alt="Logo"
-                    class="max-w-full h-auto" />
-            </div>
-            <div class="font-serif font-medium text-3xl ml-3">
-                Medianalytics
-            </div>
-        </div>
-        <nav>
-            <div class="font-medium font-serif text-2xl mym:hidden">
-                <ul class="flex space-x-8 mym:hidden">
-                    @for (route of routes; track route) {
-                    <li>
-                        <a [routerLink]="'/'+route" routerLinkActive="active" class="hover-underline">{{ 'header.'+route | translate }}</a>
-                    </li>
-                    }
-                    <li>
-                        <a class="hover-settings" role="button" tabindex="0" (click)="toggleMenu = !toggleMenu"
-                            (keydown.enter)="toggleMenu = false"><i class="bi bi-gear-fill text-xl"></i></a>
-                        <div class="menu" [ngClass]="{'menu-hide': toggleMenu}"
-                            tabindex="1">
-                            <app-settings></app-settings>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="hidden mym:block">
-                <div role="button" tabindex="2" (click)="menu.toggle($event);toggleMenu = true" (keydown.enter)="menu.toggle($event)">
-                    <i class="bi text-3xl"
-                    [ngClass]="menu.visible ? 'bi-three-dots' : 'bi-three-dots-vertical'"></i>
-                </div>
-                <p-menu #menu [model]="items" [popup]="true" styleClass="!absolute !top-[var(--height-header)-18px] !right-[32px] font-medium font-serif text-xl w-[135px]">
-                    <ng-template #item let-item>
-                        <a pRipple [routerLink]="item.routerLink" routerLinkActive="active" class="flex items-center p-menu-item-link">
-                            <span class="ml-[6px]">{{ 'header.'+item.label | translate }}</span>
-                        </a>
-                    </ng-template>
-                    <ng-template #end>
-                        <a class="flex items-center p-menu-item-link hover-settings ml-[12px]" role="button" tabindex="3" (click)="toggleMenu = !toggleMenu"
-                            (keydown.enter)="toggleMenu = false">{{ 'header.settings' | translate }}</a>
-                        <div class="menu-res" [ngClass]="{'menu-hide': toggleMenu}"
-                            tabindex="4">
-                            <app-settings></app-settings>
-                        </div>
-                    </ng-template>
-                </p-menu>
-            </div>
-        </nav>
+  <div
+    class="py-[var(--margin-header-footer)] mx-auto flex justify-between items-center"
+  >
+    <div
+      routerLink="/"
+      class="flex flex-row items-center text-bold cursor-pointer"
+    >
+      <div>
+        <img
+          src="assets/medianalytics-header-logo.png"
+          width="35"
+          height="35"
+          alt="Logo"
+        />
+      </div>
+
+      <div class="font-serif font-medium text-3xl ml-3">Medianalytics</div>
     </div>
+
+    <nav>
+      <div class="font-medium font-serif text-2xl mym:hidden">
+        <ul class="flex space-x-8 mym:hidden">
+          @for (route of routes; track route) {
+          <li>
+            <a
+              [routerLink]="'/' + route"
+              routerLinkActive="active"
+              class="hover-underline"
+              >{{ "header." + route | translate }}</a
+            >
+          </li>
+          }
+          <li>
+            <a
+              class="hover-settings"
+              role="button"
+              tabindex="0"
+              (click)="toggleMenu = !toggleMenu"
+              (keydown.enter)="toggleMenu = false"
+              ><i class="bi bi-gear-fill text-xl"></i
+            ></a>
+            <div
+              class="menu"
+              [ngClass]="{ 'menu-hide': toggleMenu }"
+              tabindex="1"
+            >
+              <app-settings></app-settings>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hidden mym:block">
+        <div
+          role="button"
+          tabindex="2"
+          (click)="menu.toggle($event); toggleMenu = true"
+          (keydown.enter)="menu.toggle($event)"
+        >
+          <i
+            class="bi text-3xl"
+            [ngClass]="
+              menu.visible ? 'bi-three-dots' : 'bi-three-dots-vertical'
+            "
+          ></i>
+        </div>
+
+        <p-menu
+          #menu
+          [model]="items"
+          [popup]="true"
+          styleClass="!absolute !top-[var(--height-header)-18px] !right-[32px] font-medium font-serif text-xl w-[135px]"
+        >
+          <ng-template #item let-item>
+            <a
+              pRipple
+              [routerLink]="item.routerLink"
+              routerLinkActive="active"
+              class="flex items-center p-menu-item-link"
+            >
+              <span class="ml-[6px]">{{
+                "header." + item.label | translate
+              }}</span>
+            </a>
+          </ng-template>
+
+          <ng-template #end>
+            <a
+              class="flex items-center p-menu-item-link hover-settings ml-[12px]"
+              role="button"
+              tabindex="3"
+              (click)="toggleMenu = !toggleMenu"
+              (keydown.enter)="toggleMenu = false"
+              >{{ "header.settings" | translate }}</a
+            >
+            <div
+              class="menu-res"
+              [ngClass]="{ 'menu-hide': toggleMenu }"
+              tabindex="4"
+            >
+              <app-settings></app-settings>
+            </div>
+          </ng-template>
+        </p-menu>
+      </div>
+    </nav>
+  </div>
 </header>

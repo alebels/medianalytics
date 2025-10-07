@@ -9,11 +9,11 @@ export class ScrollTopComponent {
   windowScrolled = false;
 
   @HostListener('window:scroll', [])
-  onWindowScroll() {
+  onWindowScroll(): void {
     this.windowScrolled = window.scrollY > 140;
   }
 
-  scrollToTop() {
+  scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

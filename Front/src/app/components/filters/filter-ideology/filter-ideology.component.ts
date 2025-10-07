@@ -6,6 +6,7 @@ import {
   TO_API,
 } from '../../../utils/constants';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { FilterChartsRead, NoData } from '../../../models/items.model';
 import {
   FilterItem,
   SelectGroupItem2,
@@ -26,10 +27,10 @@ import { FilterComponent } from '../filter/filter.component';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { GeneralService } from '../../../services/general.service';
+import { Ideologies } from '../../../models/sentiment-ideology.model';
 import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
 import { MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { NoData } from '../../../models/items.model';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
 import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
@@ -101,17 +102,17 @@ export class FilterIdeologyComponent implements OnInit {
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
-  sendFiltersDialog(type: string) {
+  sendFiltersDialog(type: string): void {
     filtersTypeDialog$.next(type);
   }
 
   getComposeValues(
     e: { type: string; key: string | number | string[] | null }[]
-  ) {
+  ): void {
     this.composeValues = e;
   }
 
-  showWarn() {
+  showWarn(): void {
     this.messageService.clear();
     this.messageService.add({
       severity: 'warn',
@@ -122,7 +123,7 @@ export class FilterIdeologyComponent implements OnInit {
     });
   }
 
-  onClickFilter() {
+  onClickFilter(): void {
     if (
       this.composeValues.length == 0 ||
       !this.composeValues.some((item) => item.type !== DATE)
@@ -131,31 +132,37 @@ export class FilterIdeologyComponent implements OnInit {
       return;
     } else {
       this.noData.isLoading?.next(true);
+
       const composeObj: Record<string, string | number | string[] | null> = {};
       this.composeValues.forEach((item) => {
         if (item.type in TO_API) {
           composeObj[TO_API[item.type as keyof typeof TO_API]] = item.key;
         }
       });
+
       if (this.ideologies.value()) {
         composeObj[IDEOLOGIES] = this.ideologies
           .value()
           .map((item: SelectItem2) => item.key);
       }
+
       this.barChart = null;
       this.pieChart = null;
       this.lineChart = null;
+
       this.sentimentIdeologySrv
         .setFilterIdeology(composeObj)
-        .then((data) => {
+        .then((data: FilterChartsRead) => {
           if (data.plain) {
             this.barChart = setToBarChart(data.plain, COUNT);
             this.barChart.translate = IDEOLOGIES;
           }
+
           if (data.categorized) {
             this.pieChart = setToPieChart(data.categorized);
             this.pieChart.translate = IDEOLOGIES;
           }
+
           if (data.date_chart) {
             this.lineChart = setToLineChart(
               data.date_chart.items,
@@ -173,7 +180,7 @@ export class FilterIdeologyComponent implements OnInit {
   private setIdeologies(): void {
     this.sentimentIdeologySrv.ideologies$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
+      .subscribe((data: Ideologies) => {
         this.ideologies.data.set(data.ideologies);
         this.ideologies.value.set(null);
       });

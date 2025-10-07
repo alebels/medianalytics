@@ -57,6 +57,7 @@ export class PieChartComponent implements OnInit {
     } else {
       this.chartLabels = this.dataPieChart()?.xLabels || [];
     }
+
     this.chartOptionsUpdate(this.chartLabels);
   }
 
@@ -71,6 +72,7 @@ export class PieChartComponent implements OnInit {
         },
         width: 470,
       },
+
       labels: xlabels || [],
       stroke: {
         width: 2,
@@ -88,6 +90,7 @@ export class PieChartComponent implements OnInit {
         palette: 'palette7',
       },
       colors: [],
+
       responsive: [
         {
           breakpoint: 1755,
@@ -139,6 +142,7 @@ export class PieChartComponent implements OnInit {
         },
       ],
     };
+
     if (this.dataPieChart()?.translate === SENTIMENTS) {
       this.setSentimentColors();
     } else if (this.dataPieChart()?.translate === IDEOLOGIES) {
@@ -153,6 +157,7 @@ export class PieChartComponent implements OnInit {
       NEUTRALS: 'var(--color-neutral)',
       POSITIVES: 'var(--color-positive)',
     };
+
     // Set colors array in the same order as the labels
     this.chartOptions.colors =
       this.dataPieChart()?.xLabels?.map(
@@ -173,6 +178,7 @@ export class PieChartComponent implements OnInit {
       PHILOSOPHICAL_ORIENTATIONS: 'var(--color-philosophical-orientations)',
       EPISTEMOLOGICAL_ORIENTATIONS: 'var(--color-epistemological-orientations)',
     };
+
     // Set colors array in the same order as the labels
     this.chartOptions.colors =
       this.dataPieChart()?.xLabels?.map(
@@ -183,7 +189,7 @@ export class PieChartComponent implements OnInit {
   private setTranslateChart(): void {
     // Initial translation
     this.chartLabels =
-      this.dataPieChart()?.xLabels?.map((label) =>
+      this.dataPieChart()?.xLabels?.map((label: string) =>
         this.trans.instant(this.translateType + '.' + label)
       ) || [];
 
@@ -192,7 +198,7 @@ export class PieChartComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.chartLabels =
-          this.dataPieChart()?.xLabels?.map((label) =>
+          this.dataPieChart()?.xLabels?.map((label: string) =>
             this.trans.instant(this.translateType + '.' + label)
           ) || [];
         this.chartOptionsUpdate(this.chartLabels);

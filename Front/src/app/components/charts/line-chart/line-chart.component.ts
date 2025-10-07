@@ -61,10 +61,12 @@ export class LineChartComponent implements OnInit {
     }
     this.chartLabels = this.dataLineChart()?.xLabels || [];
     this.setTranslateChart();
+
     const maxValues: number[] = [];
     this.chartSeries.forEach((item) => {
       maxValues.push(Math.max(...(item.data as number[])));
     });
+
     this.maxYValue = maxValues.length > 0 ? Math.max(...maxValues) : undefined;
     this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
   }
@@ -87,6 +89,7 @@ export class LineChartComponent implements OnInit {
       dataLabels: {
         enabled: false,
       },
+
       xaxis: {
         labels: {
           show:
@@ -99,18 +102,20 @@ export class LineChartComponent implements OnInit {
         },
         categories: xlabels || [],
       },
+
       yaxis: {
         show: true,
         max: this.maxYValue ? this.maxYValue + 1 : undefined,
         tickAmount: this.maxYValue && this.maxYValue > 12 ? 8 : undefined,
         min: 0,
         labels: {
-          formatter: (val) => (val ? Math.round(val).toString() : '-'),
+          formatter: (val: number) => (val ? Math.round(val).toString() : '-'),
           style: {
             fontSize: '16px',
           },
         },
       },
+
       grid: {
         borderColor: '#e7e7e7',
         row: {
@@ -126,6 +131,7 @@ export class LineChartComponent implements OnInit {
           size: 6,
         },
       },
+
       legend: {
         show: true,
         position: 'top',
@@ -156,24 +162,29 @@ export class LineChartComponent implements OnInit {
     }
 
     // Update translations when language changes
-    this.trans.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.dataLineChart()?.translate !== NONE) {
-        this.setTranslate();
-      }
-      this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
-    });
+    this.trans.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.dataLineChart()?.translate !== NONE) {
+          this.setTranslate();
+        }
+
+        this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
+      });
   }
 
   private setTranslate(): void {
     this.chartLabels =
-      this.dataLineChart()?.xLabels?.map((label) => {
+      this.dataLineChart()?.xLabels?.map((label: string) => {
         const date = new Date(label);
         const day = date.getDate();
+
         const month = date
           .toLocaleString(this.trans.currentLang, { month: 'short' })
           .replace(/\.$/, '')
           .trim()
           .replace(/^(.)(.*)$/, (_, first, rest) => first.toUpperCase() + rest);
+
         const year = (date.getFullYear() % 100).toString().padStart(2, '0');
         return `${day} ${month} ${year}`;
       }) || [];

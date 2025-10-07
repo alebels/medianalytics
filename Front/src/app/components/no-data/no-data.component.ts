@@ -25,7 +25,7 @@ export class NoDataComponent implements OnInit {
     this.type = this.noData()?.type ?? NO_DATA.NO_DATA;
     this.noData()
       ?.isLoading?.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((loading) => {
+      .subscribe((loading: boolean) => {
         this.isLoading = loading;
       });
   }

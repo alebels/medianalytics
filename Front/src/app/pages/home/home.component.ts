@@ -96,6 +96,7 @@ export class HomeComponent implements OnInit {
     this.generalAverageWords = this.homeSrv.generalAverageWord$;
     this.generalTotalWords = this.homeSrv.generalTotalWords$;
     this.isMobile = this.generalSrv.isMobile$.getValue();
+
     this.setGeneralTable();
     this.setGeneralDayTopWords();
     this.setGeneralDaySentiments();
@@ -110,8 +111,9 @@ export class HomeComponent implements OnInit {
     this.initializeDialogs();
   }
 
-  showFiltersDialog(type: string) {
+  showFiltersDialog(type: string): void {
     this.isShowChartDialog.set(false);
+
     if (type === this.dataFiltersDialog?.header()) {
       // Same type clicked - toggle visibility
       this.isShowFiltersDialog.set(!this.isShowFiltersDialog());
@@ -124,6 +126,7 @@ export class HomeComponent implements OnInit {
 
   private initializeDialogs(): void {
     this.setFiltersDialog();
+
     // Subscribe to dialog visibility changes
     isShowFiltersDialog$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -131,12 +134,14 @@ export class HomeComponent implements OnInit {
         this.isShowFiltersDialog.set(data);
         this.isShowChartDialog.set(false);
       });
+
     isShowChartDialog$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: boolean) => {
         this.isShowChartDialog.set(data);
         this.isShowFiltersDialog.set(false);
       });
+
     dataChartDialog$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: ChartDialog) => {
@@ -150,6 +155,7 @@ export class HomeComponent implements OnInit {
       .subscribe((sentimentData: Sentiments) => {
         this.dataFiltersDialog.sentiments = sentimentData.sentiments;
       });
+
     this.sentimentIdeologySrv.ideologies$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((ideologyData: Ideologies) => {

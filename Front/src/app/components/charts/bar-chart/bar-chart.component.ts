@@ -59,12 +59,16 @@ export class BarChartComponent implements OnInit {
 
   private initialize(): void {
     this.chartMode = this.dataBarChart()?.translate || NONE;
+
     // if (this.chartMode !== NONE) {
     //   // Determine if this is a sentiment or ideology chart
-    //   this.chartDialog = this.dataBarChart()?.filterDialogChart || new ChartDialog();
+    //   this.chartDialog =
+    //     this.dataBarChart()?.filterDialogChart || new ChartDialog();
     //   this.chartDialog.valuation = this.chartMode;
     // }
+
     this.setTranslateChart();
+
     this.maxYValue = Array.isArray(this.chartSeries[0].data)
       ? Math.max(...(this.chartSeries[0].data as number[]))
       : undefined;
@@ -87,6 +91,7 @@ export class BarChartComponent implements OnInit {
         //     if (this.chartMode === NONE) {
         //       return; // Do nothing if mode is NONE
         //     }
+
         //     if (
         //       config.seriesIndex !== undefined &&
         //       config.seriesIndex >= 0 &&
@@ -97,6 +102,7 @@ export class BarChartComponent implements OnInit {
         //         this.chartSeries[config.seriesIndex].data[
         //           config.dataPointIndex
         //         ];
+
         //       const category =
         //         this.dataBarChart()?.xLabels?.[config.dataPointIndex] || '';
 
@@ -115,6 +121,7 @@ export class BarChartComponent implements OnInit {
         //   // },
         // },
       },
+
       dataLabels: {
         enabled: false,
       },
@@ -128,13 +135,14 @@ export class BarChartComponent implements OnInit {
         },
         categories: xlabels || [],
       },
+
       yaxis: {
         show: true,
         max: this.maxYValue,
         tickAmount: this.maxYValue ? 8 : undefined,
         min: 0,
         labels: {
-          formatter: (val) => Math.round(val).toLocaleString(),
+          formatter: (val: number) => Math.round(val).toLocaleString(),
           style: {
             fontSize: '16px',
           },
@@ -155,6 +163,7 @@ export class BarChartComponent implements OnInit {
     // Initial translation
     this.setTranslate();
     this.yTitle = this.trans.instant('chart.' + COUNT);
+
     // Update translations when language changes
     this.trans.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -168,7 +177,7 @@ export class BarChartComponent implements OnInit {
   private setTranslate(): void {
     if (this.chartMode !== NONE) {
       this.chartLabels =
-        this.dataBarChart()?.xLabels?.map((label) =>
+        this.dataBarChart()?.xLabels?.map((label: string) =>
           this.trans.instant(this.chartMode + '.' + label)
         ) || [];
     } else if (this.chartLabels === undefined) {

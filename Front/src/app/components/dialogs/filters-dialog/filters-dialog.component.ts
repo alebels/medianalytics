@@ -6,6 +6,8 @@ import {
   MEDIA_GROUP,
   SENTIMENTS,
 } from '../../../utils/constants';
+import { GeneralMedia, MediaRead } from '../../../models/media.model';
+import { SelectGroupItem2, SelectItem2 } from '../../../models/primeng.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -54,11 +56,11 @@ export class FiltersDialogComponent implements OnInit {
       const regions = medias.map((media) => media.region) || [];
       return Array.from(new Set(regions)).length;
     } else if (header === this.SENTIMENTS) {
-      return sentiments.reduce((total, sentiment) => {
+      return sentiments.reduce((total: number, sentiment: SelectGroupItem2) => {
         return total + (sentiment.items?.length || 0);
       }, 0);
     } else if (header === this.IDEOLOGIES) {
-      return ideologies.reduce((total, ideology) => {
+      return ideologies.reduce((total: number, ideology: SelectGroupItem2) => {
         return total + (ideology.items?.length || 0);
       }, 0);
     } else if (header === this.GENERAL_MEDIAS) {
@@ -74,115 +76,148 @@ export class FiltersDialogComponent implements OnInit {
   private generalSrv = inject(GeneralService);
   private translate = inject(TranslateService);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
-  onClose() {
+  onClose(): void {
     isShowFiltersDialog$.next(false);
   }
 
-  getMediaIcon(type: string) {
+  getMediaIcon(type: string): string {
     return MEDIA_GROUP[type as keyof typeof MEDIA_GROUP]?.icon || 'newspaper';
   }
 
-  getUniqueGeneralTypes() {
-    const types =
-      this.dataFiltersDialog()?.generalMedias?.map((media) => media.type) || [];
-    return Array.from(new Set(types)).sort((a, b) => a.localeCompare(b));
-  }
-
-  getCountriesForType(type: string) {
-    const medias = this.dataFiltersDialog()?.generalMedias || [];
-    const countries = medias
-      .filter((media) => media.type === type)
-      .map((media) => media.country);
-    const uniqueCountries = Array.from(new Set(countries));
-    return uniqueCountries.sort((a, b) => {
-      const transA = this.translate.instant(this.COUNTRIES + '.' + a);
-      const transB = this.translate.instant(this.COUNTRIES + '.' + b);
-      return transA.localeCompare(transB);
-    });
-  }
-
-  getMediasForTypeAndCountry(type: string, country: string) {
-    const filteredItems =
-      this.dataFiltersDialog()?.generalMedias?.filter(
-        (media) => media.type === type && media.country === country
+  getUniqueGeneralTypes(): string[] {
+    const types: string[] =
+      this.dataFiltersDialog()?.generalMedias?.map(
+        (media: GeneralMedia) => media.type
       ) || [];
-    return filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+
+    return Array.from(new Set(types)).sort((a: string, b: string) =>
+      a.localeCompare(b)
+    );
   }
 
-  getUniqueTypes() {
-    const types =
-      this.dataFiltersDialog()?.medias?.map((media) => media.type) || [];
-    return Array.from(new Set(types)).sort((a, b) => a.localeCompare(b));
-  }
+  getCountriesForType(type: string): string[] {
+    const medias: GeneralMedia[] =
+      this.dataFiltersDialog()?.generalMedias || [];
 
-  getMediaForType(type: string) {
-    const medias = this.dataFiltersDialog()?.medias || [];
-    return medias
-      .filter((media) => media.type === type)
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }
+    const countries: string[] = medias
+      .filter((media: GeneralMedia) => media.type === type)
+      .map((media: GeneralMedia) => media.country);
 
-  getUniqueCountries() {
-    const countries =
-      this.dataFiltersDialog()?.medias?.map((media) => media.country) || [];
-    return Array.from(new Set(countries)).sort((a, b) => {
+    const uniqueCountries: string[] = Array.from(new Set(countries));
+
+    return uniqueCountries.sort((a: string, b: string) => {
       const transA = this.translate.instant(this.COUNTRIES + '.' + a);
       const transB = this.translate.instant(this.COUNTRIES + '.' + b);
       return transA.localeCompare(transB);
     });
   }
 
-  getMediaForCountry(country: string) {
-    const medias = this.dataFiltersDialog()?.medias || [];
-    return medias
-      .filter((media) => media.country === country)
-      .sort((a, b) => a.name.localeCompare(b.name));
+  getMediasForTypeAndCountry(type: string, country: string): GeneralMedia[] {
+    const filteredItems: GeneralMedia[] =
+      this.dataFiltersDialog()?.generalMedias?.filter(
+        (media: GeneralMedia) =>
+          media.type === type && media.country === country
+      ) || [];
+
+    return filteredItems.sort((a: GeneralMedia, b: GeneralMedia) =>
+      a.name.localeCompare(b.name)
+    );
   }
 
-  getUniqueRegions() {
-    const regions =
-      this.dataFiltersDialog()?.medias?.map((media) => media.region) || [];
-    return Array.from(new Set(regions)).sort((a, b) => {
+  getUniqueTypes(): string[] {
+    const types: string[] =
+      this.dataFiltersDialog()?.medias?.map((media: MediaRead) => media.type) ||
+      [];
+
+    return Array.from(new Set(types)).sort((a: string, b: string) =>
+      a.localeCompare(b)
+    );
+  }
+
+  getMediaForType(type: string): MediaRead[] {
+    const medias: MediaRead[] = this.dataFiltersDialog()?.medias || [];
+
+    return medias
+      .filter((media: MediaRead) => media.type === type)
+      .sort((a: MediaRead, b: MediaRead) => a.name.localeCompare(b.name));
+  }
+
+  getUniqueCountries(): string[] {
+    const countries: string[] =
+      this.dataFiltersDialog()?.medias?.map(
+        (media: MediaRead) => media.country
+      ) || [];
+
+    return Array.from(new Set(countries)).sort((a: string, b: string) => {
+      const transA = this.translate.instant(this.COUNTRIES + '.' + a);
+      const transB = this.translate.instant(this.COUNTRIES + '.' + b);
+      return transA.localeCompare(transB);
+    });
+  }
+
+  getMediaForCountry(country: string): MediaRead[] {
+    const medias: MediaRead[] = this.dataFiltersDialog()?.medias || [];
+
+    return medias
+      .filter((media: MediaRead) => media.country === country)
+      .sort((a: MediaRead, b: MediaRead) => a.name.localeCompare(b.name));
+  }
+
+  getUniqueRegions(): string[] {
+    const regions: string[] =
+      this.dataFiltersDialog()?.medias?.map(
+        (media: MediaRead) => media.region
+      ) || [];
+
+    return Array.from(new Set(regions)).sort((a: string, b: string) => {
       const transA = this.translate.instant(this.REGIONS + '.' + a);
       const transB = this.translate.instant(this.REGIONS + '.' + b);
       return transA.localeCompare(transB);
     });
   }
 
-  getCountriesForRegion(region: string) {
-    const medias = this.dataFiltersDialog()?.medias || [];
-    const countries = medias
-      .filter((media) => media.region === region)
-      .map((media) => media.country);
-    return Array.from(new Set(countries)).sort((a, b) => {
+  getCountriesForRegion(region: string): string[] {
+    const medias: MediaRead[] = this.dataFiltersDialog()?.medias || [];
+
+    const countries: string[] = medias
+      .filter((media: MediaRead) => media.region === region)
+      .map((media: MediaRead) => media.country);
+
+    return Array.from(new Set(countries)).sort((a: string, b: string) => {
       const transA = this.translate.instant(this.COUNTRIES + '.' + a);
       const transB = this.translate.instant(this.COUNTRIES + '.' + b);
       return transA.localeCompare(transB);
     });
   }
 
-  getMediaForRegionAndCountry(region: string, country: string) {
-    const medias = this.dataFiltersDialog()?.medias || [];
+  getMediaForRegionAndCountry(region: string, country: string): MediaRead[] {
+    const medias: MediaRead[] = this.dataFiltersDialog()?.medias || [];
+
     return medias
-      .filter((media) => media.region === region && media.country === country)
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .filter(
+        (media: MediaRead) =>
+          media.region === region && media.country === country
+      )
+      .sort((a: MediaRead, b: MediaRead) => a.name.localeCompare(b.name));
   }
 
-  getSentimentsSorted() {
-    const sentiments = this.dataFiltersDialog()?.sentiments || [];
+  getSentimentsSorted(): SelectGroupItem2[] {
+    const sentiments: SelectGroupItem2[] =
+      this.dataFiltersDialog()?.sentiments || [];
+
     return sentiments
-      .sort((a, b) => {
+      .sort((a: SelectGroupItem2, b: SelectGroupItem2) => {
         const transA = this.translate.instant(this.SENTIMENTS + '.' + a.label);
         const transB = this.translate.instant(this.SENTIMENTS + '.' + b.label);
         return transA.localeCompare(transB);
       })
-      .map((sentiment) => ({
+      .map((sentiment: SelectGroupItem2) => ({
         ...sentiment,
-        items: sentiment.items.sort((a, b) => {
+        items: sentiment.items.sort((a: SelectItem2, b: SelectItem2) => {
           const transA = this.translate.instant(this.SENTIMENTS + '.' + a.key);
           const transB = this.translate.instant(this.SENTIMENTS + '.' + b.key);
           return transA.localeCompare(transB);
@@ -190,17 +225,19 @@ export class FiltersDialogComponent implements OnInit {
       }));
   }
 
-  getIdeologiesSorted() {
-    const ideologies = this.dataFiltersDialog()?.ideologies || [];
+  getIdeologiesSorted(): SelectGroupItem2[] {
+    const ideologies: SelectGroupItem2[] =
+      this.dataFiltersDialog()?.ideologies || [];
+
     return ideologies
-      .sort((a, b) => {
+      .sort((a: SelectGroupItem2, b: SelectGroupItem2) => {
         const transA = this.translate.instant(this.IDEOLOGIES + '.' + a.label);
         const transB = this.translate.instant(this.IDEOLOGIES + '.' + b.label);
         return transA.localeCompare(transB);
       })
-      .map((ideology) => ({
+      .map((ideology: SelectGroupItem2) => ({
         ...ideology,
-        items: ideology.items.sort((a, b) => {
+        items: ideology.items.sort((a: SelectItem2, b: SelectItem2) => {
           const transA = this.translate.instant(this.IDEOLOGIES + '.' + a.key);
           const transB = this.translate.instant(this.IDEOLOGIES + '.' + b.key);
           return transA.localeCompare(transB);

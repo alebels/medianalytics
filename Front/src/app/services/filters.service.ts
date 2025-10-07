@@ -37,16 +37,21 @@ export class FiltersService {
   }
 
   getTranslatedMediaCompose(): void {
-    const translateAndSortItems = (groups: SelectItem2[], prefix: string) => {
+    const translateAndSortItems = (
+      groups: SelectItem2[],
+      prefix: string
+    ): SelectItem2[] => {
       return groups
-        .map((item) => {
+        .map((item: SelectItem2) => {
           const newItem = new SelectItem2(item.key);
           newItem.updateTranslation(
             this.trans.instant(`${prefix}.${item.key}`)
           );
           return newItem;
         })
-        .sort((a, b) => a.label.localeCompare(b.label));
+        .sort((a: SelectItem2, b: SelectItem2) =>
+          a.label.localeCompare(b.label)
+        );
     };
 
     const sendMediaCompose = new MediaCompose();
@@ -82,37 +87,40 @@ export class FiltersService {
       this.http.get<MediaRead[]>(`${this.apiUrl}/medias`)
     );
     this.mediaReadSub.next(data);
+
     const countries = new Set<string>(),
       regions = new Set<string>(),
       types = new Set<string>();
     const medias: MediaBase[] = [];
 
-    data.forEach((media) => {
+    data.forEach((media: MediaRead) => {
       medias.push(new MediaBase(media.id, media.name, media.type));
       countries.add(media.country);
       regions.add(media.region);
       types.add(media.type);
     });
-    medias.sort((a, b) => a.label.localeCompare(b.label));
+    medias.sort((a: MediaBase, b: MediaBase) => a.label.localeCompare(b.label));
 
     this.setGroupedMedia(medias);
 
     this.mediaCompose.countries = [...countries].map(
-      (country) => new SelectItem2(country)
+      (country: string) => new SelectItem2(country)
     );
     this.mediaCompose.regions = [...regions].map(
-      (region) => new SelectItem2(region)
+      (region: string) => new SelectItem2(region)
     );
-    this.mediaCompose.types = [...types].map((type) => new SelectItem2(type));
+    this.mediaCompose.types = [...types].map(
+      (type: string) => new SelectItem2(type)
+    );
     this.getTranslatedMediaCompose();
   }
 
   private setGroupedMedia(medias: MediaBase[]): void {
     const sendMediaGroups = MEDIA_GROUPS.reduce(
-      (acc: SelectGroupSimple[], group) => {
+      (acc: SelectGroupSimple[], group: SelectGroupSimple) => {
         const items = medias
-          .filter((media) => media.type === group.label)
-          .map((media) => new SelectSimple(media.key, media.label));
+          .filter((media: MediaBase) => media.type === group.label)
+          .map((media: MediaBase) => new SelectSimple(media.key, media.label));
 
         if (items.length > 0) {
           acc.push({ ...group, items });

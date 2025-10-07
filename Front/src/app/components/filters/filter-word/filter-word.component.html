@@ -1,6 +1,9 @@
 <p-toast />
-<div class="flex flex-wrap justify-start items-center gap-[var(--margin-standard)] mb-[var(--margin-standard)]">
+<div
+  class="flex flex-wrap justify-start items-center gap-[var(--margin-standard)] mb-[var(--margin-standard)]"
+>
   <app-filter (composeValues)="getComposeValues($event)"></app-filter>
+
   <p-floatlabel variant="on">
     <p-inputnumber
       class="w-[100px]"
@@ -12,6 +15,7 @@
     />
     <label for="word-minRange">{{ "filters.min_range" | translate }}</label>
   </p-floatlabel>
+
   <p-floatlabel variant="on">
     <p-inputnumber
       class="w-[100px]"
@@ -24,6 +28,7 @@
     />
     <label for="word-maxRange">{{ "filters.max_range" | translate }}</label>
   </p-floatlabel>
+
   <div>
     <p-radiobutton
       name="desc"
@@ -33,10 +38,17 @@
     />
     <label class="ml-2" for="word-desc">{{ "filters.desc" | translate }}</label>
   </div>
+
   <div>
-    <p-radiobutton name="asc" value="asc" [(ngModel)]="order" inputId="word-asc" />
+    <p-radiobutton
+      name="asc"
+      value="asc"
+      [(ngModel)]="order"
+      inputId="word-asc"
+    />
     <label class="ml-2" for="word-asc">{{ "filters.asc" | translate }}</label>
   </div>
+
   <div>
     <p-button (onClick)="onClickFilter()" [raised]="true" size="small">{{
       "filters.filter" | translate
@@ -49,6 +61,7 @@
   <p-card styleClass="rounded bg-miscellany h-full">
     <app-sort-table [dataSortTable]="dataWordsTable"></app-sort-table>
   </p-card>
+
   } @else {
   <div class="w-full h-full">
     <app-no-data [noData]="noData"></app-no-data>
