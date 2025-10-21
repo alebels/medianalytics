@@ -65,8 +65,14 @@
     "ideologies": "Classification of ideologies - {{count}}",
     "sentiments_filter": "Based on the selected filters, there may not be data for a specific sentiment",
     "ideologies_filter": "Based on the selected filters, there may not be data for a specific ideology",
-    "sentiments_home": "For each article, 3 different sentiments are extracted",
-    "ideologies_home": "For each article, 3 different ideological orientations are extracted"
+    "sentiments_home": "For each article, 3 different sentiments are extracted by the AI model",
+    "ideologies_home": "For each article, 3 different ideological orientations are extracted by the AI model",
+    "frequency": "Frequency",
+    "valuation": "Articles rated by",
+    "word": "Articles containing",
+    "disclaimer": "Not all articles may be available anymore",
+    "disclaimer2": "The date of the article may not match the date it was added to the platform",
+    "disclaimer3": "Not all articles may accurately report the frequency of the word"
   },
   "messages": {
     "error": "Error",
@@ -77,11 +83,11 @@
     "loading_data_home": "Loading home data...",
     "no_data_filters": "No data available. Select other filters.",
     "empty_filters": "You must select at least one filter for source, type, country or region.",
-    "range_too_large": "Range too large. The range between minimum and maximum cannot be greater than 200.",
+    "range_too_large": "Range too large. The range between minimum and maximum cannot be greater than 400.",
     "min_max_range": "The minimum range cannot be greater than or equal to the maximum range."
   },
   "home": {
-    "description": "Open source platform for the analysis of media and other relevant sources that influence public opinion",
+    "description": "Open-source platform for the analysis of media and other relevant sources that influence public opinion",
     "total_sources": "Sources analyzed",
     "total_articles": "Articles processed",
     "average_words": "Average words per article",
@@ -99,7 +105,8 @@
     "ratings_day": "Ratings of the day",
     "subtitle_ratings_day": "Result of the ratings extracted from articles published in the sources integrated into the platform for the day",
     "subtitle_general_table": "Summary table with the most relevant statistics of each of the sources integrated into the platform",
-    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from their articles from {{ minDate }} to {{ maxDate }}"
+    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from their articles from {{ minDate }} to {{ maxDate }}",
+    "words": "Not all articles may accurately report the frequency of the words"
   },
   "filters": {
     "description": "Filter and compare the data collected by the platform about its sources according to their sentiments, ideological orientations, or words",
@@ -121,7 +128,8 @@
     "filter_ideology": "Filter by ideological orientations",
     "filter_words": "Filter by words",
     "word": "Word",
-    "count": "Count"
+    "count": "Frequency",
+    "words": "Words extracted from articles processed by the platform"
   },
   "manifest": {
     "description1": "Medianalytics is an",
@@ -136,6 +144,7 @@
     "warning2": "Due to the different registration dates of each source or their correct processing, not all sources may have the same number of processed articles, which could lead to significant disproportions, especially in general statistics.",
     "warning3": "As an",
     "warning4": " project, any feature may be subject to modification or improvement by the community.",
+    "warning5": "Not all processed articles may accurately reflect word frequency due to captions, annexes, or other contextual factors.",
     "footer1": "Medianalytics is not responsible for the accuracy of the data obtained or the implications thereof.",
     "footer2": "For any inquiry, you can contact us through email at"
   },
@@ -169,7 +178,7 @@
     "COMPANY": "Companies"
   },
   "chart": {
-    "count": "Count"
+    "count": "Frequency"
   },
   "grammar": {
     "NOUN": "Noun",

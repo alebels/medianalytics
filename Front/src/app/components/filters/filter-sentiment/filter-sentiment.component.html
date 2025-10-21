@@ -36,7 +36,7 @@
     }}</label>
 
     <i
-      class="bi bi-info-circle info-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
+      class="bi bi-info-circle base-tooltip-size absolute mt-[-10px] ml-[-5px] z-10 cursor-pointer hover:text-accent"
       tabindex="7"
       (click)="sendFiltersDialog(sentiments.type)"
       (keydown.enter)="sendFiltersDialog(sentiments.type)"
@@ -59,7 +59,10 @@
     class="xym:!w-full xym:mb-[var(--margin-standard)]"
   >
     <p-card styleClass="rounded bg-miscellany h-full">
-      <app-bar-chart [dataBarChart]="barChart"></app-bar-chart>
+      <app-bar-chart
+        [dataBarChart]="barChart"
+        [filterDialog]="chartFilter"
+      ></app-bar-chart>
     </p-card>
   </div>
 

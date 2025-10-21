@@ -13,7 +13,7 @@ import {
   ApexYAxis,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { CHART_THEME, NONE } from '../../../utils/constants';
+import { CHART_THEME } from '../../../utils/constants';
 import { DataChart } from '../../../models/chart.model';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -56,9 +56,7 @@ export class LineChartComponent implements OnInit {
   }
 
   private initialize(): void {
-    if (this.dataLineChart()?.translate !== NONE) {
-      this.translateType = this.dataLineChart()?.translate || '';
-    }
+    this.translateType = this.dataLineChart()?.translate || '';
     this.chartLabels = this.dataLineChart()?.xLabels || [];
     this.setTranslateChart();
 
@@ -157,17 +155,13 @@ export class LineChartComponent implements OnInit {
 
   private setTranslateChart(): void {
     // Initial translation
-    if (this.dataLineChart()?.translate !== NONE) {
-      this.setTranslate();
-    }
+    this.setTranslate();
 
     // Update translations when language changes
     this.trans.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (this.dataLineChart()?.translate !== NONE) {
-          this.setTranslate();
-        }
+        this.setTranslate();
 
         this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
       });

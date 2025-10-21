@@ -9,7 +9,6 @@ import {
 import {
   CHART_THEME,
   IDEOLOGIES,
-  NONE,
   SENTIMENTS,
 } from '../../../utils/constants';
 import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
@@ -51,14 +50,8 @@ export class PieChartComponent implements OnInit {
   }
 
   private initialize(): void {
-    if (this.dataPieChart()?.translate !== NONE) {
-      this.translateType = this.dataPieChart()?.translate || '';
-      this.setTranslateChart();
-    } else {
-      this.chartLabels = this.dataPieChart()?.xLabels || [];
-    }
-
-    this.chartOptionsUpdate(this.chartLabels);
+    this.translateType = this.dataPieChart()?.translate || '';
+    this.setTranslateChart();
   }
 
   private chartOptionsUpdate(xlabels: string[]): void {
@@ -192,6 +185,7 @@ export class PieChartComponent implements OnInit {
       this.dataPieChart()?.xLabels?.map((label: string) =>
         this.trans.instant(this.translateType + '.' + label)
       ) || [];
+    this.chartOptionsUpdate(this.chartLabels);
 
     // Update translations when language changes
     this.trans.onLangChange
@@ -201,7 +195,7 @@ export class PieChartComponent implements OnInit {
           this.dataPieChart()?.xLabels?.map((label: string) =>
             this.trans.instant(this.translateType + '.' + label)
           ) || [];
-        this.chartOptionsUpdate(this.chartLabels);
+        this.chartOptions.labels = this.chartLabels;
       });
   }
 }

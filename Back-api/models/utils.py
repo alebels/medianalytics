@@ -5,7 +5,7 @@ from datetime import date
 
 class ItemRead(BaseModel):
     """
-    Pydantic model for items schema.
+    Pydantic model for items schema used in most cases.
     """
 
     name: Annotated[str, StringConstraints(min_length=2, max_length=70)]

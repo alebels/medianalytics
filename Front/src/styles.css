@@ -57,8 +57,9 @@ html.dark {
 
 html {
   width: 100%;
-  min-height: 100vh; /* Fallback for browsers that don't support dvh */
+  min-height: 100vh;
   min-height: 100dvh;
+  min-height: max(100vh, 100dvh);
   background-color: var(--color-background);
 }
 
@@ -188,6 +189,10 @@ p {
   text-align: start;
 }
 
+.base-tooltip-size {
+  font-size: var(--tooltip-size);
+}
+
 /* PrimeNG component overrides */
 @layer primeng {
   .p-card-body {
@@ -204,6 +209,12 @@ p {
     padding-bottom: 0 !important;
     cursor: pointer !important;
     align-items: start !important;
+  }
+
+  .p-dialog-footer {
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
   }
 
   @media screen and (min-width: 900px) {

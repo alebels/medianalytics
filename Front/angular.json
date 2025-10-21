@@ -31,9 +31,7 @@
               "src/styles.css"
             ],
             "scripts": ["node_modules/apexcharts/dist/apexcharts.min.js"],
-            "allowedCommonJsDependencies": [
-              "apexcharts"
-            ],
+            "allowedCommonJsDependencies": ["apexcharts"],
             "optimization": {
               "scripts": true,
               "styles": {
@@ -41,7 +39,8 @@
                 "inlineCritical": true
               },
               "fonts": true
-            }
+            },
+            "aot": true
           },
           "configurations": {
             "production": {
@@ -57,7 +56,16 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

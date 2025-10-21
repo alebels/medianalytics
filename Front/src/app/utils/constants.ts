@@ -95,16 +95,24 @@ export const CHART_THEME = {
       pan: true,
       reset: true,
     },
-  },
-  export: {
-    scale: undefined,
-    width: undefined,
-    csv: {
-      filename: undefined,
-      columnDelimiter: ',',
-    },
-    svg: {
-      filename: undefined,
+    export: {
+      scale: 1,
+      width: undefined,
+      csv: {
+        filename: `medianalytics-chart_${
+          new Date().toISOString().split('T')[0]
+        }`,
+        columnDelimiter: ',',
+        headerCategory: 'Category',
+        headerValue: 'Value',
+        dateFormatter: (timestamp: number) =>
+          new Date(timestamp).toLocaleDateString(),
+      },
+      svg: {
+        filename: `medianalytics-chart_${
+          new Date().toISOString().split('T')[0]
+        }`,
+      },
     },
   },
   zoom: {

@@ -1,5 +1,5 @@
 from config.sentiments_ideologies_enums import (IdeologiesEnum, SentimentsEnum)
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 from typing import Annotated
 from config.constant_enums import (
     MediaTypeEnum,
@@ -130,11 +130,89 @@ class WordsFilter(BaseFilter):
     Filter model for words.
     """
     min_range: Annotated[int | None, Field(gt=-1, lt=100000)] = None
-    max_range: Annotated[int, Field(gt=0, lt=100000)] = 200
+    max_range: Annotated[int, Field(gt=0, lt=100000)] = 400
     order_by_desc: bool = True
 
     class Config:
         """
         Configuration for WordsFilter model.
+        """
+        frozen = True
+
+
+class PaginationParams(BaseModel):
+    """
+    Pagination parameters for infinite scroll.
+    """
+    page: Annotated[int, Field(ge=1)] = 1
+    page_size: Annotated[int, Field(ge=1, le=100)] = 50
+
+    class Config:
+        """
+        Configuration for PaginationParams model.
+        """
+        frozen = True
+
+
+class ChartDialogPaginated(BaseFilter):
+    """
+    Filter model for chart dialog with pagination support.
+    """
+    sentiment: SentimentsEnum | None = None
+    ideology: IdeologiesEnum | None = None
+    word: Annotated[str, StringConstraints(
+        min_length=2,
+        max_length=70,
+        pattern=r'^[a-zA-Z0-9\-]+$'  # Only alphanumeric, hyphens
+    )] | None = None
+    pagination: PaginationParams = Field(default_factory=PaginationParams)
+
+    class Config:
+        """
+        Configuration for ChartDialogPaginated model.
+        """
+        frozen = True
+
+
+class ItemUrl(BaseModel):
+    """
+    Model for item URL.
+    """
+    url: HttpUrl
+    frequency: Annotated[int, Field(gt=0)] | None = None
+
+    class Config:
+        """
+        Configuration for ItemUrl model.
+        """
+        frozen = True
+
+
+class ItemDialog(BaseModel):
+    """
+    Model for item dialog.
+    """
+    media_name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
+    urls: list[ItemUrl]
+
+    class Config:
+        """
+        Configuration for ChartDialogFilter model.
+        """
+        frozen = True
+
+
+class ChartDialogPaginatedRead(BaseModel):
+    """
+    Paginated model for chart dialog read.
+    """
+    results: list[ItemDialog]
+    total_count: int
+    page: int
+    has_more: bool
+
+    class Config:
+        """
+        Configuration for ChartDialogPaginatedRead model.
         """
         frozen = True

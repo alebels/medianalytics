@@ -90,14 +90,14 @@ export class HomeService {
 
   private async initialize(): Promise<void> {
     await Promise.all([
+      this.getGeneralTable(),
+      this.getGeneralDaySentiments(),
+      this.getGeneralDayIdeologies(),
       this.getGeneralMedias(),
       this.getGeneralTotalArticles(),
       this.getGeneralAverageWordCount(),
       this.getGeneralTotalWords(),
       this.getGeneralDayTopWords(),
-      this.getGeneralDaySentiments(),
-      this.getGeneralDayIdeologies(),
-      this.getGeneralTable(),
       this.getGeneralTopWords(),
       this.getGeneralBottomWords(),
       this.getGeneralSentiments(),

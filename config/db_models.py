@@ -64,7 +64,7 @@ class Article(Base):
     __tablename__ = "article"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    media_id: Mapped[SmallInteger] = mapped_column(ForeignKey("media.id"))
+    media_id: Mapped[SmallInteger] = mapped_column(ForeignKey("media.id"), index=True)
     title: Mapped[str] = mapped_column(String(350))
     url: Mapped[str] = mapped_column(String(600), unique=True)
     article: Mapped[str] = mapped_column(Text)

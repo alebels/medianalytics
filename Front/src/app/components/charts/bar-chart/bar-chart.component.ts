@@ -12,12 +12,12 @@ import {
   COUNT,
   NONE,
 } from '../../../utils/constants';
+import { ChartDialog, ChartFilter } from '../../../models/dialog.model';
 import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
-// import {
-//   dataChartDialog$,
-//   isShowChartDialog$,
-// } from '../../../utils/dialog-subjects';
-import { ChartDialog } from '../../../models/dialog.model';
+import {
+  dataChartDialog$,
+  isShowChartDialog$,
+} from '../../../utils/dialog-subjects';
 import { DataChart } from '../../../models/chart.model';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -39,6 +39,7 @@ interface ChartOptions {
 })
 export class BarChartComponent implements OnInit {
   readonly dataBarChart = input<DataChart>();
+  readonly filterDialog = input<ChartFilter | undefined>();
 
   chartOptions!: ChartOptions;
 
@@ -48,7 +49,7 @@ export class BarChartComponent implements OnInit {
   private yTitle!: string;
   private maxYValue: number | undefined;
 
-  private chartDialog!: ChartDialog;
+  private chartDialog: ChartDialog | undefined;
 
   private trans = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
@@ -60,19 +61,15 @@ export class BarChartComponent implements OnInit {
   private initialize(): void {
     this.chartMode = this.dataBarChart()?.translate || NONE;
 
-    // if (this.chartMode !== NONE) {
-    //   // Determine if this is a sentiment or ideology chart
-    //   this.chartDialog =
-    //     this.dataBarChart()?.filterDialogChart || new ChartDialog();
-    //   this.chartDialog.valuation = this.chartMode;
-    // }
-
-    this.setTranslateChart();
-
-    this.maxYValue = Array.isArray(this.chartSeries[0].data)
-      ? Math.max(...(this.chartSeries[0].data as number[]))
-      : undefined;
-    this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
+    if (this.filterDialog()) {
+      this.chartDialog = new ChartDialog();
+      this.chartDialog.media_id = this.filterDialog()?.media_id;
+      this.chartDialog.type = this.filterDialog()?.type;
+      this.chartDialog.country = this.filterDialog()?.country;
+      this.chartDialog.rangeDates = this.filterDialog()?.rangeDates;
+      this.chartDialog.valuation = this.chartMode; // Determine if this is a sentiment or ideology chart, word chart if NONE
+    }
+    this.setChart();
   }
 
   private chartOptionsUpdate(
@@ -86,40 +83,32 @@ export class BarChartComponent implements OnInit {
         type: 'bar',
         height: 400,
         width: '100%',
-        // events: {
-        //   click: (_event, _chartContext, config) => {
-        //     if (this.chartMode === NONE) {
-        //       return; // Do nothing if mode is NONE
-        //     }
+        events: {
+          dataPointSelection: (_event, _chartContext, config) => {
+            if (!this.chartDialog) return; // Do nothing if chartDialog is not defined
 
-        //     if (
-        //       config.seriesIndex !== undefined &&
-        //       config.seriesIndex >= 0 &&
-        //       config.dataPointIndex !== undefined &&
-        //       config.dataPointIndex >= 0
-        //     ) {
-        //       const value =
-        //         this.chartSeries[config.seriesIndex].data[
-        //           config.dataPointIndex
-        //         ];
+            if (
+              config.seriesIndex !== undefined &&
+              config.seriesIndex >= 0 &&
+              config.dataPointIndex !== undefined &&
+              config.dataPointIndex >= 0
+            ) {
+              const value =
+                this.chartSeries[config.seriesIndex].data[
+                  config.dataPointIndex
+                ];
 
-        //       const category =
-        //         this.dataBarChart()?.xLabels?.[config.dataPointIndex] || '';
+              const category =
+                this.dataBarChart()?.xLabels?.[config.dataPointIndex] || '';
 
-        //       this.chartDialog.value.set(category);
-        //       this.chartDialog.count.set(Number(value));
+              this.chartDialog.value.set(category);
+              this.chartDialog.count.set(Number(value));
 
-        //       dataChartDialog$.next(this.chartDialog);
-        //       isShowChartDialog$.next(true);
-        //     }
-        //   },
-        //   // dataPointMouseEnter: (event, chartContext, config) => {
-        //   //   console.log('on mouse enter', event, chartContext, config);
-        //   // },
-        //   // dataPointMouseLeave: (event, chartContext, config) => {
-        //   //   console.log('on mouse leave', event, chartContext, config);
-        //   // },
-        // },
+              dataChartDialog$.next(this.chartDialog);
+              isShowChartDialog$.next(true);
+            }
+          },
+        },
       },
 
       dataLabels: {
@@ -159,10 +148,14 @@ export class BarChartComponent implements OnInit {
     };
   }
 
-  private setTranslateChart(): void {
-    // Initial translation
+  private setChart(): void {
+    // Initial translation and setup chart
     this.setTranslate();
     this.yTitle = this.trans.instant('chart.' + COUNT);
+    this.maxYValue = Array.isArray(this.chartSeries[0].data)
+      ? Math.max(...(this.chartSeries[0].data as number[]))
+      : undefined;
+    this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
 
     // Update translations when language changes
     this.trans.onLangChange

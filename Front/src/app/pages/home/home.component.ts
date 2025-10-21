@@ -1,4 +1,8 @@
-import { ChartDialog, FilterDialog } from '../../models/dialog.model';
+import {
+  ChartDialog,
+  ChartFilter,
+  FilterDialog,
+} from '../../models/dialog.model';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CompoundDataCharts, DataChart } from '../../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../../models/table.model';
@@ -80,28 +84,31 @@ export class HomeComponent implements OnInit {
 
   isShowChartDialog = signal(false);
   dataChartDialog = signal(new ChartDialog());
+  dayChartFilter!: ChartFilter;
+  rangeChartFilter!: ChartFilter;
 
   readonly GENERAL_MEDIAS = MEDIAS;
   readonly SENTIMENTS = SENTIMENTS;
   readonly IDEOLOGIES = IDEOLOGIES;
 
-  private homeSrv = inject(HomeService);
   private generalSrv = inject(GeneralService);
+  private homeSrv = inject(HomeService);
   private trans = inject(TranslateService);
   private sentimentIdeologySrv = inject(SentimentIdeologyService);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
+    this.getMinMaxDate();
+    this.setGeneralTable();
+
     this.generalTotalArticles = this.homeSrv.generalTotalArticles$;
     this.generalAverageWords = this.homeSrv.generalAverageWord$;
     this.generalTotalWords = this.homeSrv.generalTotalWords$;
     this.isMobile = this.generalSrv.isMobile$.getValue();
 
-    this.setGeneralTable();
-    this.setGeneralDayTopWords();
     this.setGeneralDaySentiments();
     this.setGeneralDayIdeologies();
-    this.getMinMaxDate();
+    this.setGeneralDayTopWords();
     this.setGeneralMedias();
     this.setGeneralIdeologies();
     this.setGeneralSentiments();
@@ -185,7 +192,6 @@ export class HomeComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: CompoundDataCharts) => {
         this.generalDaySentiments = data;
-        // this.generalDaySentiments.plain.filterDialogChart = new FilterDialogChart(undefined, undefined, undefined, undefined, undefined, undefined, true);
       });
   }
 
@@ -201,12 +207,14 @@ export class HomeComponent implements OnInit {
     this.generalSrv.minMaxDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: MinMaxDateRead) => {
-        if (data) {
-          const minDateParsed = new Date(data.min_date);
-          const maxDateParsed = new Date(data.max_date);
+        if (data.min_date && data.max_date) {
+          this.minDate = new Date(data.min_date);
+          this.maxDate = new Date(data.max_date);
 
-          this.minDate = isNaN(minDateParsed.getTime()) ? null : minDateParsed;
-          this.maxDate = isNaN(maxDateParsed.getTime()) ? null : maxDateParsed;
+          this.dayChartFilter = new ChartFilter();
+          this.dayChartFilter.rangeDates = [this.maxDate];
+          this.rangeChartFilter = new ChartFilter();
+          this.rangeChartFilter.rangeDates = [this.minDate, this.maxDate];
 
           this.currentLang = this.trans.currentLang || 'en';
           this.trans.onLangChange
@@ -217,11 +225,6 @@ export class HomeComponent implements OnInit {
         }
       });
   }
-
-  // private setGeneralChartDataFilter(minDate: Date, maxDate: Date): void {
-  //   this.generalDaySentiments.plain.filterDialogChart = new ChartDialog();
-  //   this.generalDaySentiments.plain.filterDialogChart.rangeDates = [maxDate];
-  // }
 
   private setGeneralTopWords(): void {
     this.homeSrv.generalTopWords$

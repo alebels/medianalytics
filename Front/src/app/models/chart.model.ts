@@ -1,5 +1,4 @@
 import { ApexAxisChartSeries, ChartType } from 'ng-apexcharts';
-import { ChartDialog } from './dialog.model';
 import { NONE } from '../utils/constants';
 
 export class DataChart {
@@ -7,8 +6,7 @@ export class DataChart {
     public readonly xLabels: string[] = [],
     public readonly series: ApexAxisChartSeries | number[] = [],
     public readonly type: ChartType = 'bar',
-    public translate: string = NONE,
-    public filterDialogChart?: ChartDialog
+    public translate: string = NONE
   ) {}
 }
 

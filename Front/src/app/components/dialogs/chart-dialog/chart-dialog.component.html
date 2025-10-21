@@ -1,6 +1,7 @@
 <p-dialog
   [(visible)]="isVisible"
   [style]="{
+    width: '620px',
     maxWidth: '90vw',
     borderRadius: 'var(--border-radius-standard)',
     background: 'var(--color-miscellany)'
@@ -13,12 +14,87 @@
 >
   <ng-template #header pTemplate="header" styleClass="p-dialog-header">
     <span class="p-dialog-title">
-      {{ title() | translate }} - {{ count() }}
+      {{ (title() | translate) | titlecase }} - {{ count() }}
     </span>
   </ng-template>
 
-  <div>
-    {{ "dialog.chart" | translate }}
-    {{ dataChartDialog()?.rangeDates?.[0] | date: 'longDate' }}
+  @if(dataSource) {
+  <div class="w-auto">
+    <cdk-virtual-scroll-viewport #virtualScroll id="media-items-viewport">
+      <div class="mb-2 text-base text-cText max-w-[95%] text-center mx-auto">
+        @if(dataChartDialog()?.valuation === NONE) {
+        <u>{{ "dialog.word" | translate }}</u
+        >: <i>{{ title() | titlecase }}</i
+        ><br />
+        *{{ "dialog.disclaimer3" | translate }}* } @else {
+        <u>{{ "dialog.valuation" | translate }}</u
+        >:
+        <i>{{ (title() | translate) | titlecase }}</i>
+        }<br />
+        *{{ "dialog.disclaimer" | translate }}*<br />
+        *{{ "dialog.disclaimer2" | translate }}*
+      </div>
+      <div
+        *cdkVirtualFor="
+          let item of dataSource;
+          trackBy: trackByItemId;
+          let mediaIndex = index
+        "
+        class="media-item-container"
+      >
+        <dl class="m-0 p-0">
+          <dt class="text-xl font-semibold text-accent mb-3">
+            {{ item.media_name }}
+            <span class="text-lg">- {{ item.urls.length }}</span>
+            @if (item.urls[0].frequency) {
+            <span class="text-base">
+              ({{ "dialog.frequency" | translate }}:
+              {{ getTotalFrequency(item) }})
+            </span>
+            }
+          </dt>
+          <dd
+            *ngFor="
+              let urlItem of item.urls;
+              trackBy: trackByUrl;
+              let urlIndex = index
+            "
+            class="text-base text-cText ml-3 w-auto mb-2"
+          >
+            <b>{{ getGlobalUrlIndex(mediaIndex, urlIndex) }}.</b>&nbsp;
+            <a
+              [href]="urlItem.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="underline text-cText hover:text-accent"
+            >
+              {{ urlItem.url }}
+            </a>
+            @if (urlItem.frequency) {
+            <span class="text-base">
+              &nbsp;-&nbsp;<span class="font-semibold"
+                >{{ "dialog.frequency" | translate }}:</span
+              >&nbsp;{{ urlItem.frequency }}</span
+            >
+            }
+          </dd>
+        </dl>
+      </div>
+    </cdk-virtual-scroll-viewport>
   </div>
+  <!-- Loading indicator when fetching more data (inside viewport for smooth scroll) -->
+  <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">
+    <div class="w-[95%] h-[3px]">
+      @if (dataSource.loading$ | async) {
+      <p-progressbar mode="indeterminate" [style]="{ height: '100%' }" />
+      }
+    </div>
+  </ng-template>
+  } @else {
+  <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">
+    <div class="w-[95%] h-[3px]">
+      <p-progressbar mode="indeterminate" [style]="{ height: '100%' }" />
+    </div>
+  </ng-template>
+  }
 </p-dialog>

@@ -27,7 +27,7 @@ dataChartDialog().value()) {
         >
           {{ generalTotalMedias | number : "1.0-0" }}
           <i
-            class="bi bi-info-circle info-size absolute ml-[5px] z-10 mb-1 mt-[-9px]"
+            class="bi bi-info-circle base-tooltip-size absolute ml-[5px] z-10 mb-1 mt-[-9px]"
             tabindex="6"
           ></i>
         </span>
@@ -59,11 +59,11 @@ dataChartDialog().value()) {
 
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
     <div class="w-full text-center px-[var(--margin-title-lines)]">
       <h1>{{ "home.ratings_day" | translate }}</h1>
     </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   </div>
 
   <div
@@ -80,12 +80,12 @@ dataChartDialog().value()) {
       class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
     >
       @if (generalDaySentiments.plain &&
-      generalDaySentiments.plain.xLabels.length > 0) {
+      generalDaySentiments.plain.xLabels.length > 0 && dayChartFilter) {
       <p-card styleClass="rounded bg-miscellany h-full">
         <div class="mb-[10px]">
           {{ "home.sentiments" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
             (click)="showFiltersDialog(SENTIMENTS)"
             (keydown.enter)="showFiltersDialog(SENTIMENTS)"
             tabindex="7"
@@ -93,6 +93,7 @@ dataChartDialog().value()) {
         </div>
         <app-bar-chart
           [dataBarChart]="generalDaySentiments.plain"
+          [filterDialog]="dayChartFilter"
         ></app-bar-chart>
       </p-card>
 
@@ -131,12 +132,12 @@ dataChartDialog().value()) {
       class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
     >
       @if (generalDayIdeologies.plain &&
-      generalDayIdeologies.plain.xLabels.length > 0) {
+      generalDayIdeologies.plain.xLabels.length > 0 && dayChartFilter) {
       <p-card styleClass="rounded bg-miscellany h-full">
         <div class="mb-[10px]">
           {{ "home.ideologies" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
             (click)="showFiltersDialog(IDEOLOGIES)"
             (keydown.enter)="showFiltersDialog(IDEOLOGIES)"
             tabindex="8"
@@ -144,6 +145,7 @@ dataChartDialog().value()) {
         </div>
         <app-bar-chart
           [dataBarChart]="generalDayIdeologies.plain"
+          [filterDialog]="dayChartFilter"
         ></app-bar-chart>
       </p-card>
 
@@ -183,8 +185,17 @@ dataChartDialog().value()) {
     <p-card styleClass="rounded bg-miscellany">
       <div class="mb-[10px]">
         {{ "home.top_words" | translate : { num: 50 } }}
+        <i
+          class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-2px]"
+          pTooltip="{{ 'home.words' | translate }}"
+          [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+          tabindex="9"
+        ></i>
       </div>
-      <app-bar-chart [dataBarChart]="generalDayTopWords"></app-bar-chart>
+      <app-bar-chart
+        [dataBarChart]="generalDayTopWords"
+        [filterDialog]="dayChartFilter"
+      ></app-bar-chart>
     </p-card>
 
     } @else {
@@ -197,19 +208,19 @@ dataChartDialog().value()) {
 
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
     <div class="w-full text-center px-[var(--margin-title-lines)]">
       <h1>
         {{ "home.general_table" | translate }}
         <i
-          class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-2px]"
+          class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-2px]"
           pTooltip="{{ 'home.general_table_info' | translate }}"
           [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-          tabindex="9"
+          tabindex="10"
         ></i>
       </h1>
     </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   </div>
 
   <div
@@ -233,11 +244,11 @@ dataChartDialog().value()) {
 
 <div>
   <div class="flex items-center mt-[var(--margin-header-divider)]">
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
     <div class="w-full text-center px-[var(--margin-title-lines)]">
       <h1>{{ "home.general_values" | translate }}</h1>
     </div>
-    <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+    <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   </div>
 
   <div
@@ -267,19 +278,22 @@ dataChartDialog().value()) {
     <div
       class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
     >
-      @if (generalSentiments.plain && generalSentiments.plain.xLabels.length >
-      0) {
+      @if (generalSentiments.plain && generalSentiments.plain.xLabels.length > 0
+      && rangeChartFilter) {
       <p-card styleClass="rounded bg-miscellany h-full">
         <div class="mb-[10px]">
           {{ "home.sentiments" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
             (click)="showFiltersDialog(SENTIMENTS)"
             (keydown.enter)="showFiltersDialog(SENTIMENTS)"
-            tabindex="15"
+            tabindex="16"
           ></i>
         </div>
-        <app-bar-chart [dataBarChart]="generalSentiments.plain"></app-bar-chart>
+        <app-bar-chart
+          [dataBarChart]="generalSentiments.plain"
+          [filterDialog]="rangeChartFilter"
+        ></app-bar-chart>
       </p-card>
 
       } @else {
@@ -317,19 +331,22 @@ dataChartDialog().value()) {
     <div
       class="w-[calc(70%-var(--margin-standard))] xym:w-full xym:mb-[var(--margin-standard)]"
     >
-      @if (generalIdeologies.plain && generalIdeologies.plain.xLabels.length >
-      0) {
+      @if (generalIdeologies.plain && generalIdeologies.plain.xLabels.length > 0
+      && rangeChartFilter) {
       <p-card styleClass="rounded bg-miscellany h-full">
         <div class="mb-[10px]">
           {{ "home.ideologies" | translate
           }}<i
-            class="bi bi-info-circle info-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
+            class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-4px] cursor-pointer hover:text-accent"
             (click)="showFiltersDialog(IDEOLOGIES)"
             (keydown.enter)="showFiltersDialog(IDEOLOGIES)"
-            tabindex="16"
+            tabindex="17"
           ></i>
         </div>
-        <app-bar-chart [dataBarChart]="generalIdeologies.plain"></app-bar-chart>
+        <app-bar-chart
+          [dataBarChart]="generalIdeologies.plain"
+          [filterDialog]="rangeChartFilter"
+        ></app-bar-chart>
       </p-card>
 
       } @else {
@@ -368,8 +385,17 @@ dataChartDialog().value()) {
     <p-card styleClass="rounded bg-miscellany">
       <div class="mb-[10px]">
         {{ "home.top_words" | translate : { num: 100 } }}
+        <i
+          class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-2px]"
+          pTooltip="{{ 'home.words' | translate }}"
+          [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+          tabindex="18"
+        ></i>
       </div>
-      <app-bar-chart [dataBarChart]="generalTopWords"></app-bar-chart>
+      <app-bar-chart
+        [dataBarChart]="generalTopWords"
+        [filterDialog]="rangeChartFilter"
+      ></app-bar-chart>
     </p-card>
 
     } @else {

@@ -37,7 +37,7 @@ export class InterceptorService implements HttpInterceptor {
         }
         
         if (error.status === 403) {
-          console.error('Access forbidden - check NGINX configuration or authentication');
+          console.error('Access forbidden - check configuration or authentication');
         }
         
         // Return empty for non-critical errors, or rethrow for critical ones

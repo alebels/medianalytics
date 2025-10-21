@@ -22,6 +22,7 @@ import { BarChartComponent } from '../../charts/bar-chart/bar-chart.component';
 import { BehaviorSubject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
+import { ChartFilter } from '../../../models/dialog.model';
 import { DataChart } from '../../../models/chart.model';
 import { FilterComponent } from '../filter/filter.component';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -77,6 +78,8 @@ export class FilterIdeologyComponent implements OnInit {
   lineChart: DataChart | null = null;
 
   isMobile = false;
+
+  chartFilter!: ChartFilter;
 
   private composeValues: {
     type: string;
@@ -156,6 +159,19 @@ export class FilterIdeologyComponent implements OnInit {
           if (data.plain) {
             this.barChart = setToBarChart(data.plain, COUNT);
             this.barChart.translate = IDEOLOGIES;
+            this.chartFilter = new ChartFilter();
+            if (composeObj['media_id'])
+              this.chartFilter.media_id = composeObj['media_id'] as string;
+            if (composeObj['type'])
+              this.chartFilter.type = composeObj['type'] as string;
+            if (composeObj['country'])
+              this.chartFilter.country = composeObj['country'] as string;
+            if (composeObj['region'])
+              this.chartFilter.region = composeObj['region'] as string;
+            if (composeObj['dates'])
+              this.chartFilter.rangeDates = (
+                composeObj['dates'] as string[]
+              ).map((dateStr) => new Date(dateStr));
           }
 
           if (data.categorized) {

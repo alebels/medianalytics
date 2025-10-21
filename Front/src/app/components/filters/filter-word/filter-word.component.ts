@@ -61,13 +61,13 @@ export class FilterWordComponent implements OnInit {
   };
 
   minRange: number | null = null;
-  maxRange = 200;
+  maxRange = 400;
 
   dataWordsTable: DataCountTable | null = null;
 
   LOCALE_ID = inject(LOCALE_ID);
 
-  private readonly maxRangeCount = 200;
+  private readonly maxRangeCount = 400;
 
   private composeValues: {
     type: string;

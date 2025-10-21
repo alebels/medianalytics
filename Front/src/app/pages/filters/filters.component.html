@@ -1,19 +1,27 @@
-@if (isShowFiltersDialog && dataFiltersDialog.medias &&
+@if (isShowFiltersDialog()&& !isShowChartDialog() && dataFiltersDialog.medias &&
 dataFiltersDialog.medias.length > 0) {
 <app-filters-dialog
   [dataFiltersDialog]="dataFiltersDialog"
 ></app-filters-dialog>
+} @if (isShowChartDialog() && !isShowFiltersDialog() &&
+dataChartDialog().value()) {
+<app-chart-dialog [dataChartDialog]="dataChartDialog()"></app-chart-dialog>
 }
+
 <div class="w-full font-serif text-2xl mb-6 text-center">
   {{ "filters.description" | translate }}
 </div>
 
-<div class="flex items-center justify-center mb-[var(--margin-header-divider)]">
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+<div class="flex items-center justify-center">
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   <div class="w-full text-center px-[var(--margin-title-lines)]">
     <h1>{{ "filters.filter_sentiment" | translate }}</h1>
   </div>
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
+</div>
+
+<div class="w-full font-serif text-xl mt-4 mb-6 text-center">
+  {{ "dialog.sentiments_home" | translate }}
 </div>
 
 <div class="mb-[var(--margin-standard)]">
@@ -23,12 +31,16 @@ dataFiltersDialog.medias.length > 0) {
   <app-filter-sentiment></app-filter-sentiment>
 </div>
 
-<div class="flex items-center justify-center my-[var(--margin-header-divider)]">
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+<div class="flex items-center justify-center mt-[var(--margin-header-divider)]">
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   <div class="w-full text-center px-[var(--margin-title-lines)]">
     <h1>{{ "filters.filter_ideology" | translate }}</h1>
   </div>
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
+</div>
+
+<div class="w-full font-serif text-xl mt-4 mb-6 text-center">
+  {{ "dialog.ideologies_home" | translate }}
 </div>
 
 <div class="mb-[var(--margin-standard)]">
@@ -38,12 +50,23 @@ dataFiltersDialog.medias.length > 0) {
   <app-filter-ideology></app-filter-ideology>
 </div>
 
-<div class="flex items-center justify-center my-[var(--margin-header-divider)]">
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+<div class="flex items-center justify-center mt-[var(--margin-header-divider)]">
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
   <div class="w-full text-center px-[var(--margin-title-lines)]">
-    <h1>{{ "filters.filter_words" | translate }}</h1>
+    <h1>{{ "filters.filter_words" | translate }}
+      <i
+          class="bi bi-info-circle base-tooltip-size absolute ml-1 z-10 mt-[-2px]"
+          pTooltip="{{ 'home.words' | translate }}"
+          [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+          tabindex="10"
+        ></i>
+    </h1>
   </div>
-  <div class="w-full h-[3px] bg-accent mym:w-[40%]"></div>
+  <div class="w-full h-[3px] rounded-full bg-accent mym:w-[40%]"></div>
+</div>
+
+<div class="w-full font-serif text-xl mt-4 mb-6 text-center">
+  {{ "filters.words" | translate }}
 </div>
 
 <div class="flex flex-wrap justify-between items-center">

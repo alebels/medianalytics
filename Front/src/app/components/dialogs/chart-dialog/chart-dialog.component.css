@@ -1,0 +1,26 @@
+/* Ensure smooth scrolling */
+::ng-deep .cdk-virtual-scroll-content-wrapper {
+  width: 100%;
+}
+
+#media-items-viewport {
+  height: 65vh;
+  width: 100%;
+}
+
+.media-item-container {
+  padding: 6px 0;
+  min-height: 100px;
+}
+
+@media (max-width: 768px) {
+  .media-item-container {
+    padding: 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  #media-items-viewport {
+    height: 70vh;
+  }
+}

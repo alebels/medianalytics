@@ -115,3 +115,51 @@ async def get_words_filter(db: AsyncSession, query: str, params: dict) -> list[s
         print(f"Error executing query: {query}")
         print(f"Parameters: {params}")
         raise e
+
+
+async def get_chart_dialog_paginated(
+    db: AsyncSession,
+    query: str,
+    params: dict,
+    page: int,
+    page_size: int = 50
+) -> tuple[list, int]:
+    """
+    Execute a paginated query and return results with total count.
+    
+    This function performs two database operations:
+    1. Counts total matching records (for calculating has_more)
+    2. Retrieves the specific page of results
+    
+    Args:
+        db: The async database session
+        query: The base SQL query string (should return individual URLs, not grouped)
+        params: Dictionary of query parameters for safe parameterization
+        page: The page number (1-indexed)
+        page_size: Number of items per page (number of URLs to return)
+        
+    Returns:
+        Tuple containing:
+        - List of query results for the requested page (individual URL rows)
+        - Total count of all matching URLs
+    """
+    
+    # 1. Get total count first (without pagination)
+    count_query = f"""
+        SELECT COUNT(*) FROM ({query}) as count_subquery
+    """
+    count_result = await db.execute(text(count_query), params)
+    total_count = count_result.scalar() or 0
+    
+    # 2. Add pagination to the original query
+    offset = (page - 1) * page_size
+    paginated_query = f"{query} LIMIT :limit OFFSET :offset"
+    
+    # Add pagination parameters
+    paginated_params = {**params, "limit": page_size, "offset": offset}
+    
+    # 3. Execute paginated query
+    result = await db.execute(text(paginated_query), paginated_params)
+    items = result.fetchall()
+    
+    return items, total_count

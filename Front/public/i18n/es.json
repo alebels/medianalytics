@@ -65,8 +65,14 @@
     "ideologies": "Clasificación de ideologías - {{count}}",
     "sentiments_filter": "Según los filtros seleccionados, puede que no haya datos para un sentimiento concreto",
     "ideologies_filter": "Según los filtros seleccionados, puede que no haya datos para una ideología concreta",
-    "ideologies_home": "Por cada artículo se extraen 3 orientaciones ideológicas diferentes",
-    "sentiments_home": "Por cada artículo se extraen 3 sentimientos diferentes"
+    "ideologies_home": "Por cada artículo el modelo de IA extrae 3 orientaciones ideológicas diferentes",
+    "sentiments_home": "Por cada artículo el modelo de IA extrae 3 sentimientos diferentes",
+    "frequency": "Frecuencia",
+    "valuation": "Artículos valorados como",
+    "word": "Artículos que contienen",
+    "disclaimer":"Puede que ya no todos los artículos estén disponibles",
+    "disclaimer2":"La fecha del artículo puede no coincidir con la fecha en que se insertó en la plataforma",
+    "disclaimer3": "Puede que no todos los artículos informen con precisión sobre la frecuencia de la palabra"
   },
   "messages": {
     "error": "Error",
@@ -77,11 +83,11 @@
     "loading_data_home": "Cargando datos de inicio...",
     "no_data_filters": "No hay datos disponibles. Seleccione otros filtros.",
     "empty_filters": "Debe seleccionar al menos un filtro de fuente, tipo, país o región.",
-    "range_too_large": "Rango demasiado grande. El rango entre mínimo y máximo no puede ser mayor que 200.",
+    "range_too_large": "Rango demasiado grande. El rango entre mínimo y máximo no puede ser mayor que 400.",
     "min_max_range": "El rango mínimo no puede ser mayor o igual que el rango máximo."
   },
   "home": {
-    "description": "Plataforma open source para el análisis de medios de comunicación y demás fuentes relevantes que influyen en la opinión pública",
+    "description": "Plataforma open-source para el análisis de medios de comunicación y demás fuentes relevantes que influyen en la opinión pública",
     "total_sources": "Fuentes analizadas",
     "total_articles": "Artículos procesados",
     "average_words": "Promedio de palabras por artículo",
@@ -99,7 +105,8 @@
     "ratings_day": "Valoraciones del día",
     "subtitle_ratings_day": "Resultado de las valoraciones extraídas de los artículos publicados en las fuentes integradas en la plataforma para el día",
     "subtitle_general_table": "Tabla resumen con las estadísticas más relevantes de cada una de las fuentes integradas en la plataforma",
-    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de sus artículos desde el {{ minDate }} hasta el {{ maxDate }}"
+    "subtitle_general_values": "Datos recopilados a lo largo de todas las fuentes integradas en la plataforma y la información extraída de sus artículos desde el {{ minDate }} hasta el {{ maxDate }}",
+    "words": "Puede que no todos los artículos contabilicen con precisión la frecuencia de las palabras"
   },
   "filters": {
     "description": "Filtra y compara los datos recopilados por la plataforma sobre sus fuentes según sus sentimientos, orientaciones ideológicas o palabras",
@@ -121,7 +128,8 @@
     "filter_ideology": "Filtro por orientaciones ideológicas",
     "filter_words": "Filtro por palabras",
     "word": "Palabra",
-    "count": "Contabilizado"
+    "count": "Frecuencia",
+    "words": "Palabras extraídas de los artículos procesados por la plataforma"
   },
   "manifest": {
     "description1": "Medianalytics es un proyecto",
@@ -136,6 +144,7 @@
     "warning2": "Debido a las distintas fechas de alta de cada fuente o al correcto procesamiento de las mismas, es posible que no todas las fuentes tengan el mismo número de artículos procesados, pudiendo dar lugar a desproporciones significativas; sobre todo en las estadísticas generales.",
     "warning3": "Como proyecto",
     "warning4": ", cualquier característica puede ser susceptible de modificación o mejoría por parte de la comunidad.",
+    "warning5": "Puede que no todos los artículos procesados reflejen con exactitud la frecuencia de las palabras debido a los subtítulos, anexos u otros factores contextuales.",
     "footer1": "Medianalytics no se hace responsable de la veracidad de los datos obtenidos ni de la implicación de los mismos.",
     "footer2": "Para cualquier consulta puede ponerse en contacto a través del correo electrónico"
   },
@@ -169,7 +178,7 @@
     "COMPANY": "Empresas"
   },
   "chart": {
-    "count": "Contabilizado"
+    "count": "Frecuencia"
   },
   "grammar": {
     "NOUN": "Sustantivo",

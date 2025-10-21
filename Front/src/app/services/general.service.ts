@@ -16,8 +16,8 @@ export class GeneralService {
   public readonly minMaxDate$ = this.minMaxDateSub.asObservable();
 
   constructor(private http: HttpClient) {
-    this.isMobile$.next(this.checkIsMobile());
     this.initialize();
+    this.isMobile$.next(this.checkIsMobile());
   }
 
   private async initialize(): Promise<void> {

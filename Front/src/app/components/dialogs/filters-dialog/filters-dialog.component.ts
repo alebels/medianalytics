@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import {
   FILTERS,
   IDEOLOGIES,
@@ -22,7 +22,7 @@ import { isShowFiltersDialog$ } from '../../../utils/dialog-subjects';
   templateUrl: './filters-dialog.component.html',
   styleUrl: './filters-dialog.component.css',
 })
-export class FiltersDialogComponent implements OnInit {
+export class FiltersDialogComponent {
   readonly dataFiltersDialog = input<FilterDialog>();
 
   readonly TYPES = FILTERS.TYPES;
@@ -76,7 +76,7 @@ export class FiltersDialogComponent implements OnInit {
   private generalSrv = inject(GeneralService);
   private translate = inject(TranslateService);
 
-  ngOnInit(): void {
+  constructor() {
     this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 

@@ -75,7 +75,7 @@ async def post_sentiments_filter(
     db: AsyncSession = Depends(get_session)
 ):
     """
-    Filter articles based on provided criteria for sentiments.
+    Retrieve list of sentiments based on provided filter criteria.
     
     Args:
         request: The FastAPI request object (required by rate limiter)
@@ -88,11 +88,7 @@ async def post_sentiments_filter(
     db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_SENTIMENTS)
     
     if not db_items:
-        return schemas.FilterChartsRead(
-            medias_count=[], 
-            evolution=[], 
-            total_count=0
-        )
+        return schemas.FilterChartsRead()
     
     return db_items
 
@@ -105,7 +101,7 @@ async def post_ideologies_filter(
     db: AsyncSession = Depends(get_session)
 ):
     """
-    Filter articles based on provided criteria for ideologies.
+    Retrieve list of ideologies based on provided filter criteria.
     
     Args:
         request: The FastAPI request object (required by rate limiter)
@@ -118,11 +114,7 @@ async def post_ideologies_filter(
     db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_IDEOLOGIES)
     
     if not db_items:
-        return schemas.FilterChartsRead(
-            medias_count=[], 
-            evolution=[], 
-            total_count=0
-        )
+        return schemas.FilterChartsRead()
     
     return db_items
 
@@ -135,7 +127,7 @@ async def post_words_filter(
     db: AsyncSession = Depends(get_session)
 ):
     """
-    Filter articles based on provided criteria for words.
+    Retrieve list of words based on provided filter criteria.
     
     Args:
         request: The FastAPI request object (required by rate limiter)
@@ -149,5 +141,37 @@ async def post_words_filter(
     
     if not db_items:
         return []
+    
+    return db_items
+
+
+@FILTERS_ROUTER.post("/chartdialog/paginated", response_model=schemas.ChartDialogPaginatedRead)
+@LIMITER.limit(f"{120}/minute")
+async def post_chart_dialog_paginated(
+    request: Request,
+    filter_params: schemas.ChartDialogPaginated,
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Retrieve list of urls for a specific item based on provided filter criteria.
+
+    Args:
+        request: The FastAPI request object (required by rate limiter)
+        filter_params: Object containing all filter parameters
+        db: Database session
+        
+    Returns:
+        List of articles items matching the filter criteria
+    """
+    db_items = await srv.get_chart_dialog_paginated(db, filter_params)
+    
+    # Always return the paginated response structure, even if empty
+    if not db_items.results:
+        return schemas.ChartDialogPaginatedRead(
+            results=[],
+            total_count=0,
+            page=filter_params.pagination.page,
+            has_more=False
+        )
     
     return db_items
