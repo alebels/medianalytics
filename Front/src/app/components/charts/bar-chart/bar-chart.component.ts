@@ -66,6 +66,7 @@ export class BarChartComponent implements OnInit {
       this.chartDialog.media_id = this.filterDialog()?.media_id;
       this.chartDialog.type = this.filterDialog()?.type;
       this.chartDialog.country = this.filterDialog()?.country;
+      this.chartDialog.region = this.filterDialog()?.region;
       this.chartDialog.rangeDates = this.filterDialog()?.rangeDates;
       this.chartDialog.valuation = this.chartMode; // Determine if this is a sentiment or ideology chart, word chart if NONE
     }

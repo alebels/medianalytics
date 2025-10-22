@@ -72,7 +72,8 @@
     "word": "Articles containing",
     "disclaimer": "Not all articles may be available anymore",
     "disclaimer2": "The date of the article may not match the date it was added to the platform",
-    "disclaimer3": "Not all articles may accurately report the frequency of the word"
+    "disclaimer3": "Not all articles may accurately report the frequency of the word",
+    "no_data": "No data available, try later"
   },
   "messages": {
     "error": "Error",

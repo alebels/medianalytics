@@ -244,6 +244,15 @@ export class ChartDialogComponent implements OnDestroy {
     this.frequencyCache.clear();
     this.autoLoadSetup = false;
 
+    // Scroll viewport to top when initializing new data
+    // Use queueMicrotask to ensure viewport is ready
+    queueMicrotask(() => {
+      const viewport = this.virtualScroll();
+      if (viewport) {
+        viewport.scrollToOffset(0);
+      }
+    });
+
     // Build filter parameters from chart data
     const filterParams = new ChartDialogValue();
     if (chartData.media_id) filterParams.media_id = chartData.media_id;

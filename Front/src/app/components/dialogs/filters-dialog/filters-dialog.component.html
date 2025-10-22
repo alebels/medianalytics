@@ -59,13 +59,13 @@
     }
   </div>
 
-  } } @if (header() === TYPES) { @for (type of getUniqueTypes(); track type; let
-  i = $index) { @let medias = getMediaForType(type);
+  } } @if (header() === TYPES) { @for (type of getUniqueTypes(); track type) {
+  @let medias = getMediaForType(type);
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
       <i [class]="'icon mr-2 bi bi-' + getMediaIcon(type)"></i>
-      {{ i + 1 }}. {{ MEDIA_GROUP + "." + type | translate }}
-      <span class="text-lg"> - {{ medias.length }} </span>
+      {{ MEDIA_GROUP + "." + type | translate }}
+      <span class="text-lg"> - {{ medias.length }}</span>
     </h3>
 
     <ul class="list-disc list-inside space-y-1 ml-4">
@@ -78,11 +78,11 @@
   </div>
 
   } } @if (header() === COUNTRIES) { @for (country of getUniqueCountries();
-  track country; let i = $index) { @let medias = getMediaForCountry(country);
+  track country) { @let medias = getMediaForCountry(country);
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
-      {{ i + 1 }}. {{ COUNTRIES + "." + country | translate
-      }}<span class="text-lg"> - {{ medias.length }} </span>
+      {{ COUNTRIES + "." + country | translate
+      }}<span class="text-lg"> - {{ medias.length }}</span>
     </h3>
 
     <ul class="list-disc list-inside space-y-1 ml-4">
@@ -95,18 +95,18 @@
   </div>
 
   } } @if (header() === REGIONS) { @for (region of getUniqueRegions(); track
-  region; let i = $index) { @let countries = getCountriesForRegion(region);
+  region) { @let countries = getCountriesForRegion(region);
   <div class="mb-4">
     <h3 class="text-xl font-semibold text-accent mb-2">
-      {{ i + 1 }}. {{ REGIONS + "." + region | translate
-      }}<span class="text-lg"> - {{ countries.length }} </span>
+      {{ REGIONS + "." + region | translate
+      }}<span class="text-lg"> - {{ countries.length }}</span>
     </h3>
 
-    @for (country of countries; track country; let i = $index) { @let medias =
+    @for (country of countries; track country) { @let medias =
     getMediaForRegionAndCountry(region, country);
     <div class="ml-4 mb-2">
       <h4 class="text-xl font-serif font-semibold text-cText mb-2">
-        {{ i + 1 }}. {{ COUNTRIES + "." + country | translate }} -
+        {{ COUNTRIES + "." + country | translate }} -
         {{ medias.length }}
       </h4>
       <ul class="list-disc list-inside space-y-1">
@@ -136,8 +136,8 @@
       [ngStyle]="{ color: sentiment.color }"
     >
       <i [class]="'icon mr-2 bi bi-' + sentiment.icon"></i
-      >{{ SENTIMENTS + "." + sentiment.label | translate }} -
-      {{ sentiment.items.length }}
+      >{{ SENTIMENTS + "." + sentiment.label | translate
+      }}<span class="text-lg"> - {{ sentiment.items.length }}</span>
     </h3>
 
     <ul class="list-disc list-inside space-y-1 ml-4">
@@ -167,8 +167,8 @@
       [ngStyle]="{ color: ideology.color }"
     >
       <i [class]="'icon mr-2 bi bi-' + ideology.icon"></i
-      >{{ IDEOLOGIES + "." + ideology.label | translate }} -
-      {{ ideology.items.length }}
+      >{{ IDEOLOGIES + "." + ideology.label | translate
+      }}<span class="text-lg"> - {{ ideology.items.length }}</span>
     </h3>
 
     <ul class="list-disc list-inside space-y-1 ml-4">

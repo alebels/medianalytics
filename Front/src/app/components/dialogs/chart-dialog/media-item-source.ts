@@ -44,9 +44,6 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
   
   // BehaviorSubject tracking loading state for UI indicators
   private readonly _loadingStream = new BehaviorSubject<boolean>(false);
-  
-  // BehaviorSubject tracking if more data can be loaded
-  private readonly _hasMoreStream = new BehaviorSubject<boolean>(true);
 
   private readonly apiUrl = environment.apiUrl + '/filters';
 
@@ -72,7 +69,6 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
     this._cachedData = [];
     this._dataStream.complete();
     this._loadingStream.complete();
-    this._hasMoreStream.complete();
   }
 
   get loading$(): Observable<boolean> {
@@ -117,14 +113,13 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
     this._loadingStream.next(true);
 
     try {
+      await new Promise(resolve => setTimeout(resolve, 700));
       const response = await this._fetchMediaItemsFromAPI(this._currentPage);
 
       this._hasMore = response.has_more;
-      this._hasMoreStream.next(this._hasMore);
 
       if (!response.results?.length) {
         this._hasMore = false;
-        this._hasMoreStream.next(false);
         return;
       }
 
@@ -147,9 +142,6 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
       
       // Emit updated data for virtual scroll
       this._dataStream.next(this._cachedData);
-    } catch {
-      this._hasMore = false;
-      this._hasMoreStream.next(false);
     } finally {
       this._isLoading = false;
       this._loadingStream.next(false);
@@ -169,10 +161,10 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
     this._loadingStream.next(true);
 
     try {
+      await new Promise(resolve => setTimeout(resolve, 300));
       const response = await this._fetchMediaItemsFromAPI(1);
 
       this._hasMore = response.has_more;
-      this._hasMoreStream.next(this._hasMore);
 
       // Initialize cache with first page data only (no pre-allocation)
       this._cachedData = [...response.results];
@@ -184,8 +176,6 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
     } catch {
       this._cachedData = [];
       this._initialized = true;
-      this._hasMore = false;
-      this._hasMoreStream.next(false);
       this._dataStream.next(this._cachedData);
     } finally {
       this._isLoading = false;

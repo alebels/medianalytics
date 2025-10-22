@@ -143,23 +143,26 @@ async def get_chart_dialog_paginated(
         - List of query results for the requested page (individual URL rows)
         - Total count of all matching URLs
     """
-    
-    # 1. Get total count first (without pagination)
-    count_query = f"""
-        SELECT COUNT(*) FROM ({query}) as count_subquery
-    """
-    count_result = await db.execute(text(count_query), params)
-    total_count = count_result.scalar() or 0
-    
-    # 2. Add pagination to the original query
-    offset = (page - 1) * page_size
-    paginated_query = f"{query} LIMIT :limit OFFSET :offset"
-    
-    # Add pagination parameters
-    paginated_params = {**params, "limit": page_size, "offset": offset}
-    
-    # 3. Execute paginated query
-    result = await db.execute(text(paginated_query), paginated_params)
-    items = result.fetchall()
-    
-    return items, total_count
+    try:
+        # 1. Get total count first (without pagination)
+        count_query = f"""
+            SELECT COUNT(*) FROM ({query}) as count_subquery
+        """
+        count_result = await db.execute(text(count_query), params)
+        total_count = count_result.scalar() or 0
+        
+        # 2. Add pagination to the original query
+        offset = (page - 1) * page_size
+        paginated_query = f"{query} LIMIT :limit OFFSET :offset"
+        
+        # Add pagination parameters
+        paginated_params = {**params, "limit": page_size, "offset": offset}
+        
+        # 3. Execute paginated query
+        result = await db.execute(text(paginated_query), paginated_params)
+        items = result.fetchall()
+        
+        return items, total_count
+    except Exception as e:
+        print(f"Database error in get_chart_dialog_paginated: {e}")
+        raise

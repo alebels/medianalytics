@@ -31,10 +31,15 @@ async def get_medias(
     Returns:
         List of media items if found, otherwise raises a 404 HTTPException.
     """
-    db_items = await repo.get_medias(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No items found")
-    return db_items
+    try:
+        db_items = await repo.get_medias(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No items found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving media items")
 
 
 @FILTERS_ROUTER.get("/sentimentsideologies", response_model=schemas.SentimentsIdeologiesRead)
@@ -61,10 +66,15 @@ async def get_min_max_date(
     Returns:
         Minimum and maximum dates of articles available from the database.
     """
-    db_item = await repo.get_min_max_date(db)
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="No items found")
-    return db_item
+    try:
+        db_item = await repo.get_min_max_date(db)
+        if db_item is None:
+            raise HTTPException(status_code=404, detail="No items found")
+        return db_item
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving date range")
 
 
 @FILTERS_ROUTER.post("/sentimentsfilter", response_model=schemas.FilterChartsRead)
@@ -85,12 +95,13 @@ async def post_sentiments_filter(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_SENTIMENTS)
-    
-    if not db_items:
-        return schemas.FilterChartsRead()
-    
-    return db_items
+    try:
+        db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_SENTIMENTS)
+        if not db_items:
+            return schemas.FilterChartsRead()
+        return db_items
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error filtering sentiments")
 
 
 @FILTERS_ROUTER.post("/ideologiesfilter", response_model=schemas.FilterChartsRead)
@@ -111,12 +122,13 @@ async def post_ideologies_filter(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_IDEOLOGIES)
-    
-    if not db_items:
-        return schemas.FilterChartsRead()
-    
-    return db_items
+    try:
+        db_items = await srv.get_sentiments_ideologies_filter(db, filter_params, C_IDEOLOGIES)
+        if not db_items:
+            return schemas.FilterChartsRead()
+        return db_items
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error filtering ideologies")
 
 
 @FILTERS_ROUTER.post("/wordsfilter", response_model=list[schemas.ItemRead])
@@ -137,16 +149,17 @@ async def post_words_filter(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_words_filter(db, filter_params)
-    
-    if not db_items:
-        return []
-    
-    return db_items
+    try:
+        db_items = await srv.get_words_filter(db, filter_params)
+        if not db_items:
+            return []
+        return db_items
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error filtering words")
 
 
 @FILTERS_ROUTER.post("/chartdialog/paginated", response_model=schemas.ChartDialogPaginatedRead)
-@LIMITER.limit(f"{120}/minute")
+@LIMITER.limit(f"{50}/minute")
 async def post_chart_dialog_paginated(
     request: Request,
     filter_params: schemas.ChartDialogPaginated,
@@ -163,15 +176,17 @@ async def post_chart_dialog_paginated(
     Returns:
         List of articles items matching the filter criteria
     """
-    db_items = await srv.get_chart_dialog_paginated(db, filter_params)
-    
-    # Always return the paginated response structure, even if empty
-    if not db_items.results:
-        return schemas.ChartDialogPaginatedRead(
-            results=[],
-            total_count=0,
-            page=filter_params.pagination.page,
-            has_more=False
-        )
-    
-    return db_items
+    try:
+        db_items = await srv.get_chart_dialog_paginated(db, filter_params)
+        
+        if not db_items.results:
+            return schemas.ChartDialogPaginatedRead(
+                results=[],
+                total_count=0,
+                page=filter_params.pagination.page,
+                has_more=False
+            )
+        
+        return db_items
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error processing chart dialog request")

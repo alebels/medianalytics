@@ -84,9 +84,11 @@
   </div>
   <!-- Loading indicator when fetching more data (inside viewport for smooth scroll) -->
   <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">
-    <div class="w-[95%] h-[3px]">
+    <div class="w-[95%] min-h-[3px] text-center text-cText text-lg">
       @if (dataSource.loading$ | async) {
-      <p-progressbar mode="indeterminate" [style]="{ height: '100%' }" />
+      <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
+      } @else if (dataSource.cachedData.length <= 0) {
+      {{ "dialog.no_data" | translate }}
       }
     </div>
   </ng-template>

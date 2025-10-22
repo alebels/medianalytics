@@ -368,56 +368,47 @@ async def get_words_filter(
 
 def set_query_chart_dialog(filters: schemas.ChartDialogPaginated) -> schemas.FillQuery:
     """
-    Constructs a SQL query to retrieve individual article URLs with their media names
-    based on sentiment, ideology, or word filters.
+    Constructs an optimized SQL query to retrieve article URLs ordered by media URL count.
     
-    This function builds a query that:
-    1. Filters articles by the provided criteria (sentiment/ideology/word)
-    2. Joins with media table to get media names
-    3. Returns individual URLs with their media names (NOT grouped)
-    4. If word filter is used, includes word frequency for each URL
-    5. Allows pagination at the URL level, not media group level
+    Uses CTE (Common Table Expression) for efficient ordering:
+    1. Filters and retrieves matching URLs with media names
+    2. Calculates URL count per media for ordering
+    3. Orders primarily by URL count (DESC), then by frequency (if word filter)
     
     Args:
-        filters: ChartDialogPaginated object containing filter criteria including:
-                - sentiment: Optional sentiment filter
-                - ideology: Optional ideology filter  
-                - word: Optional word filter (includes frequency in results)
-                - Other base filters (media_id, type, region, country, dates)
+        filters: ChartDialogPaginated object containing filter criteria
     
     Returns:
-        FillQuery object containing:
-        - query: The constructed SQL query string
-        - params: Dictionary of parameters for safe query execution
+        FillQuery object with optimized query and parameters
     """
-    # Determine if we need frequency column (only for word filters)
     include_frequency = filters.word is not None
-    
-    if include_frequency:
-        base_query = """
-        SELECT DISTINCT m.name as media_name, a.url as url, f.frequency as frequency
-        FROM public.article a
-        JOIN public.media m ON a.media_id = m.id
-    """
-    else:
-        base_query = """
-        SELECT DISTINCT m.name as media_name, a.url as url
-        FROM public.article a
-        JOIN public.media m ON a.media_id = m.id
-    """
-    
-    # Initialize parameters dictionary
     params = {}
     
-    # Build WHERE conditions manually (since we already have the media JOIN)
+    # Build CTE for filtered data
+    if include_frequency:
+        filtered_cte = """
+        WITH filtered_data AS (
+            SELECT DISTINCT m.name as media_name, a.url as url, f.frequency as frequency
+            FROM public.article a
+            JOIN public.media m ON a.media_id = m.id
+            JOIN public.facts f ON f.id_article = a.id
+            JOIN public.word w ON f.id_word = w.id
+        """
+    else:
+        filtered_cte = """
+        WITH filtered_data AS (
+            SELECT DISTINCT m.name as media_name, a.url as url
+            FROM public.article a
+            JOIN public.media m ON a.media_id = m.id
+        """
+    
+    # Build WHERE conditions
     conditions = []
     
-    # Apply media_id filter if provided
     if filters.media_id is not None:
         conditions.append("a.media_id = :media_id")
         params["media_id"] = filters.media_id
     else:
-        # Apply media type/region/country filters
         if filters.type is not None:
             conditions.append("m.type::text = :type")
             params["type"] = filters.type.value
@@ -430,7 +421,7 @@ def set_query_chart_dialog(filters: schemas.ChartDialogPaginated) -> schemas.Fil
             conditions.append("m.country::text = :country")
             params["country"] = filters.country.value
     
-    # Add date filtering
+    # Date filtering
     if filters.dates is not None and len(filters.dates) > 0:
         if len(filters.dates) == 1:
             conditions.append("a.insert_date = :date_single")
@@ -440,41 +431,48 @@ def set_query_chart_dialog(filters: schemas.ChartDialogPaginated) -> schemas.Fil
             params["date_start"] = filters.dates[0]
             params["date_end"] = filters.dates[1]
     
-    # Add WHERE clause if we have conditions
-    if conditions:
-        base_query += " WHERE " + " AND ".join(conditions)
-    
-    # Add specific filters for sentiment, ideology, or word
-    # Only one of these will be present per request (mutually exclusive)
+    # Specific filters
     if filters.sentiment is not None:
-        # Add WHERE or AND depending on whether we already have conditions
-        connector = " AND " if conditions else " WHERE "
-        base_query += f"{connector}:sentiment = ANY(a.sentiments)"
+        conditions.append(":sentiment = ANY(a.sentiments)")
         params["sentiment"] = filters.sentiment.value
-    
     elif filters.ideology is not None:
-        connector = " AND " if conditions else " WHERE "
-        base_query += f"{connector}:ideology = ANY(a.ideologies)"
+        conditions.append(":ideology = ANY(a.ideologies)")
         params["ideology"] = filters.ideology.value
-    
     elif filters.word is not None:
-        # Join with word and facts tables to filter by word and get frequency
-        base_query = base_query.replace(
-            "FROM public.article a",
-            """FROM public.article a
-            JOIN public.facts f ON f.id_article = a.id
-            JOIN public.word w ON f.id_word = w.id"""
-        )
-        connector = " AND " if conditions else " WHERE "
-        base_query += f"{connector}w.name = :word"
+        conditions.append("w.name = :word")
         params["word"] = filters.word
     
-    # Order by media name and URL for consistent pagination
-    base_query += """
-        ORDER BY m.name, a.url
+    # Add WHERE clause to CTE
+    if conditions:
+        filtered_cte += " WHERE " + " AND ".join(conditions)
+    
+    # Close filtered_data CTE and add media_counts CTE
+    filtered_cte += """
+        ),
+        media_counts AS (
+            SELECT media_name, COUNT(*) as url_count
+            FROM filtered_data
+            GROUP BY media_name
+        )
     """
     
-    return schemas.FillQuery(query=base_query, params=params)
+    # Main SELECT with joins and ordering
+    if include_frequency:
+        main_query = """
+        SELECT fd.media_name, fd.url, fd.frequency
+        FROM filtered_data fd
+        JOIN media_counts mc ON fd.media_name = mc.media_name
+        ORDER BY mc.url_count DESC, fd.frequency DESC, fd.media_name, fd.url
+        """
+    else:
+        main_query = """
+        SELECT fd.media_name, fd.url
+        FROM filtered_data fd
+        JOIN media_counts mc ON fd.media_name = mc.media_name
+        ORDER BY mc.url_count DESC, fd.media_name, fd.url
+        """
+    
+    return schemas.FillQuery(query=filtered_cte + main_query, params=params)
 
 
 async def get_chart_dialog_paginated(
@@ -501,57 +499,66 @@ async def get_chart_dialog_paginated(
                 - Filter criteria (sentiment/ideology/word/media/dates)
                 - Pagination parameters (page, page_size)
     """
-    # Build query using existing logic (returns individual URLs, with frequency if word filter)
-    query_result = set_query_chart_dialog(filters)
-    
-    # Execute paginated query - now paginating by individual URLs
-    items, total_count = await repo.get_chart_dialog_paginated(
-        db,
-        query_result.query,
-        query_result.params,
-        filters.pagination.page,
-        filters.pagination.page_size
-    )
-    
-    # Check if this is a word filter (frequency will be included in results)
-    is_word_filter = filters.word is not None
-    
-    # Group URLs by media name in-memory
-    # For word filters: items are (media_name, url, frequency) tuples
-    # For sentiment/ideology: items are (media_name, url) tuples
-    media_urls_map = {}
-    for item in items:
-        media_name = str(item.media_name)
-        url = str(item.url)
+    try:
+        # Build query using existing logic (returns individual URLs, with frequency if word filter)
+        query_result = set_query_chart_dialog(filters)
         
-        if media_name not in media_urls_map:
-            media_urls_map[media_name] = []
-        
-        # Create ItemUrl with or without frequency
-        if is_word_filter:
-            frequency = int(item.frequency) if hasattr(item, 'frequency') else None
-            item_url = schemas.ItemUrl(url=url, frequency=frequency)
-        else:
-            item_url = schemas.ItemUrl(url=url)
-        
-        media_urls_map[media_name].append(item_url)
-    
-    # Transform to Pydantic models
-    results = [
-        schemas.ItemDialog(
-            media_name=media_name,
-            urls=urls
+        # Execute paginated query - now paginating by individual URLs
+        items, total_count = await repo.get_chart_dialog_paginated(
+            db,
+            query_result.query,
+            query_result.params,
+            filters.pagination.page,
+            filters.pagination.page_size
         )
-        for media_name, urls in media_urls_map.items()
-    ]
-    
-    # Calculate if there are more pages based on total URL count
-    total_pages = (total_count + filters.pagination.page_size - 1) // filters.pagination.page_size
-    has_more = filters.pagination.page < total_pages
-    
-    return schemas.ChartDialogPaginatedRead(
-        results=results,
-        total_count=total_count,  # Now represents total URLs, not total media groups
-        page=filters.pagination.page,
-        has_more=has_more
-    )
+        
+        # Check if this is a word filter (frequency will be included in results)
+        is_word_filter = filters.word is not None
+        
+        # Group URLs by media name in-memory
+        # For word filters: items are (media_name, url, frequency) tuples
+        # For sentiment/ideology: items are (media_name, url) tuples
+        media_urls_map = {}
+        for item in items:
+            try:
+                media_name = str(item.media_name)
+                url = str(item.url)
+                
+                if media_name not in media_urls_map:
+                    media_urls_map[media_name] = []
+                
+                # Create ItemUrl with or without frequency
+                if is_word_filter:
+                    frequency = int(item.frequency) if hasattr(item, 'frequency') and item.frequency is not None else None
+                    item_url = schemas.ItemUrl(url=url, frequency=frequency)
+                else:
+                    item_url = schemas.ItemUrl(url=url)
+                
+                media_urls_map[media_name].append(item_url)
+            except (ValueError, TypeError) as e:
+                # Skip invalid items but continue processing
+                print(f"Warning: Skipping invalid item: {e}")
+                continue
+        
+        # Transform to Pydantic models
+        results = [
+            schemas.ItemDialog(
+                media_name=media_name,
+                urls=urls
+            )
+            for media_name, urls in media_urls_map.items()
+        ]
+        
+        # Calculate if there are more pages based on total URL count
+        total_pages = (total_count + filters.pagination.page_size - 1) // filters.pagination.page_size
+        has_more = filters.pagination.page < total_pages
+        
+        return schemas.ChartDialogPaginatedRead(
+            results=results,
+            total_count=total_count,  # Now represents total URLs, not total media groups
+            page=filters.pagination.page,
+            has_more=has_more
+        )
+    except Exception as e:
+        print(f"Error in get_chart_dialog_paginated: {e}")
+        raise

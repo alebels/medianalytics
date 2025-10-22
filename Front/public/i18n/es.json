@@ -72,7 +72,8 @@
     "word": "Artículos que contienen",
     "disclaimer":"Puede que ya no todos los artículos estén disponibles",
     "disclaimer2":"La fecha del artículo puede no coincidir con la fecha en que se insertó en la plataforma",
-    "disclaimer3": "Puede que no todos los artículos informen con precisión sobre la frecuencia de la palabra"
+    "disclaimer3": "Puede que no todos los artículos informen con precisión sobre la frecuencia de la palabra",
+    "no_data": "No hay datos disponibles, inténtelo más tarde"
   },
   "messages": {
     "error": "Error",

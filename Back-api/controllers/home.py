@@ -31,10 +31,15 @@ async def get_general_medias(
     Returns:
         A list of media items.
     """
-    db_items = await repo.get_general_medias(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No items found")
-    return db_items
+    try:
+        db_items = await repo.get_general_medias(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No items found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving media items")
 
 
 @HOME_ROUTER.get("/generaltotalarticles", response_model=int)
@@ -51,10 +56,15 @@ async def get_general_total_articles(
     Returns:
         Total number of articles in the database.
     """
-    total = await repo.get_general_total_articles(db)
-    if total is None:
-        raise HTTPException(status_code=404, detail="No items found")
-    return total
+    try:
+        total = await repo.get_general_total_articles(db)
+        if total is None:
+            raise HTTPException(status_code=404, detail="No items found")
+        return total
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving article count")
 
 
 @HOME_ROUTER.get("/generaltotalwords", response_model=int)
@@ -71,10 +81,15 @@ async def get_general_total_words(
     Returns:
         Total number of words in the database.
     """
-    total = await repo.get_general_total_words(db)
-    if total is None:
-        raise HTTPException(status_code=404, detail="No words found")
-    return total
+    try:
+        total = await repo.get_general_total_words(db)
+        if total is None:
+            raise HTTPException(status_code=404, detail="No words found")
+        return total
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving word count")
 
 
 @HOME_ROUTER.get("/generaltopwords", response_model=list[schemas.ItemRead])
@@ -91,11 +106,15 @@ async def get_general_top_words(
     Returns:
         A list of the top words.
     """
-    
-    db_items = await repo.get_general_top_words(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No top words found")
-    return db_items
+    try:
+        db_items = await repo.get_general_top_words(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No top words found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving top words")
 
 
 @HOME_ROUTER.get("/generalbottomwords", response_model=list[schemas.ItemRead])
@@ -112,10 +131,15 @@ async def get_general_bottom_words(
     Returns:
         A list of the bottom words.
     """
-    db_items = await repo.get_general_bottom_words(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No bottom words found")
-    return db_items
+    try:
+        db_items = await repo.get_general_bottom_words(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No bottom words found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving bottom words")
 
 
 @HOME_ROUTER.get("/generalaveragewordcount", response_model=int)
@@ -132,10 +156,15 @@ async def get_general_average_word_count(
     Returns:
         The average number of words per article.
     """
-    average = await repo.get_general_average_word_count(db)
-    if average is None:
-        raise HTTPException(status_code=404, detail="No articles found")
-    return average
+    try:
+        average = await repo.get_general_average_word_count(db)
+        if average is None:
+            raise HTTPException(status_code=404, detail="No articles found")
+        return average
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error calculating average word count")
 
 
 @HOME_ROUTER.get("/generalsentiments", response_model=CompoundRead)
@@ -152,10 +181,15 @@ async def get_general_sentiments(
     Returns:
         A list of the sentiments with their counts.
     """
-    db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_SENTIMENTS)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No sentiments found")
-    return db_items
+    try:
+        db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_SENTIMENTS)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No sentiments found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving sentiments")
 
 
 @HOME_ROUTER.get("/generalideologies", response_model=CompoundRead)
@@ -172,10 +206,15 @@ async def get_general_ideologies(
     Returns:
         A list of the ideologies with their counts.
     """
-    db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_IDEOLOGIES)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No ideologies found")
-    return db_items
+    try:
+        db_items = await srv.get_compound_sentiments_ideologies(db, C_GENERAL, C_IDEOLOGIES)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No ideologies found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving ideologies")
 
 
 @HOME_ROUTER.get("/generaltopgrammar", response_model=list[schemas.ItemRead])
@@ -192,10 +231,15 @@ async def get_general_top_grammar(
     Returns:
         A list of the grammar with their counts.
     """
-    db_items = await repo.get_general_top_grammar(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No grammars found")
-    return db_items
+    try:
+        db_items = await repo.get_general_top_grammar(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No grammars found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving grammar data")
 
 
 @HOME_ROUTER.get("/generaltable", response_model=list[schemas.GeneralMediaItemRead])
@@ -212,10 +256,15 @@ async def get_general_table(
     Returns:
         A list of general media items.
     """
-    db_items = await srv.get_general_table(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No items found")
-    return db_items
+    try:
+        db_items = await srv.get_general_table(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No items found")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving table data")
 
 
 @HOME_ROUTER.get("/generaldaytopwords", response_model=list[schemas.ItemRead])
@@ -232,10 +281,15 @@ async def get_general_day_top_words(
     Returns:
         A list of the top words for the latest insert_date.
     """
-    db_items = await repo.get_general_day_top_words(db)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No top words found for today")
-    return db_items
+    try:
+        db_items = await repo.get_general_day_top_words(db)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No top words found for today")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving daily top words")
 
 
 @HOME_ROUTER.get("/generaldaysentiments", response_model=CompoundRead)
@@ -252,10 +306,15 @@ async def get_general_day_sentiments(
     Returns:
         A list of the sentiments with their counts for the latest insert_date.
     """
-    db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_SENTIMENTS)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No sentiments found for today")
-    return db_items
+    try:
+        db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_SENTIMENTS)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No sentiments found for today")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving daily sentiments")
 
 
 @HOME_ROUTER.get("/generaldayideologies", response_model=CompoundRead)
@@ -272,7 +331,12 @@ async def get_general_day_ideologies(
     Returns:
         A list of the ideologies with their counts for the latest insert_date.
     """
-    db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_IDEOLOGIES)
-    if not db_items:
-        raise HTTPException(status_code=404, detail="No ideologies found for today")
-    return db_items
+    try:
+        db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_IDEOLOGIES)
+        if not db_items:
+            raise HTTPException(status_code=404, detail="No ideologies found for today")
+        return db_items
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving daily ideologies")
