@@ -79,9 +79,8 @@ export class ChartDialogComponent implements OnDestroy {
 
   readonly NONE = NONE;
 
-  private urlOffsetCache: number[] = [];
-  private frequencyCache = new Map<string, number | null>();
   private autoLoadSetup = false;
+  private strategy: VariableSizeVirtualScrollStrategy | null = null;
 
   private readonly http = inject(HttpClient);
 
@@ -97,10 +96,15 @@ export class ChartDialogComponent implements OnDestroy {
     effect(() => {
       const viewport = this.virtualScroll();
       if (viewport && this.dataSource && !this.autoLoadSetup) {
+        // Store strategy reference for reuse
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.strategy = (viewport as any)
+          ._scrollStrategy as VariableSizeVirtualScrollStrategy;
+
         // Use queueMicrotask to defer setup until after current execution
         queueMicrotask(() => {
           if (viewport && this.dataSource && !this.autoLoadSetup) {
-            this.setupAutoLoad(viewport);
+            this.setupAutoLoad();
           }
         });
       }
@@ -125,50 +129,6 @@ export class ChartDialogComponent implements OnDestroy {
     return `${index}-${urlItem.url}`;
   }
 
-  /**
-   * Calculates the global URL index across all media items.
-   * @param mediaIndex - Index of the media item in the list
-   * @param urlIndex - Index of the URL within its media item
-   * @returns Global index starting from 1
-   */
-  getGlobalUrlIndex(mediaIndex: number, urlIndex: number): number {
-    if (!this.dataSource) return urlIndex + 1;
-
-    // Rebuild cache if it's empty or stale (lazy initialization)
-    if (this.urlOffsetCache.length === 0) {
-      this.rebuildUrlOffsetCache();
-    }
-
-    // O(1) lookup from pre-calculated cumulative offsets
-    const offset = this.urlOffsetCache[mediaIndex] ?? 0;
-    return offset + urlIndex + 1;
-  }
-
-  /**
-   * Calculates the total frequency for all URLs in a media item (optimized with caching).
-   * O(1) lookup for repeated calls with same media_name.
-   *
-   * @param item - The media item containing URLs with optional frequency
-   * @returns Total frequency sum, or null if no frequencies exist
-   */
-  getTotalFrequency(item: ItemDialog): number | null {
-    // Check cache first - O(1) lookup
-    if (this.frequencyCache.has(item.media_name)) {
-      return this.frequencyCache.get(item.media_name)!;
-    }
-
-    // Calculate sum only once per media_name
-    const total = item.urls.reduce((sum, urlItem) => {
-      return sum + (urlItem.frequency ?? 0);
-    }, 0);
-
-    // Cache the result (null if no frequencies exist)
-    const result = total > 0 ? total : null;
-    this.frequencyCache.set(item.media_name, result);
-
-    return result;
-  }
-
   onClose(): void {
     isShowChartDialog$.next(false);
   }
@@ -177,56 +137,38 @@ export class ChartDialogComponent implements OnDestroy {
    * Sets up automatic loading when user scrolls near bottom.
    * Integrates with the VariableSizeVirtualScrollStrategy.
    */
-  private setupAutoLoad(viewport: CdkVirtualScrollViewport): void {
-    if (this.autoLoadSetup) return;
+  private setupAutoLoad(): void {
+    if (this.autoLoadSetup || !this.strategy) return;
 
-    // Access the scroll strategy from the viewport's internal property
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const strategy = (viewport as any)
-      ._scrollStrategy as VariableSizeVirtualScrollStrategy;
+    if (!this.strategy.setOnNearBottom) return;
 
-    if (!strategy?.setOnNearBottom) return;
-
-    strategy.setOnNearBottom(() => void this.handleAutoLoad(strategy));
+    this.strategy.setOnNearBottom(() => void this.handleAutoLoad());
     this.autoLoadSetup = true;
   }
 
   /**
    * Handles automatic data loading when near bottom is detected.
-   * @param strategy - The scroll strategy to reset loading flag after completion
    */
-  private async handleAutoLoad(
-    strategy: VariableSizeVirtualScrollStrategy
-  ): Promise<void> {
-    if (!this.dataSource?.hasMoreSync() || this.dataSource.isLoadingSync()) {
-      strategy.resetLoadingFlag();
+  private async handleAutoLoad(): Promise<void> {
+    if (
+      !this.strategy ||
+      !this.dataSource?.hasMoreSync() ||
+      this.dataSource.isLoadingSync()
+    ) {
+      this.strategy?.resetLoadingFlag();
       return;
     }
 
     await this.dataSource.loadMore();
 
-    // Rebuild URL offset cache for accurate indexing
-    this.rebuildUrlOffsetCache();
-    
-    // Clear frequency cache since URLs may have been aggregated into existing items
-    this.frequencyCache.clear();
-
-    strategy.resetLoadingFlag();
-  }
-
-  private rebuildUrlOffsetCache(): void {
-    if (!this.dataSource) return;
-
-    const cachedData = this.dataSource.cachedData;
-    const cache: number[] = new Array(cachedData.length);
-
-    let cumulativeCount = 0;
-    for (let i = 0; i < cachedData.length; i++) {
-      cache[i] = cumulativeCount;
-      cumulativeCount += cachedData[i]?.urls.length ?? 0;
+    // Invalidate size cache only for items that were modified (URLs aggregated)
+    // This is much more efficient than invalidating everything
+    const modifiedIndices = this.dataSource.lastModifiedIndices;
+    if (modifiedIndices.length > 0) {
+      this.strategy.invalidateItemSizeCache(modifiedIndices);
     }
 
-    this.urlOffsetCache = cache;
+    this.strategy.resetLoadingFlag();
   }
 
   private initializeDataSource(): void {
@@ -236,22 +178,12 @@ export class ChartDialogComponent implements OnDestroy {
     // Clean up previous datasource
     if (this.dataSource) {
       this.dataSource.disconnect();
+      // Reset strategy state when datasource changes
+      this.strategy?.reset();
       this.dataSource = undefined;
     }
 
-    // Clear caches and reset state when datasource changes
-    this.urlOffsetCache = [];
-    this.frequencyCache.clear();
     this.autoLoadSetup = false;
-
-    // Scroll viewport to top when initializing new data
-    // Use queueMicrotask to ensure viewport is ready
-    queueMicrotask(() => {
-      const viewport = this.virtualScroll();
-      if (viewport) {
-        viewport.scrollToOffset(0);
-      }
-    });
 
     // Build filter parameters from chart data
     const filterParams = new ChartDialogValue();

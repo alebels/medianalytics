@@ -3,7 +3,11 @@
     <div>
       <p class="mb-[25px]">
         {{ "manifest.description1" | translate }}
-        <a [href]="githubLink" target="_blank" rel="noopener noreferrer"
+        <a
+          [href]="githubLink"
+          class="hover:text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
           ><i>open-source</i></a
         >
         {{ "manifest.description2" | translate }}
@@ -33,15 +37,44 @@
         {{ "manifest.warning5" | translate }}
         <br />
         {{ "manifest.warning3" | translate }}
-        <a [href]="githubLink" target="_blank" rel="noopener noreferrer"
+        <a
+          [href]="githubLink"
+          class="hover:text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
           ><i>open-source</i></a
         >{{ "manifest.warning4" | translate }}
-        <br />
-        <br />
+      </p>
+      <p class="mt-8">
+        {{ "manifest.contribute1" | translate }}:
+        <a
+          [href]="githubLink"
+          class="hover:text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ githubLink.slice(8) }}</a
+        ><br />
+        {{ "manifest.contribute2" | translate }}:
+        <a
+          [href]="xAccount"
+          class="hover:text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ xAccount.slice(8) }}</a
+        >
+      </p>
+      <p class="mt-12">
         <i
           >{{ "manifest.footer1" | translate }}
           <br />
-          {{ "manifest.footer2" | translate }} <b>{{ contactEmail }}</b>
+          {{ "manifest.footer2" | translate }}
+          <a
+            href="mailto:{{ contactEmail }}"
+            class="hover:text-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><b>{{ contactEmail }}</b></a
+          >
         </i>
       </p>
     </div>

@@ -27,6 +27,9 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
   // Contains only actual ItemDialog objects for smooth scrolling
   private _cachedData: ItemDialog[] = [];
   
+  // Track which indices were modified in the last load operation
+  private _lastModifiedIndices: number[] = [];
+  
   // Current page number for pagination (1-based to match API convention)
   private _currentPage = 1;
   
@@ -84,6 +87,14 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
   }
 
   /**
+   * Returns indices of items that were modified in the last load.
+   * Used to selectively invalidate cache entries.
+   */
+  get lastModifiedIndices(): number[] {
+    return this._lastModifiedIndices;
+  }
+
+  /**
    * Synchronously returns whether more data can be loaded.
    * Used by auto-load functionality to check before triggering load.
    */
@@ -105,12 +116,14 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
    * - Aggregates URLs for items with same media_name
    * - Appends new items to cache for smooth progressive loading
    * - Maintains stable array reference to prevent scroll position reset
+   * - Tracks modified indices for selective cache invalidation
    */
   async loadMore(): Promise<void> {
     if (this._isLoading || !this._hasMore) return;
 
     this._isLoading = true;
     this._loadingStream.next(true);
+    this._lastModifiedIndices = [];
 
     try {
       await new Promise(resolve => setTimeout(resolve, 700));
@@ -132,6 +145,8 @@ export class MediaItemDataSource extends DataSource<ItemDialog> {
         if (existingIndex !== -1 && this._cachedData[existingIndex]) {
           // Aggregate URLs into existing item (in-place modification)
           this._cachedData[existingIndex]!.urls.push(...newItem.urls);
+          // Track this index as modified for cache invalidation
+          this._lastModifiedIndices.push(existingIndex);
         } else {
           // Append new item to cache
           this._cachedData.push(newItem);

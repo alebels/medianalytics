@@ -145,7 +145,7 @@ class PaginationParams(BaseModel):
     Pagination parameters for infinite scroll.
     """
     page: Annotated[int, Field(ge=1)] = 1
-    page_size: Annotated[int, Field(ge=1, le=100)] = 50
+    page_size: Annotated[int, Field(ge=1, le=150)] = 100
 
     class Config:
         """

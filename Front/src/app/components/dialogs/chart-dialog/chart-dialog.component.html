@@ -35,23 +35,12 @@
         *{{ "dialog.disclaimer2" | translate }}*
       </div>
       <div
-        *cdkVirtualFor="
-          let item of dataSource;
-          trackBy: trackByItemId;
-          let mediaIndex = index
-        "
+        *cdkVirtualFor="let item of dataSource; trackBy: trackByItemId"
         class="media-item-container"
       >
         <dl class="m-0 p-0">
-          <dt class="text-xl font-semibold text-accent mb-3">
-            {{ item.media_name }}
-            <span class="text-lg">- {{ item.urls.length }}</span>
-            @if (item.urls[0].frequency) {
-            <span class="text-base">
-              ({{ "dialog.frequency" | translate }}:
-              {{ getTotalFrequency(item) }})
-            </span>
-            }
+          <dt class="text-xl font-semibold text-accent mb-5">
+            <b>{{ item.media_name }}</b>
           </dt>
           <dd
             *ngFor="
@@ -61,7 +50,7 @@
             "
             class="text-base text-cText ml-3 w-auto mb-2"
           >
-            <b>{{ getGlobalUrlIndex(mediaIndex, urlIndex) }}.</b>&nbsp;
+            <b>{{ urlIndex + 1 }}.</b>&nbsp;
             <a
               [href]="urlItem.url"
               target="_blank"

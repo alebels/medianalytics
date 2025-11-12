@@ -59,6 +59,7 @@ services:
     volumes:
       - ./Back-data:/app
       - ./config:/app/config
+      - ./Back-data/output:/app/output
     ports:
       - "3000:3000"
     networks:

@@ -67,7 +67,12 @@ app.add_middleware(
 # SECURITY: Trusted Host Middleware - only allow specific hosts
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["medianalytics.org", "www.medianalytics.org", "localhost"]
+    allowed_hosts=[
+        "medianalytics.org", 
+        "www.medianalytics.org", 
+        "localhost",
+        "back-api"
+    ]
 )
 
 # SECURITY: Custom security middleware

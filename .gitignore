@@ -382,6 +382,7 @@ alembic.ini
 alembic/
 db/password.txt
 miscelany/
-Media-DEV.code-workspace
+*.code-workspace
 .editorconfig
 .github/
+Back-data/output

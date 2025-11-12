@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, GITHUB_REPO } from '../../utils/constants';
+import { CONTACT_EMAIL, GITHUB_REPO, X_ACCOUNT } from '../../utils/constants';
 import { Component } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -11,4 +11,5 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class ManifestComponent {
   contactEmail = CONTACT_EMAIL;
   githubLink = GITHUB_REPO;
+  xAccount = X_ACCOUNT
 }

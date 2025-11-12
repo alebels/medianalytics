@@ -15,6 +15,7 @@ from services.scrapper import (
     get_article_with_tags,
     get_article_from_script_tag,
 )
+from services.x_upload import upload_to_x
 from media_sources.medias_map_scrapper import MEDIAS_MAPPING, MediaMap
 from utils.utils import check_href, clean_href
 
@@ -207,8 +208,10 @@ async def main_service_main():
                     await main_loop(context, media_url, media)
 
             await browser.close()
-
+            
             logger.info("Daily job from main_service.main() completed successfully.")
+            
+            await upload_to_x()
 
     except Exception as e:
         logger.error("Error in main_service.main(): %s", e)

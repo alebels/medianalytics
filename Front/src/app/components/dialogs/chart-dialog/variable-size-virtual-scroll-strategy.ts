@@ -28,6 +28,21 @@ export class VariableSizeVirtualScrollStrategy {
   // Flag to prevent multiple simultaneous load triggers
   private isLoadingMore = false;
 
+  // Store scroll position before updates to prevent jumps
+  private savedScrollOffset = 0;
+
+  // Flag to control whether to preserve scroll position during updates
+  private shouldPreservePosition = true;
+
+  // Cached total content size to avoid recalculating on every scroll event
+  private cachedTotalContentSize = 0;
+
+  // Threshold for considering scroll position significant enough to preserve (in pixels)
+  private readonly scrollPositionThreshold = 100;
+  
+  // Threshold for scroll position delta before restoration (in pixels)
+  private readonly scrollDeltaThreshold = 50;
+
   constructor(
     averageItemSize = 100,
     minBufferPx = 400,
@@ -54,6 +69,67 @@ export class VariableSizeVirtualScrollStrategy {
     this.isLoadingMore = false;
   }
 
+  /**
+   * Resets all internal state when datasource changes.
+   * Clears caches and flags to ensure clean slate for new data.
+   */
+  reset(): void {
+    this.itemSizeCache.clear();
+    this.savedScrollOffset = 0;
+    this.cachedTotalContentSize = 0;
+    this.isLoadingMore = false;
+    this.shouldPreservePosition = true;
+    this.scrollToTop();
+  }
+
+  /**
+   * Clears cached heights for items that may have changed size.
+   * Call this when items are modified (e.g., URLs added) to prevent scroll jumps.
+   * Preserves heights for currently rendered items to maintain scroll stability.
+   * 
+   * @param modifiedIndices - Optional array of specific indices that were modified.
+   *                          If provided, only these will be invalidated.
+   */
+  invalidateItemSizeCache(modifiedIndices?: number[]): void {
+    if (!this.viewport) {
+      this.itemSizeCache.clear();
+      return;
+    }
+
+    // If specific indices provided, only clear those
+    if (modifiedIndices && modifiedIndices.length > 0) {
+      const renderedRange = this.viewport.getRenderedRange();
+      
+      modifiedIndices.forEach(index => {
+        // Only clear if it's currently rendered to avoid breaking scroll position
+        if (index >= renderedRange.start && index < renderedRange.end) {
+          this.itemSizeCache.delete(index);
+        }
+      });
+      return;
+    }
+
+    // Preserve heights for currently rendered items to prevent jumps during scroll
+    const renderedRange = this.viewport.getRenderedRange();
+    const preservedHeights = new Map<number, number>();
+    
+    // Save currently visible item heights - these are accurate and shouldn't cause jumps
+    for (let i = renderedRange.start; i < renderedRange.end; i++) {
+      const cachedHeight = this.itemSizeCache.get(i);
+      if (cachedHeight) {
+        preservedHeights.set(i, cachedHeight);
+      }
+    }
+    
+    // Clear all cached heights
+    this.itemSizeCache.clear();
+    
+    // Restore heights for visible items to prevent scroll position jumps
+    preservedHeights.forEach((height, index) => {
+      this.itemSizeCache.set(index, height);
+    });
+  }
+
   attach(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
     this.updateTotalContentSize();
@@ -73,22 +149,67 @@ export class VariableSizeVirtualScrollStrategy {
 
   onDataLengthChanged(): void {
     if (this.viewport) {
+      // Save current scroll position before any updates
+      this.savedScrollOffset = this.viewport.measureScrollOffset();
+      
       this.updateTotalContentSize();
       this.updateRenderedRange();
+      
+      // Restore scroll position to prevent jumps when data changes
+      // Only if position preservation is enabled
+      if (this.shouldPreservePosition && this.savedScrollOffset > 0) {
+        requestAnimationFrame(() => {
+          if (this.viewport) {
+            this.viewport.scrollToOffset(this.savedScrollOffset);
+          }
+        });
+      }
+      
       // Reset loading flag when new data arrives
       this.isLoadingMore = false;
     }
   }
 
   onContentRendered(): void {
-    if (this.viewport) {
-      this.measureRenderedItems();
-      this.updateTotalContentSize();
+    if (!this.viewport) return;
+
+    // Save scroll position before measuring
+    const currentScrollOffset = this.viewport.measureScrollOffset();
+    
+    this.measureRenderedItems();
+    this.updateTotalContentSize();
+    
+    // Always preserve scroll position during content rendering if preservation is enabled
+    // This is critical for preventing jumps when items change height (URL aggregation)
+    if (this.shouldPreservePosition && currentScrollOffset > this.scrollPositionThreshold) {
+      // Immediate restoration without waiting for RAF to minimize visible jump
+      const newOffset = this.viewport.measureScrollOffset();
+      if (Math.abs(newOffset - currentScrollOffset) > this.scrollDeltaThreshold) {
+        this.viewport.scrollToOffset(currentScrollOffset);
+      }
     }
   }
 
   onRenderedOffsetChanged(): void {
     // No-op for this strategy, keep for interface compliance
+  }
+
+  /**
+   * Scrolls the viewport to the top (offset 0).
+   * Temporarily disables position preservation to allow the scroll.
+   */
+  private scrollToTop(): void {
+    if (!this.viewport) return;
+
+    // Disable preservation to allow scroll to top
+    this.shouldPreservePosition = false;
+    
+    // Scroll to top
+    this.viewport.scrollToOffset(0);
+    
+    // Re-enable preservation immediately - safe because savedScrollOffset will be 0
+    // which prevents restoration in onDataLengthChanged (checks savedScrollOffset > 0)
+    this.shouldPreservePosition = true;
   }
 
   /**
@@ -103,12 +224,8 @@ export class VariableSizeVirtualScrollStrategy {
     const scrollOffset = this.viewport.measureScrollOffset();
     const viewportSize = this.viewport.getViewportSize();
     
-    // Use viewport's cached total content size instead of recalculating
-    const totalContentSize = this.viewport.getDataLength() > 0 
-      ? this.calculateTotalContentSize() 
-      : 0;
-      
-    const distanceFromBottom = totalContentSize - (scrollOffset + viewportSize);
+    // Use cached total content size for performance
+    const distanceFromBottom = this.cachedTotalContentSize - (scrollOffset + viewportSize);
     
     if (distanceFromBottom < this.loadMoreThreshold) {
       this.isLoadingMore = true;
@@ -148,15 +265,17 @@ export class VariableSizeVirtualScrollStrategy {
     if (!contentWrapper) return;
 
     const items = contentWrapper.querySelectorAll('.media-item-container');
+    
     items.forEach((item, i) => {
       const index = renderedRange.start + i;
-      const height = (item as HTMLElement).offsetHeight;
-      if (height > 0) {
-        this.itemSizeCache.set(index, height);
+      const actualHeight = (item as HTMLElement).offsetHeight;
+      
+      if (actualHeight > 0) {
+        this.itemSizeCache.set(index, actualHeight);
       }
     });
 
-    // Update average item size based on measured items
+    // Update average item size based on all measured items
     if (this.itemSizeCache.size > 0) {
       const totalSize = Array.from(this.itemSizeCache.values()).reduce(
         (sum, size) => sum + size,
@@ -173,6 +292,7 @@ export class VariableSizeVirtualScrollStrategy {
     if (!this.viewport) return;
 
     const totalSize = this.calculateTotalContentSize();
+    this.cachedTotalContentSize = totalSize;
     this.viewport.setTotalContentSize(totalSize);
   }
 

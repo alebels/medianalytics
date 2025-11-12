@@ -1,4 +1,12 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
+import { Dialog, DialogModule } from 'primeng/dialog';
 import {
   FILTERS,
   IDEOLOGIES,
@@ -10,7 +18,6 @@ import { GeneralMedia, MediaRead } from '../../../models/media.model';
 import { SelectGroupItem2, SelectItem2 } from '../../../models/primeng.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
 import { FilterDialog } from '../../../models/dialog.model';
 import { GeneralService } from '../../../services/general.service';
 import { Tooltip } from 'primeng/tooltip';
@@ -24,6 +31,7 @@ import { isShowFiltersDialog$ } from '../../../utils/dialog-subjects';
 })
 export class FiltersDialogComponent {
   readonly dataFiltersDialog = input<FilterDialog>();
+  @ViewChild('filterDialog') readonly filterDialog!: Dialog;
 
   readonly TYPES = FILTERS.TYPES;
   readonly COUNTRIES = FILTERS.COUNTRIES;
@@ -78,6 +86,23 @@ export class FiltersDialogComponent {
 
   constructor() {
     this.isMobile = this.generalSrv.isMobile$.getValue();
+
+    // Scroll to top when header changes
+    effect(() => {
+      const currentHeader = this.header();
+      if (currentHeader && this.filterDialog) {
+        // Use queueMicrotask to ensure dialog content is rendered
+        queueMicrotask(() => {
+          const contentElement =
+            this.filterDialog?.el?.nativeElement?.querySelector(
+              '.p-dialog-content'
+            );
+          if (contentElement) {
+            contentElement.scrollTop = 0;
+          }
+        });
+      }
+    });
   }
 
   onClose(): void {

@@ -122,7 +122,7 @@ async def get_chart_dialog_paginated(
     query: str,
     params: dict,
     page: int,
-    page_size: int = 50
+    page_size: int = 100
 ) -> tuple[list, int]:
     """
     Execute a paginated query and return results with total count.

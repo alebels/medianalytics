@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { GITHUB_REPO, X_ACCOUNT } from '../../utils/constants';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AccordionModule } from 'primeng/accordion';
 import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { DividerModule } from 'primeng/divider';
 import { FormsModule } from '@angular/forms';
-import { GITHUB_REPO } from '../../utils/constants';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
 @Component({
@@ -24,6 +24,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 })
 export class SettingsComponent implements OnInit {
   githubLink = GITHUB_REPO;
+  xAccount = X_ACCOUNT;
   isDark!: boolean;
   toggleAccordion = true;
 
