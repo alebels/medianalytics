@@ -5,4 +5,3 @@ sqlalchemy==2.0.36
 slowapi==0.1.9
 pydantic==2.10.3
 psycopg2==2.9.10
-python-dotenv==1.0.1

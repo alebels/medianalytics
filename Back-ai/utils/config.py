@@ -1,9 +1,5 @@
 import os
 import httpx
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 MAX_CONNECTIONS = int(os.getenv("MAX_CONNECTIONS"))

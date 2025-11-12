@@ -9,14 +9,11 @@ import math
 import os
 from datetime import date
 from typing import Optional
-from dotenv import load_dotenv
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive backend for server environments
 import matplotlib.pyplot as plt
 import tweepy
 
-# Load environment variables from .env file
-load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
 # Docker service configuration (uses Docker Compose service name)
 API_VERSION = "v1"
@@ -387,35 +384,35 @@ async def upload_to_x() -> bool:
         ideology_donut = create_ideology_donut_chart(ideologies_data)
         
         # Save charts to output folder for checking
-        # output_dir = "/app/output"
-        # os.makedirs(output_dir, exist_ok=True)
+        output_dir = "/app/output"
+        os.makedirs(output_dir, exist_ok=True)
         
-        # with open(os.path.join(output_dir, "sentiment_bar.png"), "wb") as f:
-        #     f.write(sentiment_bar.getvalue())
+        with open(os.path.join(output_dir, "sentiment_bar.png"), "wb") as f:
+            f.write(sentiment_bar.getvalue())
         
-        # with open(os.path.join(output_dir, "sentiment_donut.png"), "wb") as f:
-        #     f.write(sentiment_donut.getvalue())
+        with open(os.path.join(output_dir, "sentiment_donut.png"), "wb") as f:
+            f.write(sentiment_donut.getvalue())
         
-        # with open(os.path.join(output_dir, "ideology_bar.png"), "wb") as f:
-        #     f.write(ideology_bar.getvalue())
+        with open(os.path.join(output_dir, "ideology_bar.png"), "wb") as f:
+            f.write(ideology_bar.getvalue())
         
-        # with open(os.path.join(output_dir, "ideology_donut.png"), "wb") as f:
-        #     f.write(ideology_donut.getvalue())
+        with open(os.path.join(output_dir, "ideology_donut.png"), "wb") as f:
+            f.write(ideology_donut.getvalue())
         
-        # print("✅ Charts saved to output folder")
-        # return True
+        print("✅ Charts saved to output folder")
+        return True
         
-        success = upload_images_to_x(
-            sentiment_bar, sentiment_donut, ideology_bar, ideology_donut,
-            sentiments_summary, ideologies_summary
-        )
+        # success = upload_images_to_x(
+        #     sentiment_bar, sentiment_donut, ideology_bar, ideology_donut,
+        #     sentiments_summary, ideologies_summary
+        # )
         
-        if success:
-            print("\n✅ Successfully uploaded daily report to X!")
-            return True
-        else:
-            print("\n❌ Failed to upload to X")
-            return False
+        # if success:
+        #     print("\n✅ Successfully uploaded daily report to X!")
+        #     return True
+        # else:
+        #     print("\n❌ Failed to upload to X")
+        #     return False
             
     except ValueError as e:
         print(f"❌ Data validation error: {e}")

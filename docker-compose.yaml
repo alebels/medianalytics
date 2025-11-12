@@ -3,15 +3,15 @@ services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
-    secrets:
-      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db/postgresql.conf:/var/lib/postgresql/postgresql.conf
     command: ["postgres", "-c", "config_file=/var/lib/postgresql/postgresql.conf"]
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: dockeruser
-      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: medianalytics
     networks:
       - backend-network
@@ -30,6 +30,11 @@ services:
     volumes:
       - ./Back-api:/app
       - ./config:/app/config
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      DATABASE_URL: "postgresql+asyncpg://dockeruser:${DB_PASSWORD}@db:5432/medianalytics"
     ports:
       - "8080:8080"
     networks:
@@ -60,6 +65,15 @@ services:
       - ./Back-data:/app
       - ./config:/app/config
       - ./Back-data/output:/app/output
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      DATABASE_URL: "postgresql+asyncpg://dockeruser:${DB_PASSWORD}@db:5432/medianalytics"
+      X_API_KEY: ${X_API_KEY}
+      X_API_SECRET: ${X_API_SECRET}
+      X_ACCESS_TOKEN: ${X_ACCESS_TOKEN}
+      X_ACCESS_TOKEN_SECRET: ${X_ACCESS_TOKEN_SECRET}
     ports:
       - "3000:3000"
     networks:
@@ -76,6 +90,18 @@ services:
     volumes:
       - ./Back-ai:/app
       - ./config/sentiments_ideologies_enums.py:/app/config/sentiments_ideologies_enums.py
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      API_KEY: ${API_KEY}
+      GOOGLE_AI_API_URL: ${GOOGLE_AI_API_URL}
+      VERIFY_SSL: ${VERIFY_SSL}
+      CONNECTION_TIMEOUT: ${CONNECTION_TIMEOUT}
+      READ_TIMEOUT: ${READ_TIMEOUT}
+      RETRIES: ${RETRIES}
+      MAX_CONNECTIONS: ${MAX_CONNECTIONS}
+      MAX_KEEPALIVE_CONNECTIONS: ${MAX_KEEPALIVE_CONNECTIONS}
     ports:
       - "9000:9000"
     networks:
@@ -89,7 +115,3 @@ networks:
 volumes:
   db-data:
   front_node_modules:
-
-secrets:
-  db-password:
-    file: db/password.txt
