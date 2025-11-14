@@ -1,6 +1,6 @@
 ![alt text](./Front/public/assets/full-logo.png)
 
-Medianalytics is an open-source platform that processes 5 main articles daily from each registered source and provides users with tools to view this information from a broader perspective through comprehensive data visualization and analysis.
+Medianalytics is an open-source platform that processes 5 main articles daily from each registered source (media outlets, organizations, etc) and provides users with tools to view this information from a broader perspective through comprehensive data visualization and analysis.
 
 ## 📋 Prerequisites
 
@@ -51,7 +51,8 @@ On `root` folder medianalytics:
 ### Back-data
 
 4. **Database Migration Setup**
-   In the back-data container terminal exec:
+
+   In the back-data **docker container** terminal **Exec**:
 
    ```sh
    alembic init alembic
@@ -59,22 +60,15 @@ On `root` folder medianalytics:
 
 5. **Configure Alembic**
 
-   In the `Back-data/` directory:
+   In the **local** `Back-data/` directory:
 
-   Edit `alembic.ini` to set the database URL:
+   Edit `alembic.ini` file to set the database URL:
 
    ```ini
    sqlalchemy.url = postgresql+asyncpg://dockeruser:**db_password**@db:5432/medianalytics
    ```
 
-   Update `env.py` in the `alembic` directory to import your models:
-
-   ```python
-   from models import Base  # Adjust the import based on your project structure
-   target_metadata = Base.metadata
-   ```
-
-In the back-data container terminal exec:
+In the back-data **docker container** terminal **Exec**:
 
 6. **Generate Migration Script**
 
