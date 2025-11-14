@@ -21,13 +21,12 @@ You can download it from [Docker](https://www.docker.com/get-started).
    DATABASE_URL=postgresql+asyncpg://dockeruser:**db_password**@db:5432/medianalytics
    DB_PASSWORD=**db_password**
    API_KEY=example # AI API key
-   GOOGLE_AI_API_URL=example
-   VERIFY_SSL=example
-   CONNECTION_TIMEOUT=example
-   READ_TIMEOUT=example
-   RETRIES=example
-   MAX_CONNECTIONS=example
-   MAX_KEEPALIVE_CONNECTIONS=example
+   GOOGLE_AI_API_URL="https://generativelanguage.googleapis.com/v1beta/openai/"
+   VERIFY_SSL="true"
+   CONNECTION_TIMEOUT=10
+   READ_TIMEOUT=30
+   MAX_CONNECTIONS=10
+   MAX_KEEPALIVE_CONNECTIONS=5
    # Only if you plan to use X API
    X_API_KEY=example
    X_API_SECRET=example
