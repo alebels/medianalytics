@@ -379,10 +379,10 @@ FodyWeavers.xsd
 htmls/
 .venv/
 alembic.ini
-alembic/
 db/password.txt
 miscelany/
 *.code-workspace
 .editorconfig
 .github/
+Back-data/alembic/versions/
 Back-data/output
