@@ -50,39 +50,27 @@ On `root` folder medianalytics:
 
 ### Back-data
 
-4. **Database Migration Setup**
+In the back-data **docker container** terminal **Exec**:
 
-   In the back-data **docker container** terminal **Exec**:
+4. **Database Migration Setup**
 
    ```sh
    alembic init alembic
    ```
 
-5. **Configure Alembic**
-
-   In the **local** `Back-data/` directory:
-
-   Edit `alembic.ini` file to set the database URL:
-
-   ```ini
-   sqlalchemy.url = postgresql+asyncpg://dockeruser:**db_password**@db:5432/medianalytics
-   ```
-
-In the back-data **docker container** terminal **Exec**:
-
-6. **Generate Migration Script**
+5. **Generate Migration Script**
 
    ```sh
    alembic revision --autogenerate -m "Initial migration"
    ```
 
-7. **Apply Migration**
+6. **Apply Migration**
 
    ```sh
    alembic upgrade head
    ```
 
-8. **Initialize Database**
+7. **Initialize Database**
     ```sh
     python3 init_db.py
     ```
