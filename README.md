@@ -9,7 +9,7 @@ You can download it from [Docker](https://www.docker.com/get-started).
 
 ## 🏗️ Architecture Schema
 
-![alt text](./Front/public/assets/arquitecture-schema.png)
+![alt text](./Front/public/assets/architecture_schema.png)
 
 ## ⚙️ Setup Instructions
 

@@ -5,3 +5,4 @@ sqlalchemy==2.0.36
 slowapi==0.1.9
 pydantic==2.10.3
 psycopg2==2.9.10
+redis[hiredis]==7.0.1

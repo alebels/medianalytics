@@ -12,6 +12,7 @@ from pydantic import ValidationError
 
 from services.filters import get_sentiments_ideologies_categorized
 from utils.limiter import LIMITER
+from utils.redis_cache import init_redis_pool, close_redis_pool, get_cache_stats
 from controllers.home import HOME_ROUTER
 from controllers.filters import FILTERS_ROUTER
 from middleware.security import SecurityMiddleware, RequestLoggingMiddleware
@@ -31,9 +32,11 @@ async def lifespan(_: FastAPI):
     # Startup
     logger.info("Starting API service")
     get_sentiments_ideologies_categorized()  # Preload sentiments and ideologies categorized
+    await init_redis_pool()  # Initialize Redis connection pool
     yield
     # Shutdown
     logger.info("Shutting down API service")
+    await close_redis_pool()  # Close Redis connections gracefully
 
 
 # Create the FastAPI app with the lifespan context manager.
@@ -139,4 +142,9 @@ app.include_router(FILTERS_ROUTER)
 # Health check endpoint
 @app.get("/api/v1/health")
 async def health_check():
-    return {"status": "healthy", "service": "back-api"}
+    cache_stats = await get_cache_stats()
+    return {
+        "status": "healthy",
+        "service": "back-api",
+        "cache": cache_stats
+    }

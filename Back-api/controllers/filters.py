@@ -10,6 +10,7 @@ import services.filters as srv
 from utils.constants import C_IDEOLOGIES, C_SENTIMENTS
 from repository.database import get_session
 from utils.limiter import LIMITER
+from utils.redis_cache import cache_response
 
 
 API_VERSION = "api/v1"
@@ -44,6 +45,7 @@ async def get_medias(
 
 @FILTERS_ROUTER.get("/sentimentsideologies", response_model=schemas.SentimentsIdeologiesRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
+@cache_response(key_prefix="v1:filters:sentimentsideologies", ttl=2592000)  # 30 days - static data
 async def get_sentiments_ideologies(
     request: Request
 ):

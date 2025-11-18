@@ -2,7 +2,9 @@
 This module contains the main service for web scraping using Playwright.
 """
 
+import asyncio
 import logging
+import aiohttp
 from playwright.async_api import async_playwright, BrowserContext
 from repository.repository_services import (
     get_media_id_url, 
@@ -31,6 +33,33 @@ SCRAPE_METHODS = {
 
 NUM_HREFS = 10
 HREFS_TO_SCRAPE = 5
+
+
+async def invalidate_api_cache():
+    """
+    Invalidate API cache by sending POST request to back-api internal endpoint.
+    This triggers cache refresh with fresh data after scraping completes.
+    """
+    cache_url = "http://back-api:8080/api/v1/home/internal/cache/invalidate"
+    
+    try:
+        logger.info("Triggering API cache invalidation...")
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                cache_url,
+                timeout=aiohttp.ClientTimeout(total=120)
+            ) as response:
+                if response.status != 200:
+                    logger.warning(f"Cache invalidation returned status {response.status}")
+        
+        # Allow aiohttp to clean up background tasks
+        await asyncio.sleep(10)
+                    
+    except aiohttp.ClientError as e:
+        logger.error(f"Failed to invalidate cache (network error): {e}")
+    except Exception as e:
+        logger.error(f"Failed to invalidate cache: {e}")
 
 
 async def fetch_page_content(context: BrowserContext, url: str, retries: int = 2, timeout: int = 15000) -> str:
@@ -210,6 +239,9 @@ async def main_service_main():
             await browser.close()
             
             logger.info("Daily job from main_service.main() completed successfully.")
+            
+            # Invalidate and refresh API cache after scraping
+            await invalidate_api_cache()
             
             await upload_to_x()
 
