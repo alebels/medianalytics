@@ -196,18 +196,15 @@ IDEOLOGIES = MappingProxyType({
     ],
     IdeologyCategoryEnum.PHILOSOPHICAL_ORIENTATIONS: [
         IdeologiesEnum.IDEALIST,
-        IdeologiesEnum.REALIST,
         IdeologiesEnum.PRAGMATIST,
         IdeologiesEnum.INDIVIDUALIST,
         IdeologiesEnum.UTOPIAN,
         IdeologiesEnum.DYSTOPIAN,
         IdeologiesEnum.MATERIALIST,
         IdeologiesEnum.SPIRITUALIST,
-        IdeologiesEnum.OBJECTIVIST,
         IdeologiesEnum.RELATIVIST,
         IdeologiesEnum.EXISTENTIALIST,
         IdeologiesEnum.NIHILIST,
-        IdeologiesEnum.SUBJECTIVIST,
         IdeologiesEnum.MORALIST,
         IdeologiesEnum.ETHICAL,
         IdeologiesEnum.ETNOCENTRIST

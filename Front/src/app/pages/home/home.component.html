@@ -15,9 +15,9 @@ dataChartDialog().value()) {
 <div>
   <p-card styleClass="rounded bg-miscellany">
     <div
-      class="block flex justify-between gap-[var(--margin-standard)] align-center flex-wrap text-lg"
+      class="block flex justify-between gap-[var(--margin-standard)] items-center flex-wrap text-lg"
     >
-      <div class="flex justify-left align-center">
+      <div class="flex justify-left items-end">
         {{ "home.total_sources" | translate }}:
         <span
           class="title-nums title-sources hover:text-accent"
@@ -33,21 +33,21 @@ dataChartDialog().value()) {
         </span>
       </div>
 
-      <div class="flex justify-left align-center">
+      <div class="flex justify-left items-end">
         {{ "home.total_articles" | translate }}:
         <span class="title-nums">{{
           generalTotalArticles | async | number : "1.0-0"
         }}</span>
       </div>
 
-      <div class="flex justify-left align-center">
+      <div class="flex justify-left items-end">
         {{ "home.average_words" | translate }}:
         <span class="title-nums">{{
           generalAverageWords | async | number : "1.0-0"
         }}</span>
       </div>
 
-      <div class="flex justify-left align-center">
+      <div class="flex justify-left items-end">
         {{ "home.total_words" | translate }}:
         <span class="title-nums">{{
           generalTotalWords | async | number : "1.0-0"
@@ -110,7 +110,7 @@ dataChartDialog().value()) {
         <div class="mb-[10px]">
           {{ "home.sentiments_categorized" | translate }}
         </div>
-        <div class="flex justify-center items-center h-[90%]">
+        <div class="flex justify-center items-center h-[90%] sym:h-[81%]">
           <app-pie-chart
             [dataPieChart]="generalDaySentiments.categorized"
           ></app-pie-chart>
@@ -310,7 +310,7 @@ dataChartDialog().value()) {
         <div class="mb-[10px]">
           {{ "home.sentiments_categorized" | translate }}
         </div>
-        <div class="flex justify-center items-center h-[90%]">
+        <div class="flex justify-center items-center h-[90%] sym:h-[81%]">
           <app-pie-chart
             [dataPieChart]="generalSentiments.categorized"
           ></app-pie-chart>

@@ -134,7 +134,7 @@
   },
   "manifest": {
     "description1": "Medianalytics is an",
-    "description2": "project designed to analyze and openly present data collected from various sources whose content is publicly displayed. It offers a tool that allows users to approach its information from a broader perspective.",
+    "description2": "project designed to analyze and openly present data collected from various sources, whose content is publicly displayed and relevant enough, offering a tool that allows users to approach its information from a broader perspective.",
     "how_works_title": "How does Medianalytics work?",
     "how_works1": "Medianalytics collects daily the five main articles from each of the sources registered on the platform. This number of articles is completely arbitrary, but we understand that it's enough amount to get an idea of the general vision that each source exposes that day.",
     "how_works2": "Each article is analyzed using natural language processing (NLP) techniques to separate the entities, words, and grammar that compose it. Additionally, it is processed by an artificial intelligence model",
@@ -146,7 +146,7 @@
     "warning3": "As an",
     "warning4": " project, any feature may be subject to modification or improvement by the community.",
     "warning5": "Not all processed articles may accurately reflect word frequency due to captions, annexes, or other contextual factors.",
-    "contribute1": "You can freely contribute to this project through our GitHub repository",
+    "contribute1": "You can freely contribute to this project through the GitHub repository",
     "contribute2": "Also, you can follow us on X for daily reports and updates",
     "footer1": "Medianalytics is not responsible for the accuracy of the data obtained or the implications thereof.",
     "footer2": "For any inquiry, you can contact us through email at"
