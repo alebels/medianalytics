@@ -124,6 +124,7 @@ export class BarChartComponent implements OnInit {
           trim: true,
         },
         categories: xlabels || [],
+        tickPlacement: 'on',
       },
 
       yaxis: {

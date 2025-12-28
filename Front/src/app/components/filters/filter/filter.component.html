@@ -7,7 +7,7 @@
         [options]="item.data()"
         [showClear]="true"
         [(ngModel)]="item.value"
-        class="w-40"
+        class="w-40 mym:w-36"
         [filter]="true"
         filterBy="label"
         [group]="item.type === MEDIAS"
@@ -60,7 +60,7 @@
         [readonlyInput]="true"
         [showButtonBar]="true"
         (ngModelChange)="sendComposeValue()"
-        styleClass="w-[215px]"
+        styleClass="w-[210px]"
         [yearRange]="minDate?.getFullYear() + ':' + maxDate?.getFullYear()"
       />
 

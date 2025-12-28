@@ -114,6 +114,7 @@ export const CHART_THEME = {
         }`,
       },
     },
+    autoSelected: 'zoom',
   },
   zoom: {
     enabled: true,

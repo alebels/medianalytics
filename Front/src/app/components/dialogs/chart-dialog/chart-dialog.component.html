@@ -14,7 +14,7 @@
 >
   <ng-template #header pTemplate="header" styleClass="p-dialog-header">
     <span class="p-dialog-title">
-      {{ (title() | translate) | titlecase }} - {{ count() }}
+      {{ (title() | translate) | titlecase }} - {{ count() | number:'1.0-0' }}
     </span>
   </ng-template>
 

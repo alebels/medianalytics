@@ -1,4 +1,5 @@
 import { Component, OnInit, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { DataCountTable } from '../../../models/table.model';
 import { ItemRead } from '../../../models/items.model';
 import { TableModule } from 'primeng/table';
@@ -6,7 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sort-table',
-  imports: [TableModule, TranslatePipe],
+  imports: [CommonModule, TableModule, TranslatePipe],
   templateUrl: './sort-table.component.html',
   styleUrl: './sort-table.component.css'
 })

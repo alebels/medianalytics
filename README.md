@@ -1,6 +1,6 @@
 ![alt text](./Front/public/assets/full-logo.png)
 
-Medianalytics is an open-source platform that processes 5 main articles daily from each registered source (media outlets, organizations, etc) and provides users with tools to view this information from a broader perspective through comprehensive data visualization and analysis.
+Medianalytics is an open-source platform that processes articles daily from each registered source (media outlets, organizations, etc) and provides users with tools to view this information from a broader perspective through data visualization and analysis.
 
 ## 📋 Prerequisites
 

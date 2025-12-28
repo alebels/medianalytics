@@ -50,7 +50,7 @@
     <tr [pSelectableRow]="item">
       <td>{{ i + 1 }}</td>
       <td>{{ item.name }}</td>
-      <td>{{ item.count }}</td>
+      <td>{{ item.count | number : "1.0-0" }}</td>
     </tr>
   </ng-template>
 

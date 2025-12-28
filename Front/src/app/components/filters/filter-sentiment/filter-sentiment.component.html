@@ -44,7 +44,7 @@
   </p-floatlabel>
 
   <div>
-    <p-button (onClick)="onClickFilter()" [raised]="true" size="small">{{
+    <p-button (onClick)="onClickFilter()" [disabled]="noData.isLoading?.getValue()" [raised]="true" size="small">{{
       "filters.filter" | translate
     }}</p-button>
   </div>
