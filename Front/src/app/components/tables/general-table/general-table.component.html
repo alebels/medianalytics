@@ -7,6 +7,7 @@
         </p-inputicon>
         <input
           #globalFilter
+          id="globalFilter"
           class="w-[250px]"
           type="text"
           pInputText
@@ -109,6 +110,7 @@
               (click)="toggleLock(item, false)"
               size="small"
               text
+              aria-label="Unlock item"
             >
               <i class="bi bi-lock-fill"></i>
             </button>
@@ -211,7 +213,7 @@
           </td>
 
           <td>
-            <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer" aria-label="Visit media">
               <button
                 pButton
                 pRipple
@@ -223,6 +225,7 @@
                 tooltipPosition="left"
                 [tooltipEvent]="isMobile ? 'focus' : 'hover'"
                 tabindex="12"
+                aria-label="Visit media"
               >
                 <i class="bi bi-box-arrow-up-right"></i>
               </button>
@@ -242,6 +245,7 @@
               (click)="toggleLock(item, true)"
               size="small"
               text
+              aria-label="Lock item"
             >
               <i class="bi bi-unlock-fill"></i>
             </button>
@@ -344,7 +348,7 @@
           </td>
 
           <td class="text-center">
-            <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer" aria-label="Visit media">
               <button
                 pButton
                 pRipple
@@ -356,6 +360,7 @@
                 tooltipPosition="left"
                 [tooltipEvent]="isMobile ? 'focus' : 'hover'"
                 tabindex="14"
+                aria-label="Visit media"
               >
                 <i class="bi bi-box-arrow-up-right"></i>
               </button>

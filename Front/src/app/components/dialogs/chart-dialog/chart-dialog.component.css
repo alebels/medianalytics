@@ -6,6 +6,7 @@
 #media-items-viewport {
   height: 65vh;
   width: 100%;
+  scroll-behavior: smooth;
 }
 
 .media-item-container {

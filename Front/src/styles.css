@@ -61,6 +61,7 @@ html {
   min-height: 100dvh;
   min-height: max(100vh, 100dvh);
   background-color: var(--color-background);
+  scroll-behavior: smooth;
 }
 
 @media screen and (max-width: 1095px) {
@@ -303,6 +304,11 @@ p {
 
   .p-tooltip {
     opacity: 0.85 !important;
+  }
+
+  p-table,
+  p-dialog {
+    scroll-behavior: smooth !important;
   }
 
   .p-toast-message {

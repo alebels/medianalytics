@@ -12,6 +12,7 @@ import {
 import { TranslateLoader, provideTranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { InterceptorService } from './interceptors/interceptor.service';
+import { MessageService } from 'primeng/api';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
@@ -64,5 +65,6 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    MessageService
   ],
 };

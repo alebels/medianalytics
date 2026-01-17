@@ -85,7 +85,8 @@
     "no_data_filters": "No hay datos disponibles. Seleccione otros filtros.",
     "empty_filters": "Debe seleccionar al menos un filtro de fuente, tipo, país o región.",
     "range_too_large": "Rango demasiado grande. El rango entre mínimo y máximo no puede ser mayor que 400.",
-    "min_max_range": "El rango mínimo no puede ser mayor o igual que el rango máximo."
+    "min_max_range": "El rango mínimo no puede ser mayor o igual que el rango máximo.",
+    "no_changes": "No se han detectado cambios. Por favor, modifique al menos un filtro para aplicar."
   },
   "home": {
     "description": "Plataforma open-source para el análisis de medios de comunicación y demás fuentes relevantes que influyen en la opinión pública",

@@ -17,6 +17,7 @@ import { FiltersService } from '../../services/filters.service';
 import { GeneralService } from '../../services/general.service';
 import { MediaRead } from '../../models/media.model';
 import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
+import { ToastModule } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -29,7 +30,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     FilterWordComponent,
     TranslatePipe,
     ChartDialogComponent,
-    Tooltip
+    Tooltip,
+    ToastModule
   ],
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css',

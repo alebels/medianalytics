@@ -24,12 +24,11 @@ import { FiltersService } from '../../../services/filters.service';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SortTableComponent } from '../../tables/sort-table/sort-table.component';
-import { ToastModule } from 'primeng/toast';
+import { ToastService } from '../../../services/toast.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -41,7 +40,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     FloatLabel,
     TranslatePipe,
     ButtonModule,
-    ToastModule,
     Card,
     RadioButtonModule,
     InputNumberModule,
@@ -50,7 +48,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   ],
   templateUrl: './filter-word.component.html',
   styleUrl: './filter-word.component.css',
-  providers: [MessageService],
 })
 export class FilterWordComponent implements OnInit {
   order: string = SORTING.DESCENDING;
@@ -73,11 +70,12 @@ export class FilterWordComponent implements OnInit {
     type: string;
     key: string | number | string[] | null;
   }[] = [];
+  private lastFilter: string | null = null;
 
-  private filtersSrv = inject(FiltersService);
-  private messageService = inject(MessageService);
-  private trans = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private trans = inject(TranslateService);
+  private filtersSrv = inject(FiltersService);
+  private toastSrv = inject(ToastService);
 
   ngOnInit(): void {
     this.trans.onLangChange
@@ -94,31 +92,20 @@ export class FilterWordComponent implements OnInit {
     this.composeValues = e;
   }
 
-  showWarn(msg = ''): void {
-    this.messageService.clear();
-    this.messageService.add({
-      severity: 'warn',
-      summary: this.trans.instant('messages.warning'),
-      detail: this.trans.instant('messages.' + msg),
-      life: 5000,
-      closable: true,
-    });
-  }
-
   onClickFilter(): void {
     // Check for invalid range combinations
     if (this.minRange !== null && this.maxRange !== null) {
       if (this.minRange >= this.maxRange) {
-        this.showWarn('min_max_range');
+        this.toastSrv.showWarn('min_max_range');
         return;
       }
 
       if (this.maxRange - this.minRange > this.maxRangeCount) {
-        this.showWarn('range_too_large');
+        this.toastSrv.showWarn('range_too_large');
         return;
       }
     } else if (this.minRange === null && this.maxRange > this.maxRangeCount) {
-      this.showWarn('range_too_large');
+      this.toastSrv.showWarn('range_too_large');
       return;
     }
 
@@ -126,10 +113,10 @@ export class FilterWordComponent implements OnInit {
       this.composeValues.length == 0 ||
       !this.composeValues.some((item) => item.type !== DATE)
     ) {
-      this.showWarn('empty_filters');
+      this.toastSrv.showWarn('empty_filters');
       return;
     } else {
-      this.noData.isLoading?.next(true);
+
       const composeObj: Record<
         string,
         string | number | string[] | boolean | null
@@ -152,6 +139,14 @@ export class FilterWordComponent implements OnInit {
       if (this.order === SORTING.ASCENDING) {
         composeObj[SORTING.ORDER_BY_DESC] = false;
       }
+
+      const newFilter = JSON.stringify(composeObj);
+      if (this.lastFilter === newFilter) {
+        this.toastSrv.showWarn('no_changes');
+        return;
+      }
+      this.noData.isLoading?.next(true);
+      this.lastFilter = newFilter;
 
       this.dataWordsTable = null;
 

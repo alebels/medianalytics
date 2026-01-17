@@ -30,12 +30,11 @@ import { FormsModule } from '@angular/forms';
 import { GeneralService } from '../../../services/general.service';
 import { Ideologies } from '../../../models/sentiment-ideology.model';
 import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
-import { MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { NoDataComponent } from '../../no-data/no-data.component';
 import { PieChartComponent } from '../../charts/pie-chart/pie-chart.component';
 import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
-import { ToastModule } from 'primeng/toast';
+import { ToastService } from '../../../services/toast.service';
 import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -48,7 +47,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     FloatLabel,
     TranslatePipe,
     ButtonModule,
-    ToastModule,
     BarChartComponent,
     Card,
     PieChartComponent,
@@ -57,7 +55,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   ],
   templateUrl: './filter-ideology.component.html',
   styleUrl: './filter-ideology.component.css',
-  providers: [MessageService],
 })
 export class FilterIdeologyComponent implements OnInit {
   selectionLimit = 5;
@@ -85,12 +82,13 @@ export class FilterIdeologyComponent implements OnInit {
     type: string;
     key: string | number | string[] | null;
   }[] = [];
+  private lastFilter: string | null = null;
 
-  private sentimentIdeologySrv = inject(SentimentIdeologyService);
-  private messageService = inject(MessageService);
-  private trans = inject(TranslateService);
-  private generalSrv = inject(GeneralService);
   private destroyRef = inject(DestroyRef);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
+  private trans = inject(TranslateService);
+  private toastSrv = inject(ToastService);
+  private generalSrv = inject(GeneralService);
 
   ngOnInit(): void {
     this.setIdeologies();
@@ -115,26 +113,14 @@ export class FilterIdeologyComponent implements OnInit {
     this.composeValues = e;
   }
 
-  showWarn(): void {
-    this.messageService.clear();
-    this.messageService.add({
-      severity: 'warn',
-      summary: this.trans.instant('messages.warning'),
-      detail: this.trans.instant('messages.empty_filters'),
-      life: 8000,
-      closable: true,
-    });
-  }
-
   onClickFilter(): void {
     if (
       this.composeValues.length == 0 ||
       !this.composeValues.some((item) => item.type !== DATE)
     ) {
-      this.showWarn();
+      this.toastSrv.showWarn('empty_filters');
       return;
     } else {
-      this.noData.isLoading?.next(true);
 
       const composeObj: Record<string, string | number | string[] | null> = {};
       this.composeValues.forEach((item) => {
@@ -148,6 +134,14 @@ export class FilterIdeologyComponent implements OnInit {
           .value()
           .map((item: SelectItem2) => item.key);
       }
+
+      const newFilter = JSON.stringify(composeObj);
+      if (this.lastFilter === newFilter) {
+        this.toastSrv.showWarn('no_changes');
+        return;
+      }
+      this.noData.isLoading?.next(true);
+      this.lastFilter = newFilter;
 
       this.barChart = null;
       this.pieChart = null;

@@ -1,4 +1,3 @@
-<p-toast />
 <div
   class="flex flex-wrap justify-start items-center gap-[var(--margin-standard)] mb-[var(--margin-standard)]"
 >
@@ -50,21 +49,25 @@
   </div>
 
   <div>
-    <p-button (onClick)="onClickFilter()" [disabled]="noData.isLoading?.getValue()" [raised]="true" size="small">{{
-      "filters.filter" | translate
-    }}</p-button>
+    <p-button
+      (onClick)="onClickFilter()"
+      [disabled]="noData.isLoading?.getValue()"
+      [raised]="true"
+      size="small"
+      aria-label="Apply filter"
+      >{{ "filters.filter" | translate }}</p-button
+    >
   </div>
 </div>
 
 <div class="w-full h-[var(--height-table-filter)]">
   @if (dataWordsTable && dataWordsTable.data.length > 0) {
-  <p-card styleClass="rounded bg-miscellany h-full">
-    <app-sort-table [dataSortTable]="dataWordsTable"></app-sort-table>
-  </p-card>
-
+    <p-card styleClass="rounded bg-miscellany h-full">
+      <app-sort-table [dataSortTable]="dataWordsTable"></app-sort-table>
+    </p-card>
   } @else {
-  <div class="w-full h-full">
-    <app-no-data [noData]="noData"></app-no-data>
-  </div>
+    <div class="w-full h-full">
+      <app-no-data [noData]="noData"></app-no-data>
+    </div>
   }
 </div>

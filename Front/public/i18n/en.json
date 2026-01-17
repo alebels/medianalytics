@@ -85,7 +85,8 @@
     "no_data_filters": "No data available. Select other filters.",
     "empty_filters": "You must select at least one filter for source, type, country or region.",
     "range_too_large": "Range too large. The range between minimum and maximum cannot be greater than 400.",
-    "min_max_range": "The minimum range cannot be greater than or equal to the maximum range."
+    "min_max_range": "The minimum range cannot be greater than or equal to the maximum range.",
+    "no_changes": "No changes detected. Please modify at least one filter to apply."
   },
   "home": {
     "description": "Open-source platform for the analysis of media and other relevant sources that influence public opinion",

@@ -27,6 +27,7 @@
               [routerLink]="'/' + route"
               routerLinkActive="active"
               class="hover-underline"
+              aria-label="Visit route"
               >{{ "header." + route | translate }}</a
             >
           </li>
@@ -38,6 +39,7 @@
               tabindex="0"
               (click)="toggleMenu = !toggleMenu"
               (keydown.enter)="toggleMenu = false"
+              aria-label="Toggle settings menu"
               ><i class="bi bi-gear-fill text-xl"></i
             ></a>
             <div
@@ -78,6 +80,7 @@
               [routerLink]="item.routerLink"
               routerLinkActive="active"
               class="flex items-center p-menu-item-link"
+              aria-label="Visit page"
             >
               <span class="ml-[6px]">{{
                 "header." + item.label | translate
@@ -92,6 +95,7 @@
               tabindex="3"
               (click)="toggleMenu = !toggleMenu"
               (keydown.enter)="toggleMenu = false"
+              aria-label="Settings"
               >{{ "header.settings" | translate }}</a
             >
             <div
