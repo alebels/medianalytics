@@ -386,3 +386,5 @@ miscelany/
 .github/
 Back-data/alembic/versions/
 Back-data/output
+Front/coverage/
+Front/dist/

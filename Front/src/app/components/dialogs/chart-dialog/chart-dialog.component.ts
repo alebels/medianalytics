@@ -1,11 +1,11 @@
 import {
   CdkVirtualScrollViewport,
   ScrollingModule,
-  VIRTUAL_SCROLL_STRATEGY,
 } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnDestroy,
   computed,
   effect,
@@ -16,17 +16,18 @@ import {
 import {
   ChartDialog,
   ChartDialogValue,
-  ItemDialog,
+  DialogRow,
 } from '../../../models/dialog.model';
 import { IDEOLOGIES, NONE, SENTIMENTS } from '../../../utils/constants';
+import { filter, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { HttpClient } from '@angular/common/http';
 import { MediaItemDataSource } from './media-item-source';
 import { ProgressBar } from 'primeng/progressbar';
 import { TranslatePipe } from '@ngx-translate/core';
-import { VariableSizeVirtualScrollStrategy } from './variable-size-virtual-scroll-strategy';
 import { isShowChartDialog$ } from '../../../utils/dialog-subjects';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-chart-dialog',
@@ -36,14 +37,6 @@ import { isShowChartDialog$ } from '../../../utils/dialog-subjects';
     TranslatePipe,
     ScrollingModule,
     ProgressBar,
-  ],
-  providers: [
-    {
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useFactory: () => {
-        return new VariableSizeVirtualScrollStrategy(100, 400, 800);
-      },
-    },
   ],
   templateUrl: './chart-dialog.component.html',
   styleUrl: './chart-dialog.component.css',
@@ -77,11 +70,13 @@ export class ChartDialogComponent implements OnDestroy {
 
   isVisible = true;
 
+  readonly ITEM_HEIGHT = 60;
+  readonly LOAD_THRESHOLD = 750;
   readonly NONE = NONE;
 
   private autoLoadSetup = false;
-  private strategy: VariableSizeVirtualScrollStrategy | null = null;
 
+  private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
 
   constructor() {
@@ -94,17 +89,12 @@ export class ChartDialogComponent implements OnDestroy {
 
     // Set up auto-load when both viewport and datasource are ready
     effect(() => {
+      this.title(); // React to title changes which depend on dataChartDialog
       const viewport = this.virtualScroll();
       if (viewport && this.dataSource && !this.autoLoadSetup) {
-        // Store strategy reference for reuse
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.strategy = (viewport as any)
-          ._scrollStrategy as VariableSizeVirtualScrollStrategy;
-
-        // Use queueMicrotask to defer setup until after current execution
         queueMicrotask(() => {
           if (viewport && this.dataSource && !this.autoLoadSetup) {
-            this.setupAutoLoad();
+            this.setupAutoLoad(viewport);
           }
         });
       }
@@ -116,17 +106,14 @@ export class ChartDialogComponent implements OnDestroy {
       this.dataSource.disconnect();
       this.dataSource = undefined;
     }
+    isShowChartDialog$.next(false);
   }
 
-  trackByItemId(index: number, item: ItemDialog): string {
-    return `${item.media_name}-${index}`;
-  }
-
-  trackByUrl(
-    index: number,
-    urlItem: { url: string; frequency?: number }
-  ): string {
-    return `${index}-${urlItem.url}`;
+  trackByRow(index: number, row: DialogRow): string {
+    if (row.type === 'header') {
+      return `h-${row.mediaName}`;
+    }
+    return `u-${row.mediaName}-${row.urlIndex}`;
   }
 
   onClose(): void {
@@ -135,40 +122,46 @@ export class ChartDialogComponent implements OnDestroy {
 
   /**
    * Sets up automatic loading when user scrolls near bottom.
-   * Integrates with the VariableSizeVirtualScrollStrategy.
+   * Uses the viewport's elementScrolled observable with CDK's built-in fixed strategy.
    */
-  private setupAutoLoad(): void {
-    if (this.autoLoadSetup || !this.strategy) return;
-
-    if (!this.strategy.setOnNearBottom) return;
-
-    this.strategy.setOnNearBottom(() => void this.handleAutoLoad());
+  private setupAutoLoad(viewport: CdkVirtualScrollViewport): void {
+    if (this.autoLoadSetup) return;
     this.autoLoadSetup = true;
+
+    // Reset CDK scroll position after initial data load to prevent wrong translateY offset
+    this.dataSource!.loading$.pipe(
+      filter((loading) => !loading),
+      take(1),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      viewport.scrollToOffset(0);
+      viewport.checkViewportSize();
+    });
+
+    viewport
+      .elementScrolled()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.checkNearBottom(viewport);
+      });
   }
 
   /**
-   * Handles automatic data loading when near bottom is detected.
+   * Checks if user scrolled near bottom and triggers data loading.
    */
-  private async handleAutoLoad(): Promise<void> {
-    if (
-      !this.strategy ||
-      !this.dataSource?.hasMoreSync() ||
-      this.dataSource.isLoadingSync()
-    ) {
-      this.strategy?.resetLoadingFlag();
+  private checkNearBottom(viewport: CdkVirtualScrollViewport): void {
+    if (!this.dataSource?.hasMoreSync() || this.dataSource.isLoadingSync()) {
       return;
     }
 
-    await this.dataSource.loadMore();
+    const scrollOffset = viewport.measureScrollOffset();
+    const viewportSize = viewport.getViewportSize();
+    const totalSize = viewport.getDataLength() * this.ITEM_HEIGHT;
+    const distanceFromBottom = totalSize - (scrollOffset + viewportSize);
 
-    // Invalidate size cache only for items that were modified (URLs aggregated)
-    // This is much more efficient than invalidating everything
-    const modifiedIndices = this.dataSource.lastModifiedIndices;
-    if (modifiedIndices.length > 0) {
-      this.strategy.invalidateItemSizeCache(modifiedIndices);
+    if (distanceFromBottom < this.LOAD_THRESHOLD) {
+      this.dataSource.loadMore();
     }
-
-    this.strategy.resetLoadingFlag();
   }
 
   private initializeDataSource(): void {
@@ -178,8 +171,6 @@ export class ChartDialogComponent implements OnDestroy {
     // Clean up previous datasource
     if (this.dataSource) {
       this.dataSource.disconnect();
-      // Reset strategy state when datasource changes
-      this.strategy?.reset();
       this.dataSource = undefined;
     }
 
@@ -193,7 +184,7 @@ export class ChartDialogComponent implements OnDestroy {
     if (chartData.region) filterParams.region = chartData.region;
     if (chartData.rangeDates) {
       filterParams.dates = chartData.rangeDates.map(
-        (date: Date) => date.toISOString().split('T')[0]
+        (date: Date) => date.toISOString().split('T')[0],
       );
     }
     if (chartData.valuation === SENTIMENTS) {

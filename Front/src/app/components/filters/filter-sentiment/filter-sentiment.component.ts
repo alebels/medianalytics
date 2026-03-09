@@ -27,7 +27,6 @@ import { DataChart } from '../../../models/chart.model';
 import { FilterComponent } from '../filter/filter.component';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
-import { GeneralService } from '../../../services/general.service';
 import { LineChartComponent } from '../../charts/line-chart/line-chart.component';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { NoDataComponent } from '../../no-data/no-data.component';
@@ -54,7 +53,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     NoDataComponent,
   ],
   templateUrl: './filter-sentiment.component.html',
-  styleUrl: './filter-sentiment.component.css',
 })
 export class FilterSentimentComponent implements OnInit {
   selectionLimit = 5;
@@ -74,8 +72,6 @@ export class FilterSentimentComponent implements OnInit {
   barChart: DataChart | null = null;
   lineChart: DataChart | null = null;
 
-  isMobile = false;
-
   chartFilter!: ChartFilter;
 
   private composeValues: {
@@ -88,7 +84,6 @@ export class FilterSentimentComponent implements OnInit {
   private sentimentIdeologySrv = inject(SentimentIdeologyService);
   private trans = inject(TranslateService);
   private toastSrv = inject(ToastService);
-  private generalSrv = inject(GeneralService);
 
   ngOnInit(): void {
     this.setSentiments();
@@ -100,9 +95,8 @@ export class FilterSentimentComponent implements OnInit {
         this.pieChart = null;
         this.barChart = null;
         this.lineChart = null;
+        this.lastFilter = null;
       });
-
-    this.isMobile = this.generalSrv.isMobile$.getValue();
   }
 
   sendFiltersDialog(type: string): void {

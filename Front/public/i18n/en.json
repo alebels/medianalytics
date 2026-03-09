@@ -105,9 +105,9 @@
     "top_grammar": "Most important grammatical types used",
     "general_table_info": "Sources collected from their English editions",
     "ratings_day": "Ratings of the day",
-    "subtitle_ratings_day": "Result of the ratings extracted from articles published in the sources integrated into the platform for the day",
+    "subtitle_ratings_day": "Result of the ratings extracted from {{numArticles}} articles published in the sources integrated into the platform for the day",
     "subtitle_general_table": "Summary table with the most relevant statistics of each of the sources integrated into the platform",
-    "subtitle_general_values": "Data collected across all sources integrated into the platform and information extracted from their articles from {{ minDate }} to {{ maxDate }}",
+    "subtitle_general_values": "Data collected across all sources integrated into the platform, and information extracted from {{numArticles}} articles from {{ minDate }} to {{ maxDate }}",
     "words": "Not all articles may accurately report the frequency of the words"
   },
   "filters": {

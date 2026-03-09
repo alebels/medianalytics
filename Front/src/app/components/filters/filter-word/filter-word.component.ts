@@ -47,7 +47,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     NoDataComponent,
   ],
   templateUrl: './filter-word.component.html',
-  styleUrl: './filter-word.component.css',
 })
 export class FilterWordComponent implements OnInit {
   order: string = SORTING.DESCENDING;
@@ -83,6 +82,7 @@ export class FilterWordComponent implements OnInit {
       .subscribe(() => {
         this.composeValues = [];
         this.dataWordsTable = null;
+        this.lastFilter = null;
       });
   }
 

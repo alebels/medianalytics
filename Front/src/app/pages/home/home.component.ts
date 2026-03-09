@@ -56,6 +56,7 @@ export class HomeComponent implements OnInit {
   };
 
   generalTotalMedias = 0;
+  totalDayArticles!: Observable<number>;
   generalTotalArticles!: Observable<number>;
   generalAverageWords!: Observable<number>;
   generalTotalWords!: Observable<number>;
@@ -98,14 +99,16 @@ export class HomeComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.getMinMaxDate();
-    this.setGeneralTable();
+    this.isMobile = this.generalSrv.isMobile$.getValue();
 
+    this.getMinMaxDate();
+
+    this.totalDayArticles = this.homeSrv.totalDayArticles$;
     this.generalTotalArticles = this.homeSrv.generalTotalArticles$;
     this.generalAverageWords = this.homeSrv.generalAverageWord$;
     this.generalTotalWords = this.homeSrv.generalTotalWords$;
-    this.isMobile = this.generalSrv.isMobile$.getValue();
 
+    this.setGeneralTable();
     this.setGeneralDaySentiments();
     this.setGeneralDayIdeologies();
     this.setGeneralDayTopWords();

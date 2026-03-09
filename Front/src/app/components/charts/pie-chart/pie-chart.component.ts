@@ -32,7 +32,6 @@ interface ChartOptions {
   selector: 'app-pie-chart',
   imports: [NgApexchartsModule],
   templateUrl: './pie-chart.component.html',
-  styleUrl: './pie-chart.component.css',
 })
 export class PieChartComponent implements OnInit {
   readonly dataPieChart = input<DataChart>();

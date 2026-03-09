@@ -9,10 +9,8 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-sort-table',
   imports: [CommonModule, TableModule, TranslatePipe],
   templateUrl: './sort-table.component.html',
-  styleUrl: './sort-table.component.css'
 })
 export class SortTableComponent implements OnInit {
-
   readonly dataSortTable = input<DataCountTable>();
 
   sortOrder!: number;
@@ -25,10 +23,9 @@ export class SortTableComponent implements OnInit {
   label2!: string;
 
   ngOnInit(): void {
-    this.dataTable = [...this.dataSortTable()?.data ?? []];
+    this.dataTable = [...(this.dataSortTable()?.data ?? [])];
     this.label1 = this.dataSortTable()?.label1 ?? '';
     this.label2 = this.dataSortTable()?.label2 ?? '';
     this.sortOrder = this.dataSortTable()?.sortOrder ?? 1;
   }
-
 }

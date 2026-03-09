@@ -2,9 +2,7 @@ import { COUNT, GRAMMAR, IDEOLOGIES, SENTIMENTS, WORD } from '../utils/constants
 import { CompoundDataCharts, DataChart } from '../models/chart.model';
 import { DataCountTable, GeneralMediaTable } from '../models/table.model';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { GeneralService } from './general.service';
 import { HomeService } from './home.service';
-import { MinMaxDateRead } from '../models/items.model';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../environments/environment';
 
@@ -15,18 +13,14 @@ describe('HomeService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [HomeService, GeneralService],
+      providers: [HomeService],
     });
     service = TestBed.inject(HomeService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // Handle the initial HTTP request from GeneralService
-    const minMaxReq = httpMock.expectOne(`${environment.apiUrl}/filters/minmaxdate`);
-    minMaxReq.flush(new MinMaxDateRead());
-
     // Handle all the initial HTTP requests from HomeService
     const requests = [
-      { url: `${environment.apiUrl}/home/generaltotalmedias`, response: 5 },
+      { url: `${environment.apiUrl}/home/generalmedias`, response: [] },
       { url: `${environment.apiUrl}/home/generaltotalarticles`, response: 100 },
       { url: `${environment.apiUrl}/home/generalaveragewordcount`, response: 250 },
       { url: `${environment.apiUrl}/home/generaltotalwords`, response: 50000 },

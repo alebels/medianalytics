@@ -11,7 +11,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'app-root',
   imports: [RouterOutlet, FooterComponent, HeaderComponent, ScrollTopComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit {
   title = 'Medianalytics';

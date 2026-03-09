@@ -59,7 +59,7 @@ describe('AppComponent', () => {
   });
 
   it('should call checkLanguage on ngOnInit', () => {
-    const checkLanguageSpy = jest.spyOn(component as any, 'checkLanguage').mockImplementation(() => undefined);
+    const checkLanguageSpy = jest.spyOn(component as unknown as { checkLanguage: () => void }, 'checkLanguage').mockImplementation(() => undefined);
     
     component.ngOnInit();
     

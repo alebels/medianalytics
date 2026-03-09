@@ -114,7 +114,7 @@ describe('InterceptorService', () => {
     const req = httpMock.expectOne(testUrl);
     req.flush('Forbidden', { status: 403, statusText: 'Forbidden' });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Access forbidden - check NGINX configuration or authentication');
+    expect(consoleSpy).toHaveBeenCalledWith('Access forbidden - check configuration or authentication');
     consoleSpy.mockRestore();
   });
 });

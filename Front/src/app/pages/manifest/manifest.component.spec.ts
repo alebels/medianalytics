@@ -1,36 +1,7 @@
+import { CONTACT_EMAIL, GITHUB_REPO, X_ACCOUNT } from '../../utils/constants';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Pipe, PipeTransform } from '@angular/core';
 import { ManifestComponent } from './manifest.component';
-import { TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
-
-// Mock TranslatePipe
-@Pipe({ name: 'translate' })
-class MockTranslatePipe implements PipeTransform {
-  transform(value: string): string {
-    return value;
-  }
-}
-
-// Mock TranslateService
-class MockTranslateService {
-  get(key: string) {
-    return of(key);
-  }
-  
-  onLangChange = of({ lang: 'en', translations: {} });
-  onTranslationChange = of({ lang: 'en', translations: {} });
-  onDefaultLangChange = of({ lang: 'en', translations: {} });
-  
-  instant(key: string) {
-    return key;
-  }
-  
-  use(lang: string) {
-    console.log(`Language set to: ${lang}`);
-    return of({});
-  }
-}
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ManifestComponent', () => {
   let component: ManifestComponent;
@@ -38,11 +9,13 @@ describe('ManifestComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManifestComponent, MockTranslatePipe],
-      providers: [
-        { provide: TranslateService, useClass: MockTranslateService },
-      ]
-    }).compileComponents();
+      imports: [ManifestComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .overrideComponent(ManifestComponent, {
+        set: { imports: [], template: '<div></div>' },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ManifestComponent);
     component = fixture.componentInstance;
@@ -51,5 +24,17 @@ describe('ManifestComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have the correct contactEmail', () => {
+    expect(component.contactEmail).toBe(CONTACT_EMAIL);
+  });
+
+  it('should have the correct githubLink', () => {
+    expect(component.githubLink).toBe(GITHUB_REPO);
+  });
+
+  it('should have the correct xAccount', () => {
+    expect(component.xAccount).toBe(X_ACCOUNT);
   });
 });

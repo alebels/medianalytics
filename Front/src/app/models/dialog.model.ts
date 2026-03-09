@@ -74,3 +74,11 @@ export class ChartDialogPaginatedRead {
     public has_more: boolean
   ) {}
 }
+
+export interface DialogRow {
+  type: 'header' | 'url';
+  mediaName: string;
+  url?: string;
+  frequency?: number;
+  urlIndex?: number;
+}

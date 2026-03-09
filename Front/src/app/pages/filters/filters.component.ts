@@ -19,6 +19,7 @@ import { MediaRead } from '../../models/media.model';
 import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
 import { ToastModule } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
+import { startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -31,10 +32,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     TranslatePipe,
     ChartDialogComponent,
     Tooltip,
-    ToastModule
+    ToastModule,
   ],
   templateUrl: './filters.component.html',
-  styleUrl: './filters.component.css',
 })
 export class FiltersComponent implements OnInit {
   dataFiltersDialog!: FilterDialog;
@@ -53,13 +53,11 @@ export class FiltersComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeDialogs();
-    this.filtersSrv.getTranslatedMediaCompose();
-    this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
     this.isMobile = this.generalSrv.isMobile$.getValue();
 
     // Subscribe to language change to update translations
     this.trans.onLangChange
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(startWith(null), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.filtersSrv.getTranslatedMediaCompose();
         this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();

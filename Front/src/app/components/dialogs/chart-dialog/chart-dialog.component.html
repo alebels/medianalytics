@@ -1,17 +1,9 @@
-<p-dialog
-  [(visible)]="isVisible"
-  [style]="{
+<p-dialog [(visible)]="isVisible" [style]="{
     width: '620px',
     maxWidth: '90vw',
     borderRadius: 'var(--border-radius-standard)',
     background: 'var(--color-miscellany)'
-  }"
-  [keepInViewport]="true"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [draggable]="true"
-  (onHide)="onClose()"
->
+  }" [keepInViewport]="true" [closable]="true" [closeOnEscape]="true" [draggable]="true" (onHide)="onClose()">
   <ng-template #header pTemplate="header" styleClass="p-dialog-header">
     <span class="p-dialog-title">
       {{ (title() | translate) | titlecase }} - {{ count() | number:'1.0-0' }}
@@ -19,68 +11,41 @@
   </ng-template>
 
   @if(dataSource) {
-  <div class="w-auto">
-    <cdk-virtual-scroll-viewport #virtualScroll id="media-items-viewport">
-      <div class="mb-2 text-base text-cText max-w-[95%] text-center mx-auto">
-        @if(dataChartDialog()?.valuation === NONE) {
-        <u>{{ "dialog.word" | translate }}</u
-        >: <i>{{ title() | titlecase }}</i
-        ><br />
-        *{{ "dialog.disclaimer3" | translate }}* } @else {
-        <u>{{ "dialog.valuation" | translate }}</u
-        >:
-        <i>{{ (title() | translate) | titlecase }}</i>
-        }<br />
-        *{{ "dialog.disclaimer" | translate }}*<br />
-        *{{ "dialog.disclaimer2" | translate }}*
-      </div>
-      <div
-        *cdkVirtualFor="let item of dataSource; trackBy: trackByItemId"
-        class="media-item-container"
-      >
-        <dl class="m-0 p-0">
-          <dt class="text-xl font-semibold text-accent mb-5">
-            <b>{{ item.media_name }}</b>
-          </dt>
-          <dd
-            *ngFor="
-              let urlItem of item.urls;
-              trackBy: trackByUrl;
-              let urlIndex = index
-            "
-            class="text-base text-cText ml-3 w-auto mb-2"
-          >
-            <b>{{ urlIndex + 1 }}.</b>&nbsp;
-            <a
-              [href]="urlItem.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline text-cText hover:text-accent"
-              aria-label="Visit article"
-            >
-              {{ urlItem.url }}
-            </a>
-            @if (urlItem.frequency) {
-            <span class="text-base">
-              &nbsp;-&nbsp;<span class="font-semibold"
-                >{{ "dialog.frequency" | translate }}:</span
-              >&nbsp;{{ urlItem.frequency }}</span
-            >
-            }
-          </dd>
-        </dl>
-      </div>
-    </cdk-virtual-scroll-viewport>
-  </div>
-  <!-- Loading indicator when fetching more data (inside viewport for smooth scroll) -->
+  <cdk-virtual-scroll-viewport #virtualScroll id="media-items-viewport" [itemSize]="ITEM_HEIGHT">
+    <div class="mb-2 text-base text-cText max-w-[95%] text-center mx-auto">
+      @if(dataChartDialog()?.valuation === NONE) {
+      <u>{{ "dialog.word" | translate }}</u>: <i>{{ title() | titlecase }}</i><br />
+      *{{ "dialog.disclaimer3" | translate }}* } @else {
+      <u>{{ "dialog.valuation" | translate }}</u>:
+      <i>{{ (title() | translate) | titlecase }}</i>
+      }<br />
+      *{{ "dialog.disclaimer" | translate }}*<br />
+      *{{ "dialog.disclaimer2" | translate }}*
+    </div>
+    <div *cdkVirtualFor="let row of dataSource; trackBy: trackByRow"
+      [ngClass]="row.type === 'header' ? 'header-row' : 'url-row'">
+      @if (row.type === 'header') {
+      <b class="text-xl text-accent">{{ row.mediaName }}</b>
+      } @else {
+      <span class="url-content">
+        <span class="url-link">
+          <b>{{ row.urlIndex }}.</b>&nbsp;<a [href]="row.url" target="_blank" rel="noopener noreferrer"
+            class="underline text-cText hover:text-accent" aria-label="Visit article">{{ row.url }}</a>
+        </span>
+        @if (row.frequency) {
+        <span class="url-frequency text-sm">
+          - <span class="font-bold">{{ "dialog.frequency" | translate }}:</span>&nbsp;{{ row.frequency }}
+        </span>
+        }
+      </span>
+      }
+    </div>
+  </cdk-virtual-scroll-viewport>
   <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">
     <div class="w-[95%] min-h-[3px] text-center text-cText text-lg">
       @if (dataSource.loading$ | async) {
       <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
-      } @else if (dataSource.cachedData.length <= 0) {
-      {{ "dialog.no_data" | translate }}
-      }
-    </div>
+      } @else if (dataSource.cachedData.length <= 0) { {{ "dialog.no_data" | translate }} } </div>
   </ng-template>
   } @else {
   <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">

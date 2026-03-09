@@ -35,7 +35,6 @@ interface ChartOptions {
   selector: 'app-line-chart',
   imports: [NgApexchartsModule],
   templateUrl: './line-chart.component.html',
-  styleUrl: './line-chart.component.css',
 })
 export class LineChartComponent implements OnInit {
   readonly dataLineChart = input<DataChart>();

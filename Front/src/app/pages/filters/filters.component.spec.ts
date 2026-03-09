@@ -1,49 +1,33 @@
 import { BehaviorSubject, Subject, of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Pipe, PipeTransform } from '@angular/core';
+import { dataChartDialog$, isShowChartDialog$, isShowFiltersDialog$ } from '../../utils/dialog-subjects';
+import { ChartDialog } from '../../models/dialog.model';
 import { FiltersComponent } from './filters.component';
 import { FiltersService } from '../../services/filters.service';
 import { GeneralService } from '../../services/general.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { SentimentIdeologyService } from '../../services/sentiment-ideology.service';
 import { TranslateService } from '@ngx-translate/core';
-
-// Mock TranslatePipe
-@Pipe({ name: 'translate' })
-class MockTranslatePipe implements PipeTransform {
-  transform(value: string): string {
-    return value;
-  }
-}
 
 class MockTranslateService {
   onLangChange = new Subject<{ lang: string; translations: Record<string, unknown> }>();
   onTranslationChange = of({ lang: 'en', translations: {} });
   onDefaultLangChange = of({ lang: 'en', translations: {} });
-
-  get(key: string) {
-    return of(key);
-  }
-
-  instant(key: string) {
-    return key;
-  }
+  get = jest.fn((key: string) => of(key));
+  instant = jest.fn((key: string) => key);
 }
 
 class MockFiltersService {
+  mediaRead$ = of([]);
   medias$ = of([]);
-  sentiments$ = of([]);
-  ideologies$ = of([]);
   mediaCompose$ = of({ countries: [], regions: [], types: [] });
+  getTranslatedMediaCompose = jest.fn();
+}
 
-  getTranslatedMediaCompose(): void {
-    // Mock implementation
-  }
-
-  getTranslatedSentimentsIdeologies(): void {
-    // Mock implementation
-  }
+class MockSentimentIdeologyService {
+  sentiments$ = new BehaviorSubject({ sentiments: [] });
+  ideologies$ = new BehaviorSubject({ ideologies: [] });
+  getTranslatedSentimentsIdeologies = jest.fn();
 }
 
 class MockGeneralService {
@@ -54,27 +38,29 @@ class MockGeneralService {
 describe('FiltersComponent', () => {
   let component: FiltersComponent;
   let fixture: ComponentFixture<FiltersComponent>;
-  let filtersService: MockFiltersService;
-  let translateService: MockTranslateService;
+  let mockFiltersService: MockFiltersService;
+  let mockSentimentService: MockSentimentIdeologyService;
+  let mockTranslateService: MockTranslateService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        FiltersComponent,
-        HttpClientTestingModule,
-        MockTranslatePipe,
-        MultiSelectModule,
-        NoopAnimationsModule,
-      ],
+      imports: [FiltersComponent],
       providers: [
         { provide: TranslateService, useClass: MockTranslateService },
         { provide: FiltersService, useClass: MockFiltersService },
+        { provide: SentimentIdeologyService, useClass: MockSentimentIdeologyService },
         { provide: GeneralService, useClass: MockGeneralService },
       ],
-    }).compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .overrideComponent(FiltersComponent, {
+        set: { imports: [], template: '<div></div>' },
+      })
+      .compileComponents();
 
-    filtersService = TestBed.inject(FiltersService) as unknown as MockFiltersService;
-    translateService = TestBed.inject(TranslateService) as unknown as MockTranslateService;
+    mockFiltersService = TestBed.inject(FiltersService) as unknown as MockFiltersService;
+    mockSentimentService = TestBed.inject(SentimentIdeologyService) as unknown as MockSentimentIdeologyService;
+    mockTranslateService = TestBed.inject(TranslateService) as unknown as MockTranslateService;
 
     fixture = TestBed.createComponent(FiltersComponent);
     component = fixture.componentInstance;
@@ -85,18 +71,48 @@ describe('FiltersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should subscribe to language changes and call translation methods', () => {
-    const mediaComposeSpy = jest.spyOn(filtersService, 'getTranslatedMediaCompose');
-    const sentimentsSpy = jest.spyOn(filtersService, 'getTranslatedSentimentsIdeologies');
+  it('should call getTranslatedMediaCompose on init', () => {
+    expect(mockFiltersService.getTranslatedMediaCompose).toHaveBeenCalled();
+  });
 
-    // Simulate language change
-    translateService.onLangChange.next({
-      lang: 'fr',
-      translations: {},
-    });
+  it('should call getTranslatedSentimentsIdeologies on init', () => {
+    expect(mockSentimentService.getTranslatedSentimentsIdeologies).toHaveBeenCalled();
+  });
 
-    // Verify that methods were called at least once
-    expect(mediaComposeSpy).toHaveBeenCalled();
-    expect(sentimentsSpy).toHaveBeenCalled();
+  it('should set isMobile from GeneralService on init', () => {
+    expect(component.isMobile).toBe(false);
+  });
+
+  it('should re-translate on language change', () => {
+    mockFiltersService.getTranslatedMediaCompose.mockClear();
+    mockSentimentService.getTranslatedSentimentsIdeologies.mockClear();
+
+    mockTranslateService.onLangChange.next({ lang: 'es', translations: {} });
+
+    expect(mockFiltersService.getTranslatedMediaCompose).toHaveBeenCalled();
+    expect(mockSentimentService.getTranslatedSentimentsIdeologies).toHaveBeenCalled();
+  });
+
+  it('isShowFiltersDialog should update when isShowFiltersDialog$ emits true', () => {
+    isShowFiltersDialog$.next(true);
+    expect(component.isShowFiltersDialog()).toBe(true);
+  });
+
+  it('isShowFiltersDialog should update when isShowFiltersDialog$ emits false', () => {
+    isShowFiltersDialog$.next(true);
+    isShowFiltersDialog$.next(false);
+    expect(component.isShowFiltersDialog()).toBe(false);
+  });
+
+  it('isShowChartDialog should update when isShowChartDialog$ emits true', () => {
+    isShowChartDialog$.next(true);
+    expect(component.isShowChartDialog()).toBe(true);
+  });
+
+  it('dataChartDialog should update when dataChartDialog$ emits', () => {
+    const newDialog = new ChartDialog();
+    newDialog.count.set(5);
+    dataChartDialog$.next(newDialog);
+    expect(component.dataChartDialog().count()).toBe(5);
   });
 });

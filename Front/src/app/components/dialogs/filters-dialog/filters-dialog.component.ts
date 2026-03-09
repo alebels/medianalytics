@@ -1,5 +1,6 @@
 import {
   Component,
+  OnDestroy,
   ViewChild,
   computed,
   effect,
@@ -27,9 +28,8 @@ import { isShowFiltersDialog$ } from '../../../utils/dialog-subjects';
   selector: 'app-filters-dialog',
   imports: [CommonModule, DialogModule, TranslatePipe, Tooltip],
   templateUrl: './filters-dialog.component.html',
-  styleUrl: './filters-dialog.component.css',
 })
-export class FiltersDialogComponent {
+export class FiltersDialogComponent implements OnDestroy {
   readonly dataFiltersDialog = input<FilterDialog>();
   @ViewChild('filterDialog') readonly filterDialog!: Dialog;
 
@@ -90,12 +90,11 @@ export class FiltersDialogComponent {
     // Scroll to top when header changes
     effect(() => {
       const currentHeader = this.header();
-      if (currentHeader && this.filterDialog) {
-        // Use queueMicrotask to ensure dialog content is rendered
-        queueMicrotask(() => {
+      if (currentHeader) {
+        setTimeout(() => {
           const contentElement =
             this.filterDialog?.el?.nativeElement?.querySelector(
-              '.p-dialog-content'
+              '.p-dialog-content',
             );
           if (contentElement) {
             contentElement.scrollTop = 0;
@@ -103,6 +102,10 @@ export class FiltersDialogComponent {
         });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    isShowFiltersDialog$.next(false);
   }
 
   onClose(): void {
@@ -116,11 +119,11 @@ export class FiltersDialogComponent {
   getUniqueGeneralTypes(): string[] {
     const types: string[] =
       this.dataFiltersDialog()?.generalMedias?.map(
-        (media: GeneralMedia) => media.type
+        (media: GeneralMedia) => media.type,
       ) || [];
 
     return Array.from(new Set(types)).sort((a: string, b: string) =>
-      a.localeCompare(b)
+      a.localeCompare(b),
     );
   }
 
@@ -145,11 +148,11 @@ export class FiltersDialogComponent {
     const filteredItems: GeneralMedia[] =
       this.dataFiltersDialog()?.generalMedias?.filter(
         (media: GeneralMedia) =>
-          media.type === type && media.country === country
+          media.type === type && media.country === country,
       ) || [];
 
     return filteredItems.sort((a: GeneralMedia, b: GeneralMedia) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
   }
 
@@ -159,7 +162,7 @@ export class FiltersDialogComponent {
       [];
 
     return Array.from(new Set(types)).sort((a: string, b: string) =>
-      a.localeCompare(b)
+      a.localeCompare(b),
     );
   }
 
@@ -174,7 +177,7 @@ export class FiltersDialogComponent {
   getUniqueCountries(): string[] {
     const countries: string[] =
       this.dataFiltersDialog()?.medias?.map(
-        (media: MediaRead) => media.country
+        (media: MediaRead) => media.country,
       ) || [];
 
     return Array.from(new Set(countries)).sort((a: string, b: string) => {
@@ -195,7 +198,7 @@ export class FiltersDialogComponent {
   getUniqueRegions(): string[] {
     const regions: string[] =
       this.dataFiltersDialog()?.medias?.map(
-        (media: MediaRead) => media.region
+        (media: MediaRead) => media.region,
       ) || [];
 
     return Array.from(new Set(regions)).sort((a: string, b: string) => {
@@ -225,7 +228,7 @@ export class FiltersDialogComponent {
     return medias
       .filter(
         (media: MediaRead) =>
-          media.region === region && media.country === country
+          media.region === region && media.country === country,
       )
       .sort((a: MediaRead, b: MediaRead) => a.name.localeCompare(b.name));
   }

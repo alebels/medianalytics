@@ -34,7 +34,6 @@ import { TranslatePipe } from '@ngx-translate/core';
     Tooltip,
   ],
   templateUrl: './general-table.component.html',
-  styleUrl: './general-table.component.css',
 })
 export class GeneralTableComponent implements OnInit {
   readonly dataGeneralTable = input<GeneralMediaTable>();

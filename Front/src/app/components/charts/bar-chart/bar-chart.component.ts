@@ -35,7 +35,6 @@ interface ChartOptions {
   selector: 'app-bar-chart',
   imports: [NgApexchartsModule],
   templateUrl: './bar-chart.component.html',
-  styleUrl: './bar-chart.component.css',
 })
 export class BarChartComponent implements OnInit {
   readonly dataBarChart = input<DataChart>();
@@ -75,7 +74,7 @@ export class BarChartComponent implements OnInit {
 
   private chartOptionsUpdate(
     series: ApexAxisChartSeries,
-    xlabels: string[]
+    xlabels: string[],
   ): void {
     this.chartOptions = {
       series: series || [],
@@ -121,6 +120,7 @@ export class BarChartComponent implements OnInit {
             fontSize: '16px',
           },
           rotate: -45,
+          rotateAlways: true,
           trim: true,
         },
         categories: xlabels || [],
@@ -173,7 +173,7 @@ export class BarChartComponent implements OnInit {
     if (this.chartMode !== NONE) {
       this.chartLabels =
         this.dataBarChart()?.xLabels?.map((label: string) =>
-          this.trans.instant(this.chartMode + '.' + label)
+          this.trans.instant(this.chartMode + '.' + label),
         ) || [];
     } else if (this.chartLabels === undefined) {
       this.chartLabels = this.dataBarChart()?.xLabels || [];
