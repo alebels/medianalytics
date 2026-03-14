@@ -23,6 +23,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ChartFilter } from '../../../models/dialog.model';
+import { CommonModule } from '@angular/common';
 import { DataChart } from '../../../models/chart.model';
 import { FilterComponent } from '../filter/filter.component';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -35,11 +36,13 @@ import { SentimentIdeologyService } from '../../../services/sentiment-ideology.s
 import { Sentiments } from '../../../models/sentiment-ideology.model';
 import { ToastService } from '../../../services/toast.service';
 import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
+import { getNumArticlesFromItems } from '../../../utils/functions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-filter-sentiment',
   imports: [
+    CommonModule,
     FormsModule,
     FilterComponent,
     MultiSelectModule,
@@ -74,6 +77,8 @@ export class FilterSentimentComponent implements OnInit {
 
   chartFilter!: ChartFilter;
 
+  numArticlesRetrieved = 0;
+
   private composeValues: {
     type: string;
     key: string | number | string[] | null;
@@ -96,6 +101,7 @@ export class FilterSentimentComponent implements OnInit {
         this.barChart = null;
         this.lineChart = null;
         this.lastFilter = null;
+        this.numArticlesRetrieved = 0;
       });
   }
 
@@ -137,6 +143,7 @@ export class FilterSentimentComponent implements OnInit {
         return;
       }
       this.noData.isLoading?.next(true);
+      this.numArticlesRetrieved = 0;
       this.lastFilter = newFilter;
 
       this.barChart = null;
@@ -162,9 +169,10 @@ export class FilterSentimentComponent implements OnInit {
               this.chartFilter.rangeDates = (
                 composeObj['dates'] as string[]
               ).map((dateStr) => new Date(dateStr));
-          }
-
-          if (data.categorized) {
+            }
+            
+            if (data.categorized) {
+            this.numArticlesRetrieved = getNumArticlesFromItems(data.categorized);
             this.pieChart = setToPieChart(data.categorized);
             this.pieChart.translate = SENTIMENTS;
           }

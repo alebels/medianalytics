@@ -6,6 +6,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   OnDestroy,
   computed,
   effect,
@@ -19,7 +20,7 @@ import {
   DialogRow,
 } from '../../../models/dialog.model';
 import { IDEOLOGIES, NONE, SENTIMENTS } from '../../../utils/constants';
-import { filter, take } from 'rxjs';
+import { filter, fromEvent, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -44,6 +45,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class ChartDialogComponent implements OnDestroy {
   readonly dataChartDialog = input<ChartDialog>();
+  
+  readonly scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollContainer');
   readonly virtualScroll = viewChild<CdkVirtualScrollViewport>('virtualScroll');
 
   count = computed(() => this.dataChartDialog()?.count() || 0);
@@ -71,7 +74,7 @@ export class ChartDialogComponent implements OnDestroy {
   isVisible = true;
 
   readonly ITEM_HEIGHT = 60;
-  readonly LOAD_THRESHOLD = 750;
+  readonly LOAD_THRESHOLD = 900;
   readonly NONE = NONE;
 
   private autoLoadSetup = false;
@@ -91,10 +94,11 @@ export class ChartDialogComponent implements OnDestroy {
     effect(() => {
       this.title(); // React to title changes which depend on dataChartDialog
       const viewport = this.virtualScroll();
-      if (viewport && this.dataSource && !this.autoLoadSetup) {
+      const container = this.scrollContainer();
+      if (viewport && container && this.dataSource && !this.autoLoadSetup) {
         queueMicrotask(() => {
-          if (viewport && this.dataSource && !this.autoLoadSetup) {
-            this.setupAutoLoad(viewport);
+          if (this.dataSource && !this.autoLoadSetup) {
+            this.setupAutoLoad(viewport, container.nativeElement);
           }
         });
       }
@@ -124,40 +128,36 @@ export class ChartDialogComponent implements OnDestroy {
    * Sets up automatic loading when user scrolls near bottom.
    * Uses the viewport's elementScrolled observable with CDK's built-in fixed strategy.
    */
-  private setupAutoLoad(viewport: CdkVirtualScrollViewport): void {
+  private setupAutoLoad(viewport: CdkVirtualScrollViewport, scrollEl: HTMLElement): void {
     if (this.autoLoadSetup) return;
     this.autoLoadSetup = true;
 
-    // Reset CDK scroll position after initial data load to prevent wrong translateY offset
+    // Reset scroll position after initial data load to prevent wrong translateY offset
     this.dataSource!.loading$.pipe(
       filter((loading) => !loading),
       take(1),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(() => {
-      viewport.scrollToOffset(0);
+      scrollEl.scrollTop = 0;
       viewport.checkViewportSize();
     });
 
-    viewport
-      .elementScrolled()
+    fromEvent(scrollEl, 'scroll')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this.checkNearBottom(viewport);
+        this.checkNearBottom(scrollEl);
       });
   }
 
   /**
    * Checks if user scrolled near bottom and triggers data loading.
    */
-  private checkNearBottom(viewport: CdkVirtualScrollViewport): void {
+  private checkNearBottom(scrollEl: HTMLElement): void {
     if (!this.dataSource?.hasMoreSync() || this.dataSource.isLoadingSync()) {
       return;
     }
 
-    const scrollOffset = viewport.measureScrollOffset();
-    const viewportSize = viewport.getViewportSize();
-    const totalSize = viewport.getDataLength() * this.ITEM_HEIGHT;
-    const distanceFromBottom = totalSize - (scrollOffset + viewportSize);
+    const distanceFromBottom = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight;
 
     if (distanceFromBottom < this.LOAD_THRESHOLD) {
       this.dataSource.loadMore();

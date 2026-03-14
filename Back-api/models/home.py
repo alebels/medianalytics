@@ -6,6 +6,16 @@ from config.constant_enums import (
     CountriesEnum,
 )
 from models.utils import ItemRead
+from datetime import date
+
+
+class MinMaxDateRead(BaseModel):
+    """
+    Pydantic model for reading minimum and maximum dates.
+    """
+
+    min_date: date
+    max_date: date
 
 
 class MediaItemRead(BaseModel):

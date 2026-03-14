@@ -131,7 +131,8 @@
     "filter_words": "Filter by words",
     "word": "Word",
     "count": "Frequency",
-    "words": "Words extracted from articles processed by the platform"
+    "words": "Words extracted from articles processed by the platform",
+    "articles_retrieved": "Articles"
   },
   "manifest": {
     "description1": "Medianalytics is an",

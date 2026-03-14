@@ -58,27 +58,6 @@ async def get_sentiments_ideologies(
     return srv.SENTIMENTS_IDEOLOGIES_CATEGORIZED
 
 
-@FILTERS_ROUTER.get("/minmaxdate", response_model=schemas.MinMaxDateRead)
-@LIMITER.limit(f"{NUM_REQUESTS}/minute")
-async def get_min_max_date(
-    request: Request,
-    db: AsyncSession = Depends(get_session)
-):
-    """
-    Returns:
-        Minimum and maximum dates of articles available from the database.
-    """
-    try:
-        db_item = await repo.get_min_max_date(db)
-        if db_item is None:
-            raise HTTPException(status_code=404, detail="No items found")
-        return db_item
-    except HTTPException:
-        raise
-    except Exception:
-        raise HTTPException(status_code=500, detail="Error retrieving date range")
-
-
 @FILTERS_ROUTER.post("/sentimentsfilter", response_model=schemas.FilterChartsRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def post_sentiments_filter(

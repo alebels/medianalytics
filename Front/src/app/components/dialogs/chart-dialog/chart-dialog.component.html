@@ -11,7 +11,7 @@
   </ng-template>
 
   @if(dataSource) {
-  <cdk-virtual-scroll-viewport #virtualScroll id="media-items-viewport" [itemSize]="ITEM_HEIGHT">
+  <div #scrollContainer id="media-items-viewport" cdkVirtualScrollingElement>
     <div class="mb-2 text-base text-cText max-w-[95%] text-center mx-auto">
       @if(dataChartDialog()?.valuation === NONE) {
       <u>{{ "dialog.word" | translate }}</u>: <i>{{ title() | titlecase }}</i><br />
@@ -22,25 +22,27 @@
       *{{ "dialog.disclaimer" | translate }}*<br />
       *{{ "dialog.disclaimer2" | translate }}*
     </div>
-    <div *cdkVirtualFor="let row of dataSource; trackBy: trackByRow"
-      [ngClass]="row.type === 'header' ? 'header-row' : 'url-row'">
-      @if (row.type === 'header') {
-      <b class="text-xl text-accent">{{ row.mediaName }}</b>
-      } @else {
-      <span class="url-content">
-        <span class="url-link">
-          <b>{{ row.urlIndex }}.</b>&nbsp;<a [href]="row.url" target="_blank" rel="noopener noreferrer"
-            class="underline text-cText hover:text-accent" aria-label="Visit article">{{ row.url }}</a>
-        </span>
-        @if (row.frequency) {
-        <span class="url-frequency text-sm">
-          - <span class="font-bold">{{ "dialog.frequency" | translate }}:</span>&nbsp;{{ row.frequency }}
+    <cdk-virtual-scroll-viewport #virtualScroll [itemSize]="ITEM_HEIGHT">
+      <div *cdkVirtualFor="let row of dataSource; trackBy: trackByRow"
+        [ngClass]="row.type === 'header' ? 'header-row' : 'url-row'">
+        @if (row.type === 'header') {
+        <b class="text-xl text-accent">{{ row.mediaName }}</b>
+        } @else {
+        <span class="url-content">
+          <span class="url-link">
+            <b>{{ row.urlIndex }}.</b>&nbsp;<a [href]="row.url" target="_blank" rel="noopener noreferrer"
+              class="underline text-cText hover:text-accent" aria-label="Visit article">{{ row.url }}</a>
+          </span>
+          @if (row.frequency) {
+          <span class="url-frequency text-sm">
+            - <span class="font-bold">{{ "dialog.frequency" | translate }}:</span>&nbsp;{{ row.frequency }}
+          </span>
+          }
         </span>
         }
-      </span>
-      }
-    </div>
-  </cdk-virtual-scroll-viewport>
+      </div>
+    </cdk-virtual-scroll-viewport>
+  </div>
   <ng-template #footer pTemplate="footer" styleClass="p-dialog-footer">
     <div class="w-[95%] min-h-[3px] text-center text-cText text-lg">
       @if (dataSource.loading$ | async) {

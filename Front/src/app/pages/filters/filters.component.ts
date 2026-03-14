@@ -72,7 +72,7 @@ export class FiltersComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: boolean) => {
         this.isShowFiltersDialog.set(data);
-        this.isShowChartDialog.set(false);
+        if (data) this.isShowChartDialog.set(false);
       });
 
     // Subscribe to dialog type changes
@@ -86,7 +86,7 @@ export class FiltersComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: boolean) => {
         this.isShowChartDialog.set(data);
-        this.isShowFiltersDialog.set(false);
+        if (data) this.isShowFiltersDialog.set(false);
       });
 
     dataChartDialog$

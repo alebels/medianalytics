@@ -131,7 +131,8 @@
     "filter_words": "Filtro por palabras",
     "word": "Palabra",
     "count": "Frecuencia",
-    "words": "Palabras extraídas de los artículos procesados por la plataforma"
+    "words": "Palabras extraídas de los artículos procesados por la plataforma",
+    "articles_retrieved": "Artículos"
   },
   "manifest": {
     "description1": "Medianalytics es un proyecto",

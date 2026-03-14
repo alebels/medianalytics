@@ -51,15 +51,6 @@ class SentimentsIdeologiesRead(BaseModel):
     ideologies: list[CategoryValues]
 
 
-class MinMaxDateRead(BaseModel):
-    """
-    Pydantic model for reading minimum and maximum dates.
-    """
-
-    min_date: date
-    max_date: date
-
-
 class FillQuery(BaseModel):
     """
     A model representing a query with its parameters for database operations.
@@ -80,6 +71,7 @@ class FilterData(BaseModel):
 
     plain: list[ItemRead] | None = None
     dated: list[ItemDate] | None = None
+    num_articles: int | None = None
 
 
 class FilterChartsRead(BaseModel):
@@ -90,6 +82,7 @@ class FilterChartsRead(BaseModel):
     plain: list[ItemRead] | None = None
     categorized: list[ItemRead] | None = None
     date_chart: DateChartRead | None = None
+    num_articles: int | None = None
 
 
 class BaseFilter(BaseModel):

@@ -292,6 +292,11 @@ p {
 
   .p-button {
     letter-spacing: 0.7px !important;
+    font-weight: 600 !important;
+  }
+
+  .p-button:hover {
+    box-shadow: 0px 0px 5px 4px var(--color-accent-background) !important;
   }
 
   p-sorticon {

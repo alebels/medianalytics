@@ -43,15 +43,15 @@
   </p-floatlabel>
 
   <div>
-    <p-button
-      (onClick)="onClickFilter()"
-      [disabled]="noData.isLoading?.getValue()"
-      [raised]="true"
-      size="small"
-      aria-label="Apply filter"
-      >{{ "filters.filter" | translate }}</p-button
-    >
+    <p-button (onClick)="onClickFilter()" [disabled]="noData.isLoading?.getValue()" size="small"
+      aria-label="Apply filter">{{ "filters.filter" | translate }}</p-button>
   </div>
+
+  @if (numArticlesRetrieved > 0) {
+  <div class="text-base">
+    <span class="text-base font-semibold">{{ "filters.articles_retrieved" | translate }}</span>: {{ numArticlesRetrieved | number : '1.0-0' }}
+  </div>
+  }
 </div>
 
 <div

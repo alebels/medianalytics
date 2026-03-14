@@ -48,6 +48,28 @@ async def get_general_medias(
         raise HTTPException(status_code=500, detail="Error retrieving media items")
 
 
+@HOME_ROUTER.get("/minmaxdate", response_model=schemas.MinMaxDateRead)
+@LIMITER.limit(f"{NUM_REQUESTS}/minute")
+@cache_response(key_prefix="v1:home:minmaxdate", ttl=93600)
+async def get_min_max_date(
+    request: Request,
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Returns:
+        Minimum and maximum dates of articles available from the database.
+    """
+    try:
+        db_item = await repo.get_min_max_date(db)
+        if db_item is None:
+            raise HTTPException(status_code=404, detail="No items found")
+        return db_item
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error retrieving date range")
+
+
 @HOME_ROUTER.get("/generaltotalarticles", response_model=int)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 @cache_response(key_prefix="v1:home:generaltotalarticles", ttl=93600)
@@ -382,6 +404,7 @@ async def warm_cache_async() -> None:
             
             # Call controllers directly - decorator populates Redis
             await asyncio.gather(
+                get_min_max_date(mock_request, db),
                 get_general_medias(mock_request, db),
                 get_general_total_articles(mock_request, db),
                 get_general_total_words(mock_request, db),

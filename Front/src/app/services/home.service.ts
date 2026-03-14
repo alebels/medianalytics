@@ -18,6 +18,7 @@ import { GeneralMedia } from '../models/media.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { getNumArticlesFromItems } from '../utils/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -144,7 +145,8 @@ export class HomeService {
       this.http.get<CompoundRead>(`${this.apiUrl}/generaldaysentiments`),
     );
 
-    this.getTotalDayArticles(data.categorized);
+    const totalArticles = getNumArticlesFromItems(data.categorized);
+    this.totalDayArticlesSub.next(totalArticles);
 
     const sendData = new CompoundDataCharts(
       setToBarChart(data.plain, COUNT),
@@ -154,13 +156,6 @@ export class HomeService {
     sendData.plain.translate = SENTIMENTS;
     sendData.categorized.translate = SENTIMENTS;
     this.generalDaySentimentsSub.next(sendData);
-  }
-
-  private getTotalDayArticles(categorized: ItemRead[]): void {
-    const totalArticles = Math.round(
-      categorized.reduce((total, item) => total + item.count, 0) / 3,
-    );
-    this.totalDayArticlesSub.next(totalArticles);
   }
 
   private async getGeneralDayIdeologies(): Promise<void> {

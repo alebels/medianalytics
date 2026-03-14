@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import models.filters as schemas
 import config.db_models as models
-from sqlalchemy import exists, text, func
+from sqlalchemy import exists, text
 
 
 async def get_medias(db: AsyncSession) -> list[schemas.MediaRead]:
@@ -24,35 +24,6 @@ async def get_medias(db: AsyncSession) -> list[schemas.MediaRead]:
     result = await db.execute(query)
     medias = result.all()
     return [schemas.MediaRead.model_validate(media).model_dump() for media in medias]
-
-
-async def get_min_max_date(db: AsyncSession) -> schemas.MinMaxDateRead:
-    """
-    Retrieve the minimum and maximum dates from the database.
-    
-    Args:
-        db (AsyncSession): The database session.
-        
-    Returns:
-        schemas.MinMaxDateRead: The minimum and maximum dates.
-    """
-    # Get minimum date
-    min_date_result = await db.execute(
-        select(func.min(models.Article.insert_date))
-    )
-    min_date = min_date_result.scalar()
-    
-    # Get maximum date
-    max_date_result = await db.execute(
-        select(func.max(models.Article.insert_date))
-    )
-    max_date = max_date_result.scalar()
-
-    # Create MinMaxDateRead with date values
-    return schemas.MinMaxDateRead(
-        min_date=min_date,
-        max_date=max_date
-    )
 
 
 async def get_sentiments_ideologies_filter(db: AsyncSession, query: str, params: dict) -> schemas.FilterData:

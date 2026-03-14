@@ -25,6 +25,35 @@ async def get_general_top_words(db: AsyncSession) -> list[schemas.ItemRead]:
     return [schemas.ItemRead.model_validate(word) for word in words]
 
 
+async def get_min_max_date(db: AsyncSession) -> schemas.MinMaxDateRead:
+    """
+    Retrieve the minimum and maximum dates from the database.
+    
+    Args:
+        db (AsyncSession): The database session.
+        
+    Returns:
+        schemas.MinMaxDateRead: The minimum and maximum dates.
+    """
+    # Get minimum date
+    min_date_result = await db.execute(
+        select(func.min(models.Article.insert_date))
+    )
+    min_date = min_date_result.scalar()
+    
+    # Get maximum date
+    max_date_result = await db.execute(
+        select(func.max(models.Article.insert_date))
+    )
+    max_date = max_date_result.scalar()
+
+    # Create MinMaxDateRead with date values
+    return schemas.MinMaxDateRead(
+        min_date=min_date,
+        max_date=max_date
+    )
+
+
 async def get_general_bottom_words(db: AsyncSession) -> list[schemas.ItemRead]:
     """
     Retrieve the bottom most repeated words.

@@ -5,6 +5,7 @@
 #media-items-viewport {
   height: 65vh;
   width: 100%;
+  overflow: auto;
 }
 
 .header-row {

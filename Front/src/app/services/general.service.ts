@@ -26,7 +26,7 @@ export class GeneralService {
 
   private async getMinMaxDates(): Promise<void> {
     const data = await firstValueFrom(
-      this.http.get<MinMaxDateRead>(`${environment.apiUrl}/filters/minmaxdate`)
+      this.http.get<MinMaxDateRead>(`${environment.apiUrl}/home/minmaxdate`)
     );
     this.minMaxDateSub.next(data);
   }
