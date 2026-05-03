@@ -26,9 +26,12 @@ async def get_medias(db: AsyncSession) -> list[schemas.MediaRead]:
     return [schemas.MediaRead.model_validate(media).model_dump() for media in medias]
 
 
-async def get_sentiments_ideologies_filter(db: AsyncSession, query: str, params: dict) -> schemas.FilterData:
+async def get_sentiments_ideologies_filter(
+    db: AsyncSession, query: str, params: dict
+) -> schemas.FilterData:
     """
-    Retrieve sentiment filter results from the database.
+    Retrieve sentiment filter results and article count from the database.
+    The query is expected to include a num_articles column via a CTE scalar subquery.
     
     Args:
         db (AsyncSession): The database session.
@@ -36,33 +39,31 @@ async def get_sentiments_ideologies_filter(db: AsyncSession, query: str, params:
         params (dict): The parameters to bind to the query.
         
     Returns:
-        schemas.FilterData: A list of filter items, with dates if available.
+        schemas.FilterData: Filter items (with dates if available) and total article count.
     """
-    # Create a bindparam statement with explicit parameter binding
-    stmt = text(query).bindparams(**params)
-    
     try:
+        stmt = text(query).bindparams(**params)
         result = await db.execute(stmt)
         result_list = result.mappings().all()
+
+        num_articles = result_list[0]['num_articles'] if result_list else 0
         
-        # Check if the list is not empty and the first item has a 'date' key
         if result_list and 'date' in result_list[0]:
-            # If the result has a date attribute, return ItemDate
             items = [schemas.ItemDate.model_validate(item) for item in result_list]
-            return schemas.FilterData(dated=items)
+            return schemas.FilterData(dated=items, num_articles=num_articles)
         
         items = [schemas.ItemRead.model_validate(item) for item in result_list]
-        return schemas.FilterData(plain=items)
+        return schemas.FilterData(plain=items, num_articles=num_articles)
     except Exception as e:
-        # Log the error with the query and parameters for debugging
         print(f"Error executing query: {query}")
         print(f"Parameters: {params}")
         raise e
 
 
-async def get_words_filter(db: AsyncSession, query: str, params: dict) -> list[schemas.ItemRead]:
+async def get_words_filter(db: AsyncSession, query: str, params: dict) -> schemas.FilterData:
     """
-    Retrieve word filter results from the database.
+    Retrieve word filter results and article count from the database.
+    The query is expected to include a num_articles column via a CTE scalar subquery.
     
     Args:
         db (AsyncSession): The database session.
@@ -70,19 +71,17 @@ async def get_words_filter(db: AsyncSession, query: str, params: dict) -> list[s
         params (dict): The parameters to bind to the query.
         
     Returns:
-        list[schemas.ItemRead]: A list of filter items (words with counts).
+        schemas.FilterData: Words with counts and total article count.
     """
-    # Create a bindparam statement with explicit parameter binding
-    stmt = text(query).bindparams(**params)
-    
     try:
+        stmt = text(query).bindparams(**params)
         result = await db.execute(stmt)
         result_list = result.mappings().all()
-        
-        # Return a list of ItemRead directly, not wrapped in FilterData
-        return [schemas.ItemRead.model_validate(item) for item in result_list]
+
+        num_articles = result_list[0]['num_articles'] if result_list else 0
+        items = [schemas.ItemRead.model_validate(item) for item in result_list]
+        return schemas.FilterData(plain=items, num_articles=num_articles)
     except Exception as e:
-        # Log the error with the query and parameters for debugging
         print(f"Error executing query: {query}")
         print(f"Parameters: {params}")
         raise e

@@ -6,9 +6,9 @@ import {
   SelectSimple,
 } from '../models/primeng.model';
 import { FILTERS } from '../utils/constants';
+import { FilterData } from '../models/items.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ItemRead } from '../models/items.model';
 import { MEDIA_GROUPS } from '../utils/groups-constant';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
@@ -72,9 +72,9 @@ export class FiltersService {
 
   async setFilterWord(
     filter: Record<string, string | number | string[] | boolean | null>
-  ): Promise<ItemRead[]> {
+  ): Promise<FilterData> {
     return await firstValueFrom(
-      this.http.post<ItemRead[]>(`${this.apiUrl}/wordsfilter`, filter)
+      this.http.post<FilterData>(`${this.apiUrl}/wordsfilter`, filter)
     );
   }
 
@@ -93,12 +93,12 @@ export class FiltersService {
       types = new Set<string>();
     const medias: MediaBase[] = [];
 
-    data.forEach((media: MediaRead) => {
+    for (const media of data) {
       medias.push(new MediaBase(media.id, media.name, media.type));
       countries.add(media.country);
       regions.add(media.region);
       types.add(media.type);
-    });
+    }
     medias.sort((a: MediaBase, b: MediaBase) => a.label.localeCompare(b.label));
 
     this.setGroupedMedia(medias);

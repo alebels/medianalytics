@@ -36,7 +36,6 @@ import { SentimentIdeologyService } from '../../../services/sentiment-ideology.s
 import { Sentiments } from '../../../models/sentiment-ideology.model';
 import { ToastService } from '../../../services/toast.service';
 import { filtersTypeDialog$ } from '../../../utils/dialog-subjects';
-import { getNumArticlesFromItems } from '../../../utils/functions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -110,7 +109,7 @@ export class FilterSentimentComponent implements OnInit {
   }
 
   getComposeValues(
-    e: { type: string; key: string | number | string[] | null }[]
+    e: { type: string; key: string | number | string[] | null }[],
   ): void {
     this.composeValues = e;
   }
@@ -123,13 +122,12 @@ export class FilterSentimentComponent implements OnInit {
       this.toastSrv.showWarn('empty_filters');
       return;
     } else {
-
       const composeObj: Record<string, string | number | string[] | null> = {};
-      this.composeValues.forEach((item) => {
+      for (const item of this.composeValues) {
         if (item.type in TO_API) {
           composeObj[TO_API[item.type as keyof typeof TO_API]] = item.key;
         }
-      });
+      }
 
       if (this.sentiments.value()) {
         composeObj[SENTIMENTS] = this.sentiments
@@ -153,6 +151,9 @@ export class FilterSentimentComponent implements OnInit {
       this.sentimentIdeologySrv
         .setFilterSentiment(composeObj)
         .then((data: FilterChartsRead) => {
+          console.log(data);
+          this.numArticlesRetrieved = data.num_articles;
+
           if (data.plain) {
             this.barChart = setToBarChart(data.plain, COUNT);
             this.barChart.translate = SENTIMENTS;
@@ -169,10 +170,9 @@ export class FilterSentimentComponent implements OnInit {
               this.chartFilter.rangeDates = (
                 composeObj['dates'] as string[]
               ).map((dateStr) => new Date(dateStr));
-            }
-            
-            if (data.categorized) {
-            this.numArticlesRetrieved = getNumArticlesFromItems(data.categorized);
+          }
+
+          if (data.categorized) {
             this.pieChart = setToPieChart(data.categorized);
             this.pieChart.translate = SENTIMENTS;
           }
@@ -180,7 +180,7 @@ export class FilterSentimentComponent implements OnInit {
           if (data.date_chart) {
             this.lineChart = setToLineChart(
               data.date_chart.items,
-              data.date_chart.labels
+              data.date_chart.labels,
             );
             this.lineChart.translate = SENTIMENTS;
           }

@@ -95,10 +95,8 @@ def remove_content_between_brackets_braces(text):
     """
     Removes content enclosed in angle brackets (<>) and curly braces ({}) from the given text.
     """
-    # print(text)
     text = re.sub(r"<.*?>", " ", text)
     text = re.sub(r"{.*?}", " ", text)
-    # text = re.sub(r"\s+", " ", text)
     return text.strip()
 
 
@@ -143,12 +141,4 @@ def clean_text(text: str) -> str:
 
 
 def clean_href(url_media: str, href: str) -> str:
-    """
-    Joins the base URL with the href to form a complete URL.
-    Args:
-        url_media (str): The base URL.
-        href (str): The href to be joined with the base URL.
-    Returns:
-        str: The complete URL formed by joining the base URL with the href.
-    """
     return urljoin(url_media, href)

@@ -13,11 +13,12 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { ItemRead, NoData } from '../../../models/items.model';
+import { FilterData, ItemRead, NoData } from '../../../models/items.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
+import { CommonModule } from '@angular/common';
 import { DataCountTable } from '../../../models/table.model';
 import { FilterComponent } from '../filter/filter.component';
 import { FiltersService } from '../../../services/filters.service';
@@ -34,6 +35,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-filter-word',
   imports: [
+    CommonModule,
     FormsModule,
     FilterComponent,
     MultiSelectModule,
@@ -63,6 +65,8 @@ export class FilterWordComponent implements OnInit {
 
   LOCALE_ID = inject(LOCALE_ID);
 
+  numArticlesRetrieved = 0;
+
   private readonly maxRangeCount = 400;
 
   private composeValues: {
@@ -83,6 +87,7 @@ export class FilterWordComponent implements OnInit {
         this.composeValues = [];
         this.dataWordsTable = null;
         this.lastFilter = null;
+        this.numArticlesRetrieved = 0;
       });
   }
 
@@ -122,11 +127,11 @@ export class FilterWordComponent implements OnInit {
         string | number | string[] | boolean | null
       > = {};
 
-      this.composeValues.forEach((item) => {
+      for (const item of this.composeValues) {
         if (item.type in TO_API) {
           composeObj[TO_API[item.type as keyof typeof TO_API]] = item.key;
         }
-      });
+      }
 
       if (this.minRange !== null) {
         composeObj[SORTING.MIN_RANGE] = this.minRange;
@@ -146,16 +151,18 @@ export class FilterWordComponent implements OnInit {
         return;
       }
       this.noData.isLoading?.next(true);
+      this.numArticlesRetrieved = 0;
       this.lastFilter = newFilter;
 
       this.dataWordsTable = null;
 
       this.filtersSrv
         .setFilterWord(composeObj)
-        .then((data: ItemRead[]) => {
+        .then((data: FilterData) => {
+          this.numArticlesRetrieved = data.num_articles;
           const sortOrder = this.order === SORTING.DESCENDING ? -1 : 1;
           this.dataWordsTable = new DataCountTable(
-            data,
+            data.plain as ItemRead[],
             WORD,
             COUNT,
             sortOrder

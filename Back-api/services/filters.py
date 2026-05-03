@@ -41,7 +41,7 @@ def get_sentiments_ideologies_categorized() -> schemas.SentimentsIdeologiesRead:
     return SENTIMENTS_IDEOLOGIES_CATEGORIZED
 
 
-def set_conditions_query(filters: schemas.SentimentsIdeologiesFilter, base_query: str) -> schemas.FillQuery:
+def set_conditions_query(filters: schemas.BaseFilter, base_query: str) -> schemas.FillQuery:
     """
     Applies filtering conditions to a base SQL query string.
     This function takes a base SQL query and a filter object, then dynamically
@@ -59,22 +59,20 @@ def set_conditions_query(filters: schemas.SentimentsIdeologiesFilter, base_query
         schemas.FillQuery: An object containing two attributes:
             - query (str): The modified SQL query string with filter conditions applied.
             - params (dict): A dictionary containing the parameters and their values
-              to be used safely with the generated query (e.g., for preventing
-              SQL injection).
+              to be used safely with the generated query.
     """
     # Initialize parameters dictionary
     params = {}
-    
+    has_where = False
+
     # Apply media_id filter if provided
     if filters.media_id is not None:
         base_query += " WHERE a.media_id = :media_id"
         params["media_id"] = filters.media_id
+        has_where = True
     else:
-        base_query += " JOIN public.media m ON a.media_id = m.id"
-        
-        # collect all the filter conditions here
         conditions = []
-        # and the corresponding params
+
         if filters.type is not None:
             conditions.append("m.type::text = :type")
             params["type"] = filters.type.value
@@ -87,17 +85,19 @@ def set_conditions_query(filters: schemas.SentimentsIdeologiesFilter, base_query
             conditions.append("m.country::text = :country")
             params["country"] = filters.country.value
 
-        # if we had at least one condition, prepend WHERE and join with AND
-        if len(conditions) > 0:
+        if conditions:
+            base_query += " JOIN public.media m ON a.media_id = m.id"
             base_query += " WHERE " + " AND ".join(conditions)
-    
+            has_where = True
+
     # Add date filtering
     if filters.dates is not None and len(filters.dates) > 0:
+        connector = " AND " if has_where else " WHERE "
         if len(filters.dates) == 1:
-            base_query += " AND a.insert_date = :date_single"
+            base_query += connector + "a.insert_date = :date_single"
             params["date_single"] = filters.dates[0]
         elif len(filters.dates) == 2:
-            base_query += " AND a.insert_date BETWEEN :date_start AND :date_end"
+            base_query += connector + "a.insert_date BETWEEN :date_start AND :date_end"
             params["date_start"] = filters.dates[0]
             params["date_end"] = filters.dates[1]
     
@@ -107,128 +107,84 @@ def set_conditions_query(filters: schemas.SentimentsIdeologiesFilter, base_query
 def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode: str) -> schemas.FillQuery:
     """
     Constructs a parameterized SQL query for analyzing sentiments or ideologies in articles based on provided filters.
-    This function builds a SQL query that counts occurrences of specific sentiments or ideologies
-    from the article table, with optional date filtering. The query uses array operations
-    to filter and unnest the array fields in the database.
-    Parameters:
-    ----------
-    filters : schemas.SentimentsIdeologiesFilter
-        An object containing filter criteria:
-        - sentiments: Optional list of sentiment enums to filter by
-        - ideologies: Optional list of ideology enums to filter by
-        - dates: Optional date range [start_date, end_date]
-        - (other potential filters handled by set_conditions_query)
-    mode : str
-        Specifies which field to analyze, must be either:
-        - C_SENTIMENTS: to analyze sentiment data
-        - C_IDEOLOGIES: to analyze ideology data
-    Returns:
-    -------
-    schemas.FillQuery
-        An object containing:
-        - query: The parameterized SQL query string
-        - params: Dictionary of parameters to be used with the query
-    Notes:
-    -----
-    - Uses array overlap operator (&&) for filtering arrays of sentiments/ideologies
-    - When date range is specified, results are grouped by date
-    - The function depends on set_conditions_query to apply additional filtering conditions
+    Uses a CTE to filter articles once, then unnests and counts from that CTE.
+    The article count is embedded as a scalar subquery to avoid a separate database round-trip.
     """
-    
     filter_values = []
-    
-    # If specific sentiments or ideologies are selected for filtering
+
     if mode == C_SENTIMENTS and filters.sentiments is not None:
-        # Store enum values for parameterized query
         filter_values = [s.value for s in filters.sentiments]
     elif mode == C_IDEOLOGIES and filters.ideologies is not None:
-        # Store enum values for parameterized query
         filter_values = [i.value for i in filters.ideologies]
-    
+
+    # Build the CTE with all article-level filters
+    cte_query = f"SELECT a.id, a.{mode}, a.insert_date FROM public.article a"
+    result = set_conditions_query(filters, cte_query)
+    cte_query = result.query
+    params = result.params
+
+    # Add array overlap filter to CTE
+    if mode == C_SENTIMENTS and filters.sentiments:
+        cte_query += f" AND a.{mode} && :filter_sentiments"
+        params["filter_sentiments"] = filter_values
+    elif mode == C_IDEOLOGIES and filters.ideologies:
+        cte_query += f" AND a.{mode} && :filter_ideologies"
+        params["filter_ideologies"] = filter_values
+
+    # Build the main query from the CTE
     base_query = f"""
-        SELECT name, COUNT(*) as count
+        WITH filtered AS ({cte_query})
+        SELECT name, COUNT(*) as count,
+               (SELECT COUNT(*) FROM filtered) as num_articles
         FROM (
-            SELECT unnest(a.{mode}) as name
-    """
-    
-    final_query = """
+            SELECT unnest({mode}) as name
+            FROM filtered
+        ) subquery
+        WHERE name = ANY(:provided_list)
         GROUP BY name
         ORDER BY count DESC
     """
-    
+
     if filters.dates is not None and len(filters.dates) == 2:
-        # If we have a date range and sentiments or ideologies, we need to group by date as well
         base_query = f"""
-            SELECT name, DATE(date) as date, COUNT(*) as count
+            WITH filtered AS ({cte_query})
+            SELECT name, DATE(date) as date, COUNT(*) as count,
+                   (SELECT COUNT(*) FROM filtered) as num_articles
             FROM (
-                SELECT unnest(a.{mode}) as name, a.insert_date as date
-        """
-        final_query = """
+                SELECT unnest({mode}) as name, insert_date as date
+                FROM filtered
+            ) subquery
+            WHERE name = ANY(:provided_list)
             GROUP BY name, date
             ORDER BY date, count DESC
         """
-    
-    base_query += " FROM public.article a"
-    
-    result = set_conditions_query(filters, base_query)
-    base_query = result.query
-    params = result.params
-    
-    # Add the sentiment or ideology filter using the array overlap operator &&
-    # Pass the list of enum values directly; the driver should handle it.
-    if mode == C_SENTIMENTS and filters.sentiments:
-        base_query += f" AND a.{mode} && :filter_sentiments"
-        # Convert enum values to their string representation for the parameter
-        params["filter_sentiments"] = filter_values
-    elif mode == C_IDEOLOGIES and filters.ideologies:
-        base_query += f" AND a.{mode} && :filter_ideologies"
-        # Convert enum values to their string representation for the parameter
-        params["filter_ideologies"] = filter_values
-    
-    # Use unnest() with array constructor for proper parameter handling
-    base_query += """
-        ) subquery
-        WHERE name = ANY(:provided_list)
-    """
+
     params["provided_list"] = filter_values if filter_values else ['']
-    
-    base_query += final_query
-    
+
     return schemas.FillQuery(query=base_query, params=params)
 
 
 def set_query_article(filters: schemas.SentimentsIdeologiesFilter, mode: str) -> schemas.FillQuery:
     """
     Constructs a SQL query to count occurrences of sentiments or ideologies in articles based on filters.
-    This function builds a query that groups and counts items from an array column in the article table.
-    The column to be analyzed is determined by the 'mode' parameter (e.g., 'sentiments', 'ideologies').
-    Parameters:
-    ----------
-    filters : schemas.SentimentsIdeologiesFilter
-        Filter criteria to be applied to the article query, including date ranges, sources, etc.
-    mode : str
-        Specifies which array column to analyze ('sentiments' or 'ideologies')
-    Returns:
-    -------
-    schemas.FillQuery
-        An object containing the constructed SQL query string and parameter dictionary
-        for use with parameterized queries
+    Uses a CTE to filter articles once, then unnests and counts from that CTE.
+    The article count is embedded as a scalar subquery to avoid a separate database round-trip.
     """
-    # Start building the base query
-    base_query = f"""
-        SELECT unnest(a.{mode}) as name, COUNT(*) as count
-        FROM public.article a
-    """
-    
-    result = set_conditions_query(filters, base_query)
-    base_query = result.query
+    # Build the CTE with all article-level filters
+    cte_query = f"SELECT a.id, a.{mode} FROM public.article a"
+    result = set_conditions_query(filters, cte_query)
+    cte_query = result.query
     params = result.params
-    
-    base_query += f"""
-        GROUP BY unnest(a.{mode})
+
+    base_query = f"""
+        WITH filtered AS ({cte_query})
+        SELECT unnest({mode}) as name, COUNT(*) as count,
+               (SELECT COUNT(*) FROM filtered) as num_articles
+        FROM filtered
+        GROUP BY unnest({mode})
         ORDER BY count DESC
     """
-    
+
     return schemas.FillQuery(query=base_query, params=params)
 
 
@@ -261,9 +217,11 @@ async def get_sentiments_ideologies_filter(
         is_categorized = True
 
     
-    db_data = await repo.get_sentiments_ideologies_filter(db, result_query.query, result_query.params)
+    db_data = await repo.get_sentiments_ideologies_filter(
+        db, result_query.query, result_query.params
+    )
     
-    result: schemas.FilterChartsRead = schemas.FilterChartsRead()
+    result: schemas.FilterChartsRead = schemas.FilterChartsRead(num_articles=db_data.num_articles)
     if is_categorized:
         # If the db_data is categorized, we need to return it in a specific format
         if mode == C_SENTIMENTS:
@@ -291,34 +249,30 @@ async def get_sentiments_ideologies_filter(
 def set_query_word(filters: schemas.WordsFilter) -> schemas.FillQuery:
     """
     Constructs a SQL query to retrieve words from the word table based on provided filters.
-    
-    Args:
-        filters (schemas.WordsFilter): Filter criteria for words including media filters,
-                                      date range, min/max count, and ordering.
-    
-    Returns:
-        schemas.FillQuery: An object containing the constructed SQL query string and 
-                          parameter dictionary for use with parameterized queries.
+    Uses a CTE to filter articles once, then joins words/facts from that CTE.
+    The article count is embedded as a scalar subquery to avoid a separate database round-trip.
     """
-    # Start building the base query
-    base_query = """
-        SELECT w.name as name, SUM(f.frequency) as count
+    # Build the CTE with all article-level filters
+    cte_query = "SELECT a.id FROM public.article a"
+    result = set_conditions_query(filters, cte_query)
+    cte_query = result.query
+    params = result.params
+
+    base_query = f"""
+        WITH filtered AS ({cte_query})
+        SELECT w.name as name, SUM(f.frequency) as count,
+               (SELECT COUNT(*) FROM filtered) as num_articles
         FROM public.word w
         JOIN public.facts f ON f.id_word = w.id
-        JOIN public.article a ON f.id_article = a.id
+        JOIN filtered fa ON f.id_article = fa.id
     """
-    
-    # Apply general conditions (media filters, date range)
-    result = set_conditions_query(filters, base_query)
-    base_query = result.query
-    params = result.params
-    
+
     # Exclude the word 'said'
-    base_query += " AND w.name != 'said'"
-    
+    base_query += " WHERE w.name != 'said'"
+
     # Add grouping clause
     base_query += " GROUP BY w.name"
-    
+
     # Add ordering based on filter parameter
     if filters.order_by_desc:
         base_query += " ORDER BY count DESC, name"
@@ -350,7 +304,7 @@ def set_query_word(filters: schemas.WordsFilter) -> schemas.FillQuery:
 async def get_words_filter(
     db: AsyncSession, 
     filters: schemas.WordsFilter
-) -> list[schemas.ItemRead]:
+) -> schemas.FilterData:
     """
     Retrieve words filtered by the provided criteria.
     
@@ -359,7 +313,7 @@ async def get_words_filter(
         filters (schemas.WordsFilter): Filter criteria.
         
     Returns:
-        list[schemas.ItemRead]: A list of words with counts.
+        schemas.FilterData: Words with counts and total article count.
     """
     result_query = set_query_word(filters)
     

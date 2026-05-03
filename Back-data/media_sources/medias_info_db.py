@@ -185,6 +185,13 @@ _MEDIAS_INFO_LIST: list[MediaInfo] = [
         country=CountriesEnum.INTERNATIONAL,
         url="https://news.un.org/en/"
     ),
+    MediaInfo(
+        name="Press TV",
+        type=MediaTypeEnum.MEDIA,
+        region=RegionsEnum.MIDDLE_EAST,
+        country=CountriesEnum.IRAN,
+        url="https://www.presstv.ir/"
+    ),
 ]
 
 # Make it immutable

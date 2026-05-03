@@ -34,10 +34,23 @@ export class FilterChartsRead {
   constructor(
     public readonly plain: ItemRead[] | null = null,
     public readonly categorized: ItemRead[] | null = null,
-    public readonly date_chart: DateChartRead | null = null
+    public readonly date_chart: DateChartRead | null = null,
+    public readonly num_articles = 0,
+  ) {}
+}
+
+// TODO: rename to FilterWordsRead and extend from FilterChartsRead and rename FilterChartsRead to FilterDataRead
+export class FilterData {
+  constructor(
+    public readonly plain: ItemRead[] | null = null,
+    public readonly dated: ItemRead[] | null = null,
+    public readonly num_articles = 0,
   ) {}
 }
 
 export class MinMaxDateRead {
-  constructor(public readonly min_date = '', public readonly max_date = '') {}
+  constructor(
+    public readonly min_date = '',
+    public readonly max_date = '',
+  ) {}
 }

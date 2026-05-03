@@ -21,7 +21,9 @@ def get_nlp():
         get_nlp.nlp.tokenizer = custom_tokenizer(get_nlp.nlp)
         
         # Add custom stop words
-        my_stop_words = {"re", "ve", "ll", "n t", "em", "mr", "ms", "dr", "st", "th", "jr", "sr", "etc", "el"}
+        my_stop_words = {
+            "re", "ve", "ll", "n t", "em", "mr", "ms", "dr", "st", "th", "jr", "sr", "etc", "el", "news", "said", "says", "told"
+        }
         for stopword in my_stop_words:
             lexeme = get_nlp.nlp.vocab[stopword]
             lexeme.is_stop = True

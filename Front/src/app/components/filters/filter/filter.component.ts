@@ -97,15 +97,15 @@ export class FilterComponent implements OnInit {
   onSelectCompose(event: FilterItem): void {
     if (event.type === MEDIAS) {
       // When MEDIAS is selected, disable all others
-      this.mediaCompose.forEach((item: FilterItem) => {
+      for (const item of this.mediaCompose) {
         if (item.type !== MEDIAS) {
           item.value.set(null);
           item.disabled.set(!!event.value());
         }
-      });
+      }
     } else if (event.type === FILTERS.TYPES) {
       // When TYPE is selected or cleared, check other selections
-      this.mediaCompose.forEach((item: FilterItem) => {
+      for (const item of this.mediaCompose) {
         if (item.type === MEDIAS) {
           // Check if any region or country is selected
           const regionSelected = this.mediaCompose
@@ -122,10 +122,10 @@ export class FilterComponent implements OnInit {
           item.value.set(null);
           item.disabled.set(shouldDisableMedia);
         }
-      });
+      }
     } else {
       // When COUNTRY or REGION is selected, disable MEDIAS and the other one between COUNTRY/REGION
-      this.mediaCompose.forEach((item: FilterItem) => {
+      for (const item of this.mediaCompose) {
         if (item.type === MEDIAS) {
           // Disable MEDIAS if either this item has value OR if TYPE has value
           const typeHasValue = !!this.mediaCompose
@@ -141,7 +141,7 @@ export class FilterComponent implements OnInit {
           item.value.set(null);
           item.disabled.set(!!event.value());
         }
-      });
+      }
     }
     this.sendComposeValue();
   }
@@ -150,14 +150,14 @@ export class FilterComponent implements OnInit {
     const values: { type: string; key: string | number | string[] | null }[] =
       [];
 
-    this.mediaCompose.forEach((item: FilterItem) => {
+    for (const item of this.mediaCompose) {
       if (item.value()) {
         values.push({
           type: item.type,
           key: item.value().key,
         });
       }
-    });
+    }
 
     if (this.rangeDates) {
       if (

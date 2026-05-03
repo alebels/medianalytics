@@ -21,12 +21,6 @@ You can download it from [Docker](https://www.docker.com/get-started).
    DATABASE_URL=postgresql+asyncpg://dockeruser:**db_password**@db:5432/medianalytics
    DB_PASSWORD=**db_password**
    API_KEY=example # AI API key
-   GOOGLE_AI_API_URL="https://generativelanguage.googleapis.com/v1beta/openai/"
-   VERIFY_SSL="true"
-   CONNECTION_TIMEOUT=10
-   READ_TIMEOUT=30
-   MAX_CONNECTIONS=10
-   MAX_KEEPALIVE_CONNECTIONS=5
    # Only if you plan to use X API
    X_API_KEY=example
    X_API_SECRET=example
@@ -38,7 +32,7 @@ You can download it from [Docker](https://www.docker.com/get-started).
 
 2. **Get an AI API key**
 
-- Recommended: [Google AI](https://ai.google.dev/) (free tier available with gemma-3-27b-it)
+- Recommended: [Google AI](https://ai.google.dev/) (free tier available with gemma-4-26b-a4b-it)
 
 On `root` folder medianalytics:
 

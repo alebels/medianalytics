@@ -57,7 +57,6 @@ class SentimentsEnum(str, Enum):
     INDIFFERENT = "INDIFFERENT"
     CRITICAL = "CRITICAL"
     SKEPTICAL = "SKEPTICAL"
-    DISTANT = "DISTANT"
     CAUTIOUS = "CAUTIOUS"
     CURIOUS = "CURIOUS"
     NOVELTY = "NOVELTY"
@@ -70,7 +69,6 @@ class SentimentsEnum(str, Enum):
     PASSIVE = "PASSIVE"
     EXAGGERATED = "EXAGGERATED"
     UNCERTAIN = "UNCERTAIN"
-    THOUGHTFUL = "THOUGHTFUL"
 
 
 class IdeologyCategoryEnum(str, Enum):
@@ -218,7 +216,6 @@ class IdeologiesEnum(str, Enum):
     
     # +++++++++ PHILOSOPHICAL ORIENTATIONS +++++++++
     IDEALIST = "IDEALIST"
-    PRAGMATIST = "PRAGMATIST"
     INDIVIDUALIST = "INDIVIDUALIST"
     UTOPIAN = "UTOPIAN"
     DYSTOPIAN = "DYSTOPIAN"
@@ -235,7 +232,6 @@ class IdeologiesEnum(str, Enum):
     NON_IDEOLOGICAL = "NON_IDEOLOGICAL"
     NON_POLITICAL = "NON_POLITICAL"
     NON_PARTISAN = "NON_PARTISAN"
-    UNBIASED = "UNBIASED"
     PRO_SCIENCE = "PRO_SCIENCE"
     ANTI_SCIENCE = "ANTI_SCIENCE"
     PRO_EDUCATION = "PRO_EDUCATION"

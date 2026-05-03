@@ -112,7 +112,7 @@ async def post_ideologies_filter(
         raise HTTPException(status_code=500, detail="Error filtering ideologies")
 
 
-@FILTERS_ROUTER.post("/wordsfilter", response_model=list[schemas.ItemRead])
+@FILTERS_ROUTER.post("/wordsfilter", response_model=schemas.FilterData)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 async def post_words_filter(
     request: Request,
@@ -128,12 +128,12 @@ async def post_words_filter(
         db: Database session
         
     Returns:
-        List of articles items matching the filter criteria
+        FilterData with words list and article count.
     """
     try:
         db_items = await srv.get_words_filter(db, filter_params)
         if not db_items:
-            return []
+            return schemas.FilterData()
         return db_items
     except Exception:
         raise HTTPException(status_code=500, detail="Error filtering words")

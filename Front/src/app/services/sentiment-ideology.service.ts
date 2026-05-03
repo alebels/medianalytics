@@ -86,7 +86,7 @@ export class SentimentIdeologyService {
       groups: SelectGroupItem2[],
       sourceCategories: CategoryValues[]
     ): void => {
-      groups.forEach((group: SelectGroupItem2) => {
+      for (const group of groups) {
         const categoryData = sourceCategories.find(
           (cat: CategoryValues) => cat.category === group.label
         );
@@ -97,7 +97,7 @@ export class SentimentIdeologyService {
         } else {
           group.items = [];
         }
-      });
+      }
     };
 
     // Process both groups with the same logic

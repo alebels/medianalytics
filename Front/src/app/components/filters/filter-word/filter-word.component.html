@@ -57,6 +57,12 @@
       >{{ "filters.filter" | translate }}</p-button
     >
   </div>
+
+  @if (numArticlesRetrieved > 0) {
+    <div class="text-base">
+      <span class="text-base font-semibold">{{ "filters.articles_retrieved" | translate }}</span>: {{ numArticlesRetrieved  | number : '1.0-0' }}
+    </div>
+    }
 </div>
 
 <div class="w-full h-[var(--height-table-filter)]">

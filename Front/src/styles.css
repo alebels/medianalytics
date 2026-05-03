@@ -208,7 +208,7 @@ p {
   .p-dialog-header {
     padding: 15px !important;
     padding-bottom: 0 !important;
-    cursor: pointer !important;
+    cursor: move !important;
     align-items: start !important;
   }
 

@@ -60,9 +60,9 @@ export class LineChartComponent implements OnInit {
     this.setTranslateChart();
 
     const maxValues: number[] = [];
-    this.chartSeries.forEach((item) => {
+    for (const item of this.chartSeries) {
       maxValues.push(Math.max(...(item.data as number[])));
-    });
+    }
 
     this.maxYValue = maxValues.length > 0 ? Math.max(...maxValues) : undefined;
     this.chartOptionsUpdate(this.chartSeries, this.chartLabels);

@@ -49,7 +49,6 @@ SENTIMENTS = MappingProxyType({
         SentimentsEnum.INDIFFERENT,
         SentimentsEnum.CRITICAL,
         SentimentsEnum.SKEPTICAL,
-        SentimentsEnum.DISTANT,
         SentimentsEnum.CAUTIOUS,
         SentimentsEnum.CURIOUS,
         SentimentsEnum.NOVELTY,
@@ -62,7 +61,6 @@ SENTIMENTS = MappingProxyType({
         SentimentsEnum.PASSIVE,
         SentimentsEnum.EXAGGERATED,
         SentimentsEnum.UNCERTAIN,
-        SentimentsEnum.THOUGHTFUL
     ]
 })
 
@@ -196,7 +194,6 @@ IDEOLOGIES = MappingProxyType({
     ],
     IdeologyCategoryEnum.PHILOSOPHICAL_ORIENTATIONS: [
         IdeologiesEnum.IDEALIST,
-        IdeologiesEnum.PRAGMATIST,
         IdeologiesEnum.INDIVIDUALIST,
         IdeologiesEnum.UTOPIAN,
         IdeologiesEnum.DYSTOPIAN,
@@ -213,7 +210,6 @@ IDEOLOGIES = MappingProxyType({
         IdeologiesEnum.NON_IDEOLOGICAL,
         IdeologiesEnum.NON_POLITICAL,
         IdeologiesEnum.NON_PARTISAN,
-        IdeologiesEnum.UNBIASED,
         IdeologiesEnum.PRO_SCIENCE,
         IdeologiesEnum.ANTI_SCIENCE,
         IdeologiesEnum.PRO_EDUCATION,

@@ -56,14 +56,13 @@ class FillQuery(BaseModel):
     A model representing a query with its parameters for database operations.
     Attributes:
         query (str): The SQL query string to be executed.
-        params (dict): A dictionary of parameters to be used with the query,
-                       typically for parameterized queries to prevent SQL injection.
+        params (dict): A dictionary of parameters to be used with the query.
     """
 
     query: str
     params: dict
 
-
+# TODO: rename to FilterWordsRead and extend from FilterChartsRead and rename FilterChartsRead to FilterDataRead
 class FilterData(BaseModel):
     """
     Pydantic model for reading filter charts data.
@@ -71,7 +70,7 @@ class FilterData(BaseModel):
 
     plain: list[ItemRead] | None = None
     dated: list[ItemDate] | None = None
-    num_articles: int | None = None
+    num_articles: int = 0
 
 
 class FilterChartsRead(BaseModel):
@@ -82,7 +81,7 @@ class FilterChartsRead(BaseModel):
     plain: list[ItemRead] | None = None
     categorized: list[ItemRead] | None = None
     date_chart: DateChartRead | None = None
-    num_articles: int | None = None
+    num_articles: int = 0
 
 
 class BaseFilter(BaseModel):

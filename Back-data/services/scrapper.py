@@ -35,7 +35,7 @@ def unwrap_tags(soup: BeautifulSoup) -> None:
             match.unwrap()
 
 
-def remove_tags(soup: BeautifulSoup, add_remove: tuple) -> None:
+def remove_tags(soup: BeautifulSoup, add_remove: tuple = ()) -> None:
     """
     Remove specified tags from a BeautifulSoup object.
     Args:

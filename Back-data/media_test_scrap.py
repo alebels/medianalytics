@@ -35,7 +35,7 @@ from utils.utils import check_href, clean_href
 # Adjust these values to control how many pages to analyze
 NUM_HREFS = 10  # Number of links to collect from the main page
 NUM_ANALYSIS = 5  # Number of article pages to actually download for analysis
-
+URL_TO_TEST = "https://www.theguardian.com/"  # URL of the media source to test - modify this for the media you're analyzing
 
 async def main_loop(context: BrowserContext, url: str, media: MediaMap):
     """
@@ -105,27 +105,28 @@ async def run_test():
 
     # MODIFY THIS SECTION FOR TESTING
     # TEST CONFIGURATION - Modify these values for the media source you're analyzing
-    URL_TO_TEST = "https://www.foxnews.com/world"
     # Initial test selectors - these might need adjustment after examining the HTML
     MEDIA_DATA_TEST = MediaMap(
         # Selector for finding article links on the main page
-        locate_main_hrefs=LocateTags(tag="main", class_="main-content"),
-        # target_hrefs=('/article/',),
-        dismiss_hrefs=("#", "/deals/", "/videos/", "/sports/", "/video", "/travel/","/lifestyle/","/tag/", "/us-regions/","/category/"),
+        locate_main_hrefs=LocateTags(tag="div", class_="box-1"),
+        target_hrefs=('/Detail/',),
+        # dismiss_hrefs=("#",),
         # URL patterns to ignore when collecting article links
-        is_generic_href=True,
+        # is_generic_href=True,
         # Number of segments in the URL path to consider relevant (for filtering)
         # numeric_hrefs=8,
         # Selectors for extracting content from article pages
         # These are initial guesses that should be refined after HTML analysis
         locate_tags={
-            "title": LocateTags(tag="h1", class_="headline"),
+            "title": LocateTags(tag="h1", class_="news-title-container"),
             "article": LocateTags(
-                tag="div", class_="article-body", remove_tags=("strong",)
+                tag="div", class_="col-md-9", remove_tags=("blockquote",)
             ),
         },
     )
-    # AFTER TESTING, UPDATE THE MEDIAS_MAPPING OBJECT WITH THE FINAL SELECTORS
+    # ADD the new media source to the MEDIAS_MAPPING in medias_info_scrapper.py file in media_sources directory as well with the same selectors used here for testing
+    # ADD the new media source to the medias_info_db.py file in _MEDIAS_INFO_LIST 
+    # RUN init_db.py to add the new media source to the database as well
 
     try:
         async with async_playwright() as playwright:
@@ -150,7 +151,7 @@ async def run_test():
 
             await browser.close()
 
-            print("Test scraping completed successfully review htmls.")
+            print("Test scraping completed successfully review htmls/ folder.")
 
     except Exception as e:
         print(f"Error in test scraping process: {e}")

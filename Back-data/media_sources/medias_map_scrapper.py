@@ -268,4 +268,14 @@ MEDIAS_MAPPING: dict[str, MediaMap] = {
             ),
         },
     ),
+    "https://www.presstv.ir/": MediaMap(
+        locate_main_hrefs=LocateTags(tag="div", class_="box-1"),
+        target_hrefs=('/Detail/',),
+        locate_tags={
+            "title": LocateTags(tag="h1", class_="news-title-container"),
+            "article": LocateTags(
+                tag="div", class_="col-md-9", remove_tags=("blockquote",)
+            ),
+        },
+    ),
 }
