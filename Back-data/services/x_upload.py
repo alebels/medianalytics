@@ -44,7 +44,7 @@ IDEOLOGY_COLORS = {
     'ECONOMIC_ORIENTATIONS': ('#04796d', 'Economic orientations'),
     'SOCIAL_MOVEMENTS': ('#5d9b28', 'Social movements'),
     'PHILOSOPHICAL_ORIENTATIONS': ('#f57c00', 'Philosophical orientations'),
-    'EPISTEMOLOGICAL_ORIENTATIONS': ('#b342e4', 'Epistemological orientations'),
+    'EPISTEMOLOGICAL_ORIENTATIONS': ('#b342e4', 'Knowledge stances'),
     'RELIGIOUS_ORIENTATIONS': ('#1ebfd4', 'Religious orientations'),
     'POLITICAL_SYSTEMS': ('#263175', 'Political systems')
 }

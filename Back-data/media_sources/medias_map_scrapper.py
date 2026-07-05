@@ -183,14 +183,13 @@ MEDIAS_MAPPING: dict[str, MediaMap] = {
             ),
         },
     ),
-    "https://japannews.yomiuri.co.jp/": MediaMap(
-        locate_main_hrefs=LocateTags(tag="div", class_="front_bloc1_wrap1"),
-        is_generic_href=True,
-        dismiss_hrefs=("#", "/latestnews/", "/features/"),
+    "https://japannews.yomiuri.co.jp/world/": MediaMap(
+        locate_main_hrefs=LocateTags(tag="div", class_="page_w1100"),
+        numeric_hrefs=8,
         locate_tags={
             "title": LocateTags(tag="div", class_="bloc_1", tag_2="h1"),
             "article": LocateTags(
-                tag="div", id="p-article-block"
+                tag="div", id="p-article-block", remove_tags=("byline", "postdate")
             ),
         },
     ),
@@ -220,7 +219,7 @@ MEDIAS_MAPPING: dict[str, MediaMap] = {
         is_generic_href=True,
         dismiss_hrefs=("#", "/liveblog", "/writers/","/daily-briefing","/blogs.", "/latest/"),
         locate_tags={
-            "title": LocateTags(tag="h1", class_="headline"),
+            "title": LocateTags(tag="h1"),
             "article": LocateTags(
                 tag="div", class_="the-content"
             ),
@@ -248,9 +247,9 @@ MEDIAS_MAPPING: dict[str, MediaMap] = {
         },
     ),
     "https://www.weforum.org/stories": MediaMap(
-        locate_main_hrefs=LocateTags(tag="div", class_="wef-c7cl1o"),
+        locate_main_hrefs=LocateTags(tag="div", class_="wef-1ppw5xu"),
         dismiss_hrefs=("#","/blogs/", "/videos/","/podcasts/"),
-        numeric_hrefs=6,
+        numeric_hrefs=5,
         locate_tags={
             "title": LocateTags(tag="h1"),
             "article": LocateTags(
@@ -272,7 +271,7 @@ MEDIAS_MAPPING: dict[str, MediaMap] = {
         locate_main_hrefs=LocateTags(tag="div", class_="box-1"),
         target_hrefs=('/Detail/',),
         locate_tags={
-            "title": LocateTags(tag="h1", class_="news-title-container"),
+            "title": LocateTags(tag="h1"),
             "article": LocateTags(
                 tag="div", class_="col-md-9", remove_tags=("blockquote",)
             ),

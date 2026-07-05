@@ -22,9 +22,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/robots.txt",
-              "src/sitemap.xml"
+              }
             ],
             "styles": [
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",

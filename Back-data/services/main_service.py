@@ -199,15 +199,16 @@ async def main_service_main():
         # Fetch all media URLs and IDs from the database
         db_medias = await get_media_id_url()
         
-        # This is useful for debugging or testing specific media.
-        # db_medias = [media for media in db_medias if media["id"] not in [1,2,3,22,23]]
-        # To test a specific media, uncomment the line below
-        # db_medias = await get_media_id_url_by_id(23)
-        
         if(len(db_medias) == 0):
             logger.info("No medias to process.")
             return
-
+        
+        # This is useful for debugging or testing specific medias.
+        # db_medias = [media for media in db_medias if media["id"] in [17,22]]
+        
+        # To test a specific media, uncomment the line below
+        # db_medias = await get_media_id_url_by_id(23)
+        
         async with async_playwright() as playwright:
 
             browser = await playwright.chromium.launch(

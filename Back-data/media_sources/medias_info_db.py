@@ -137,7 +137,7 @@ _MEDIAS_INFO_LIST: list[MediaInfo] = [
         type=MediaTypeEnum.MEDIA,
         region=RegionsEnum.EAST_ASIA,
         country=CountriesEnum.JAPAN,
-        url="https://japannews.yomiuri.co.jp/"
+        url="https://japannews.yomiuri.co.jp/world/"
     ),
     MediaInfo(
         name="RT",
