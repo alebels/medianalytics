@@ -167,7 +167,7 @@
     "top_ideologies": "Most frequent ideologies",
     "bottom_ideologies": "Least frequent ideologies",
     "top_grammar": "Most used grammar",
-    "search_filter": "Filter by source",
+    "search_filter": "Type, country, region, source",
     "top_grammar_tooltip": "May not add up to exactly 100% due to decimal rounding."
   },
   "types": {

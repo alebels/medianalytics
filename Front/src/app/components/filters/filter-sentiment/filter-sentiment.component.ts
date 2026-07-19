@@ -151,7 +151,6 @@ export class FilterSentimentComponent implements OnInit {
       this.sentimentIdeologySrv
         .setFilterSentiment(composeObj)
         .then((data: FilterChartsRead) => {
-          console.log(data);
           this.numArticlesRetrieved = data.num_articles;
 
           if (data.plain) {

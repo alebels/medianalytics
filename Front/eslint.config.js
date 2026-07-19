@@ -59,20 +59,21 @@ module.exports = tseslint.config(
               "private-constructor",
 
               // Methods
-              "public-static-method",
-              "protected-static-method",
-              "private-static-method",
+              // TODO: Review if this is better or in cascade to improve readability
+              // "public-static-method",
+              // "protected-static-method",
+              // "private-static-method",
 
-              "public-decorated-method",
-              "protected-decorated-method",
-              "private-decorated-method",
+              // "public-decorated-method",
+              // "protected-decorated-method",
+              // "private-decorated-method",
 
-              "public-instance-method",
-              "protected-instance-method",
-              "private-instance-method",
+              // "public-instance-method",
+              // "protected-instance-method",
+              // "private-instance-method",
 
-              "public-abstract-method",
-              "protected-abstract-method"
+              // "public-abstract-method",
+              // "protected-abstract-method"
             ]
           },
         },

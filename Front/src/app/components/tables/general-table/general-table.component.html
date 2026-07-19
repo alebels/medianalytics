@@ -6,12 +6,12 @@
           <i class="bi bi-search"></i>
         </p-inputicon>
         <input
-          #globalFilter
           id="globalFilter"
           class="w-[250px]"
           type="text"
           pInputText
-          (input)="filterGlobal(globalFilter.value)"
+          [(ngModel)]="globalFilterValue"
+          (input)="applyGlobalFilter()"
         />
       </p-iconfield>
 
@@ -35,6 +35,8 @@
       [metaKeySelection]="false"
       [(selection)]="select"
       selectionMode="multiple"
+      [customSort]="true"
+      (onSort)="onCustomSort($event)"
     >
       <ng-template #header>
         <tr>
@@ -122,98 +124,119 @@
           <td>
             <b>{{ item.name }}</b>
             @if (item.full_name) {
-            <i
-              class="bi bi-info-circle base-tooltip-size absolute mt-[-5px] ml-[2px] z-10"
-              [pTooltip]="item.full_name"
-              [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-              tabindex="0"
-            ></i>
+              <i
+                class="bi bi-info-circle base-tooltip-size absolute mt-[-5px] ml-[2px] z-10"
+                [pTooltip]="item.full_name"
+                [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+                tabindex="0"
+              ></i>
             }
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
               @for (word of item.top_words; track word.name; let i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
-                {{ word.count | number : "1.0-0" }}
-              </div>
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
+                  {{ word.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td class="text-center">
-            {{ item.total_articles | number : "1.0-0" }}
+            {{ item.total_articles | number: "1.0-0" }}
           </td>
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (sentiment of item.top_sentiments; track sentiment.name; let
-              i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "sentiments." + sentiment.name | translate }}:
-                {{ sentiment.count | number : "1.0-0" }}
-              </div>
+              @for (
+                sentiment of item.top_sentiments;
+                track sentiment.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "sentiments." + sentiment.name | translate }}:
+                  {{ sentiment.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (sentiment of item.bottom_sentiments; track sentiment.name;
-              let i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "sentiments." + sentiment.name | translate }}:
-                {{ sentiment.count | number : "1.0-0" }}
-              </div>
+              @for (
+                sentiment of item.bottom_sentiments;
+                track sentiment.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "sentiments." + sentiment.name | translate }}:
+                  {{ sentiment.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td class="text-center">
-            {{ item.average_words_article | number : "1.0-0" }}
+            {{ item.average_words_article | number: "1.0-0" }}
           </td>
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (ideology of item.top_ideologies; track ideology.name; let i
-              = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "ideologies." + ideology.name | translate }}:
-                {{ ideology.count | number : "1.0-0" }}
-              </div>
+              @for (
+                ideology of item.top_ideologies;
+                track ideology.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "ideologies." + ideology.name | translate }}:
+                  {{ ideology.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (ideology of item.bottom_ideologies; track ideology.name; let
-              i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "ideologies." + ideology.name | translate }}:
-                {{ ideology.count | number : "1.0-0" }}
-              </div>
+              @for (
+                ideology of item.bottom_ideologies;
+                track ideology.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "ideologies." + ideology.name | translate }}:
+                  {{ ideology.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (grammar of item.top_grammar; track grammar.name; let i =
-              $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b> {{ "grammar." + grammar.name | translate }}:
-                {{ grammar.count }} %
-              </div>
+              @for (
+                grammar of item.top_grammar;
+                track grammar.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "grammar." + grammar.name | translate }}:
+                  {{ grammar.count }} %
+                </div>
               }
             </div>
           </td>
 
           <td>
-            <a [href]="item.url" target="_blank" rel="noopener noreferrer" aria-label="Visit media">
+            <a
+              [href]="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visit media"
+            >
               <button
                 pButton
                 pRipple
@@ -257,98 +280,119 @@
           <td>
             <b>{{ item.name }}</b>
             @if (item.full_name) {
-            <i
-              class="bi bi-info-circle base-tooltip-size absolute mt-[-5px] ml-[2px] z-10"
-              [pTooltip]="item.full_name"
-              [tooltipEvent]="isMobile ? 'focus' : 'hover'"
-              tabindex="0"
-            ></i>
+              <i
+                class="bi bi-info-circle base-tooltip-size absolute mt-[-5px] ml-[2px] z-10"
+                [pTooltip]="item.full_name"
+                [tooltipEvent]="isMobile ? 'focus' : 'hover'"
+                tabindex="0"
+              ></i>
             }
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
               @for (word of item.top_words; track word.name; let i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
-                {{ word.count | number : "1.0-0" }}
-              </div>
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b> {{ word.name | titlecase }}:
+                  {{ word.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td class="text-center">
-            {{ item.total_articles | number : "1.0-0" }}
+            {{ item.total_articles | number: "1.0-0" }}
           </td>
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (sentiment of item.top_sentiments; track sentiment.name; let
-              i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "sentiments." + sentiment.name | translate }}:
-                {{ sentiment.count | number : "1.0-0" }}
-              </div>
+              @for (
+                sentiment of item.top_sentiments;
+                track sentiment.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "sentiments." + sentiment.name | translate }}:
+                  {{ sentiment.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td>
             <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (sentiment of item.bottom_sentiments; track sentiment.name;
-              let i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "sentiments." + sentiment.name | translate }}:
-                {{ sentiment.count | number : "1.0-0" }}
-              </div>
-              }
-            </div>
-          </td>
-
-          <td class="text-center">
-            {{ item.average_words_article | number : "1.0-0" }}
-          </td>
-          <td>
-            <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (ideology of item.top_ideologies; track ideology.name; let i
-              = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "ideologies." + ideology.name | translate }}:
-                {{ ideology.count | number : "1.0-0" }}
-              </div>
-              }
-            </div>
-          </td>
-
-          <td>
-            <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (ideology of item.bottom_ideologies; track ideology.name; let
-              i = $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b>
-                {{ "ideologies." + ideology.name | translate }}:
-                {{ ideology.count | number : "1.0-0" }}
-              </div>
-              }
-            </div>
-          </td>
-
-          <td>
-            <div class="flex flex-row flex-wrap justify-between w-[250px]">
-              @for (grammar of item.top_grammar; track grammar.name; let i =
-              $index) {
-              <div class="mr-2 mb-1">
-                <b>{{ i + 1 }}.</b> {{ "grammar." + grammar.name | translate }}:
-                {{ grammar.count }} %
-              </div>
+              @for (
+                sentiment of item.bottom_sentiments;
+                track sentiment.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "sentiments." + sentiment.name | translate }}:
+                  {{ sentiment.count | number: "1.0-0" }}
+                </div>
               }
             </div>
           </td>
 
           <td class="text-center">
-            <a [href]="item.url" target="_blank" rel="noopener noreferrer" aria-label="Visit media">
+            {{ item.average_words_article | number: "1.0-0" }}
+          </td>
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (
+                ideology of item.top_ideologies;
+                track ideology.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "ideologies." + ideology.name | translate }}:
+                  {{ ideology.count | number: "1.0-0" }}
+                </div>
+              }
+            </div>
+          </td>
+
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (
+                ideology of item.bottom_ideologies;
+                track ideology.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "ideologies." + ideology.name | translate }}:
+                  {{ ideology.count | number: "1.0-0" }}
+                </div>
+              }
+            </div>
+          </td>
+
+          <td>
+            <div class="flex flex-row flex-wrap justify-between w-[250px]">
+              @for (
+                grammar of item.top_grammar;
+                track grammar.name;
+                let i = $index
+              ) {
+                <div class="mr-2 mb-1">
+                  <b>{{ i + 1 }}.</b>
+                  {{ "grammar." + grammar.name | translate }}:
+                  {{ grammar.count }} %
+                </div>
+              }
+            </div>
+          </td>
+
+          <td class="text-center">
+            <a
+              [href]="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visit media"
+            >
               <button
                 pButton
                 pRipple
@@ -371,12 +415,12 @@
     </p-table>
 
     @if (dataTable.length === 0) {
-    <div class="flex items-center justify-center h-full w-full">
-      <p-message
-        severity="secondary"
-        [text]="'messages.no_data' | translate"
-      ></p-message>
-    </div>
+      <div class="flex items-center justify-center h-full w-full">
+        <p-message
+          severity="secondary"
+          [text]="'messages.no_data' | translate"
+        ></p-message>
+      </div>
     }
   </p-card>
 </div>

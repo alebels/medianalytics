@@ -5,7 +5,7 @@ export class DataCountTable {
     public readonly data: ItemRead[] = [],
     public readonly label1 = '',
     public readonly label2 = '',
-    public readonly sortOrder = 1
+    public readonly sortOrder = 1,
   ) {}
 }
 
@@ -23,7 +23,7 @@ export class GeneralMediaRead {
     public readonly top_sentiments: ItemRead[] = [],
     public readonly bottom_sentiments: ItemRead[] = [],
     public readonly top_ideologies: ItemRead[] = [],
-    public readonly bottom_ideologies: ItemRead[] = []
+    public readonly bottom_ideologies: ItemRead[] = [],
   ) {}
 }
 
@@ -42,6 +42,11 @@ export class GeneralMediaTable {
     public readonly labelBottomSentiments = '',
     public readonly labelTopIdeologies = '',
     public readonly labelBottomIdeologies = '',
-    public readonly labelTopGrammar = ''
+    public readonly labelTopGrammar = '',
   ) {}
+}
+
+export interface SortTableEvent {
+  field: string;
+  order: number;
 }
