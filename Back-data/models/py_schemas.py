@@ -15,6 +15,8 @@ from config.sentiments_ideologies_enums import (
     IdeologiesEnum
 )
 
+# TODO: Split this file into multiple files for better organization and maintainability.
+
 # ----------------- MEDIA -----------------
 class MediaInfo(BaseModel):
     """
@@ -131,3 +133,73 @@ class FactsCreate(FactsBase):
     """
 
     pass
+
+
+# ----------------- REGION / COUNTRY / MEDIA TYPE -----------------
+class RegionBase(BaseModel):
+    """
+    Pydantic model for region base schema.
+    """
+
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)] | None = None
+
+
+class CountryBase(BaseModel):
+    """
+    Pydantic model for country base schema.
+    """
+
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)] | None = None
+
+
+class MediaTypeBase(BaseModel):
+    """
+    Pydantic model for media type base schema.
+    """
+
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)]
+
+
+# ----------------- SENTIMENT CATEGORY / SENTIMENT -----------------
+class SentimentCategoryBase(BaseModel):
+    """
+    Pydantic model for sentiment category base schema.
+    """
+
+    category: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    color: Annotated[str, StringConstraints(min_length=1, max_length=10)]
+    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)]
+
+
+class SentimentBase(BaseModel):
+    """
+    Pydantic model for sentiment base schema.
+    """
+
+    id_category: int
+    sentiment: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    active: Annotated[bool, Field(default=True)] = True
+
+
+# ----------------- IDEOLOGY CATEGORY / IDEOLOGY -----------------
+class IdeologyCategoryBase(BaseModel):
+    """
+    Pydantic model for ideology category base schema.
+    """
+
+    category: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    color: Annotated[str, StringConstraints(min_length=1, max_length=10)]
+    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)]
+
+
+class IdeologyBase(BaseModel):
+    """
+    Pydantic model for ideology base schema.
+    """
+
+    id_category: int
+    ideology: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    active: Annotated[bool, Field(default=True)] = True

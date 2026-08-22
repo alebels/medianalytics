@@ -378,7 +378,6 @@ FodyWeavers.xsd
 # Medianalytics
 htmls/
 .venv/
-alembic.ini
 db/password.txt
 miscelany/
 *.code-workspace

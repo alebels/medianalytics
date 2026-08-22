@@ -1,5 +1,7 @@
 from enum import Enum
 
+# TODO: Remove to db
+
 class SentimentCategoryEnum(str, Enum):
     POSITIVES = "POSITIVES"
     NEGATIVES = "NEGATIVES"

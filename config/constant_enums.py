@@ -4,6 +4,7 @@ ideologies, word grammar, regions, and countries.
 """
 from enum import Enum
 
+# TODO: Remove to db
 
 class MediaTypeEnum(str, Enum):
     """

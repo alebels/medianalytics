@@ -162,12 +162,10 @@ export class PieChartComponent implements OnInit {
     const ideologieColorMap: Record<string, string> = {
       POLITICAL_SPECTRUM: 'var(--color-political-spectrum)',
       ECONOMIC_ORIENTATIONS: 'var(--color-economic-orientations)',
-      POLITICAL_SYSTEMS: 'var(--color-political-systems)',
       NATIONAL_STANCES: 'var(--color-national-stances)',
       GEOPOLITICAL_ALIGNMENTS: 'var(--color-geopolitical-alignments)',
       RELIGIOUS_ORIENTATIONS: 'var(--color-religious-orientations)',
       SOCIAL_MOVEMENTS: 'var(--color-social-movements)',
-      PHILOSOPHICAL_ORIENTATIONS: 'var(--color-philosophical-orientations)',
       EPISTEMOLOGICAL_ORIENTATIONS: 'var(--color-epistemological-orientations)',
     };
 

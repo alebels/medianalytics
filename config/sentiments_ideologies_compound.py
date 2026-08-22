@@ -1,6 +1,9 @@
 from config.sentiments_ideologies_enums import SentimentCategoryEnum, SentimentsEnum, IdeologyCategoryEnum, IdeologiesEnum
 from types import MappingProxyType
 
+# TODO: Remove to db
+
+# TODO: Review
 SENTIMENTS = MappingProxyType({
     SentimentCategoryEnum.POSITIVES: [
         SentimentsEnum.POSITIVE,
@@ -64,7 +67,7 @@ SENTIMENTS = MappingProxyType({
     ]
 })
 
-
+# TODO: Review
 IDEOLOGIES = MappingProxyType({
     IdeologyCategoryEnum.POLITICAL_SPECTRUM: [
         IdeologiesEnum.LEFT_LEANING,

@@ -45,10 +45,10 @@ On `root` folder medianalytics:
 
 In the back-data **docker container** terminal **Exec**:
 
-4. **Database Migration Setup**
+4. **Create alembic versions folder**
 
    ```sh
-   alembic init alembic
+   mkdir -p alembic/versions
    ```
 
 5. **Generate Migration Script**

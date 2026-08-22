@@ -457,12 +457,10 @@
   "ideologies": {
     "POLITICAL_SPECTRUM": "Political spectrum",
     "ECONOMIC_ORIENTATIONS": "Economic orientations",
-    "POLITICAL_SYSTEMS": "Political systems",
     "NATIONAL_STANCES": "National stances",
     "GEOPOLITICAL_ALIGNMENTS": "Geopolitcal alignments",
     "RELIGIOUS_ORIENTATIONS": "Religious orientations",
     "SOCIAL_MOVEMENTS": "Social movements",
-    "PHILOSOPHICAL_ORIENTATIONS": "Philosophical orientations",
     "EPISTEMOLOGICAL_ORIENTATIONS": "Knowledge stances",
     "NON_IDEOLOGICAL": "Non-Ideological",
     "LEFT_LEANING": "Left-Leaning",
