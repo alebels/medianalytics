@@ -2,6 +2,8 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexDataLabels,
+  ApexLegend,
+  ApexPlotOptions,
   ApexXAxis,
   ApexYAxis,
   NgApexchartsModule,
@@ -10,7 +12,9 @@ import {
   CHART_COLORS,
   CHART_THEME,
   COUNT,
+  IDEOLOGIES,
   NONE,
+  SENTIMENTS,
 } from '../../../utils/constants';
 import { ChartDialog, ChartFilter } from '../../../models/dialog.model';
 import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
@@ -19,6 +23,7 @@ import {
   isShowChartDialog$,
 } from '../../../utils/dialog-subjects';
 import { DataChart } from '../../../models/chart.model';
+import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -29,6 +34,8 @@ interface ChartOptions {
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
   colors: string[];
+  plotOptions: ApexPlotOptions;
+  legend: ApexLegend;
 }
 
 @Component({
@@ -52,12 +59,13 @@ export class BarChartComponent implements OnInit {
 
   private trans = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
 
   ngOnInit(): void {
     this.initialize();
   }
 
-  private initialize(): void {
+  private async initialize(): Promise<void> {
     this.chartMode = this.dataBarChart()?.translate || NONE;
 
     if (this.filterDialog()) {
@@ -72,10 +80,24 @@ export class BarChartComponent implements OnInit {
     this.setChart();
   }
 
+  private getBarColors(): string[] {
+    if (this.chartMode === SENTIMENTS || this.chartMode === IDEOLOGIES) {
+      const xLabels = this.dataBarChart()?.xLabels || [];
+      return xLabels.map((label: string) =>
+        this.sentimentIdeologySrv.getItemColor(label, this.chartMode),
+      );
+    }
+    return CHART_COLORS;
+  }
+
   private chartOptionsUpdate(
     series: ApexAxisChartSeries,
     xlabels: string[],
   ): void {
+    const isCategorized =
+      this.chartMode === SENTIMENTS || this.chartMode === IDEOLOGIES;
+    const barColors = this.getBarColors();
+
     this.chartOptions = {
       series: series || [],
       chart: {
@@ -114,6 +136,14 @@ export class BarChartComponent implements OnInit {
       dataLabels: {
         enabled: false,
       },
+      plotOptions: {
+        bar: {
+          distributed: isCategorized,
+        },
+      },
+      legend: {
+        show: false,
+      },
       xaxis: {
         labels: {
           style: {
@@ -146,7 +176,7 @@ export class BarChartComponent implements OnInit {
           },
         },
       },
-      colors: CHART_COLORS,
+      colors: barColors,
     };
   }
 
@@ -167,6 +197,21 @@ export class BarChartComponent implements OnInit {
         this.yTitle = this.trans.instant('chart.' + COUNT);
         this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
       });
+
+    // Update colors if category data arrives/updates
+    if (this.chartMode === SENTIMENTS) {
+      this.sentimentIdeologySrv.sentiments$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
+        });
+    } else if (this.chartMode === IDEOLOGIES) {
+      this.sentimentIdeologySrv.ideologies$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.chartOptionsUpdate(this.chartSeries, this.chartLabels);
+        });
+    }
   }
 
   private setTranslate(): void {

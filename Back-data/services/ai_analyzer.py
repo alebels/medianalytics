@@ -1,6 +1,5 @@
 import aiohttp
 from transformers import BartTokenizer, pipeline
-from config.sentiments_ideologies_enums import SentimentsEnum, IdeologiesEnum
 
 API_VERSION = "v1"
 URL = f"http://back-ai:9000/ai/{API_VERSION}" # Docker service name
@@ -11,7 +10,7 @@ HEADERS = {
 
 GET_ATTRIBUTE = "response"  # Attribute to extract from the response
 
-async def make_request(text: str, endpoint: str) -> list[IdeologiesEnum] | list[SentimentsEnum] | None:
+async def make_request(text: str, endpoint: str) -> list[str] | None:
     """Make async request to API endpoint."""
     analysis_url = URL + endpoint
     async with aiohttp.ClientSession() as session:
@@ -97,10 +96,10 @@ class AiAnalyzer:
         else:
             self.text = text
 
-    async def extract_ideology(self) -> list[IdeologiesEnum] | None:
+    async def extract_ideology(self) -> list[str] | None:
         """Get ideology analysis."""
         return await make_request(self.text, "/generate_ideology")
 
-    async def extract_sentiment(self) -> list[SentimentsEnum] | None:
+    async def extract_sentiment(self) -> list[str] | None:
         """Get sentiment analysis.""" 
         return await make_request(self.text, "/generate_sentiment")

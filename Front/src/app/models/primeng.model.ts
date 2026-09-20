@@ -5,7 +5,10 @@
 
 // Used when translations are NOT needed
 export class SelectSimple {
-  constructor(public readonly key: number, public readonly label: string) {}
+  constructor(
+    public readonly key: number,
+    public readonly label: string,
+  ) {}
 }
 
 // Used when translations are needed
@@ -15,15 +18,15 @@ export class SelectItem2 {
     public label = '',
     public updateTranslation = (trans: string) => {
       this.label = trans;
-    }
+    },
   ) {}
 }
 
 class SelectGroupBase {
   constructor(
     public readonly label = '',
-    public readonly icon = '',
-    public color = 'var(--color-accent)'
+    public icon = '',
+    public color = 'var(--color-accent)',
   ) {}
 }
 
@@ -31,7 +34,7 @@ class SelectGroupBase {
 export class SelectGroupItem2 extends SelectGroupBase {
   items: SelectItem2[] = [];
 
-  constructor(label: string, icon: string, color?: string) {
+  constructor(label: string, icon = '', color = '') {
     super(label, icon, color);
   }
 }

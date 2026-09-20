@@ -6,6 +6,7 @@ from utils.config import API_KEY
 from google import genai
 from google.genai import types
 from models.py_models import ResponseSchema, ResponseAI
+from services.shared_data import SHARED_STORE
 
 
 # Initialize client
@@ -13,11 +14,16 @@ client = genai.Client(api_key=API_KEY)
 
 
 async def make_ai_request(
-    system_instruction: str,
+    mode: str,
     contents: str,
     max_retries: int = 2
 ) -> ResponseAI | None:
     """Make a request to the AI provider using Google GenAI SDK."""
+    
+    if mode == "ideologies":
+        system_instruction = SHARED_STORE.system_ideology
+    elif mode == "sentiments":
+        system_instruction = SHARED_STORE.system_sentiment
 
     print("System Instruction:", system_instruction)
     print("Contents:", contents)

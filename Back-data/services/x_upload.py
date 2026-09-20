@@ -18,6 +18,7 @@ import tweepy
 # Docker service configuration (uses Docker Compose service name)
 API_VERSION = "v1"
 BACK_API_BASE_URL = f"http://back-api:8080/api/{API_VERSION}/home"
+BACK_API_FILTERS_URL = f"http://back-api:8080/api/{API_VERSION}/filters"
 
 HEADERS = {
     "Content-Type": "application/json",
@@ -30,35 +31,22 @@ X_API_SECRET = os.getenv("X_API_SECRET")
 X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN")
 X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET")
 
-# Chart styling constants
-BAR_COLOR = '#ab972c'
-SENTIMENT_COLORS = {
-    'NEGATIVES': ('#f44336', 'Negatives'),  # Red
-    'POSITIVES': ('#4caf50', 'Positives'),  # Green
-    'NEUTRALS': ('#999999', 'Neutrals')     # Gray
-}
-IDEOLOGY_COLORS = {
-    'NATIONAL_STANCES': ('#5499dd', 'National stances'),
-    'GEOPOLITICAL_ALIGNMENTS': ('#ab972c', 'Geopolitical alignments'),
-    'POLITICAL_SPECTRUM': ('#d32f2f', 'Political spectrum'),
-    'ECONOMIC_ORIENTATIONS': ('#04796d', 'Economic orientations'),
-    'SOCIAL_MOVEMENTS': ('#5d9b28', 'Social movements'),
-    'EPISTEMOLOGICAL_ORIENTATIONS': ('#f57c00', 'Knowledge stances'),
-    'RELIGIOUS_ORIENTATIONS': ('#1ebfd4', 'Religious orientations'),
-}
+# Default fallback color
+DEFAULT_COLOR = '#ab972c'
 
 
-async def make_request(endpoint: str) -> Optional[dict]:
+async def make_request(base_url: str, endpoint: str) -> Optional[dict]:
     """
     Make async GET request to back-api endpoint.
     
     Args:
+        base_url: Base URL for the API (e.g., BACK_API_BASE_URL)
         endpoint: API endpoint path (e.g., "/generaldaysentiments")
         
     Returns:
         Response JSON dict or None if request fails
     """
-    url = BACK_API_BASE_URL + endpoint
+    url = base_url + endpoint
     
     async with aiohttp.ClientSession() as session:
         try:
@@ -79,49 +67,103 @@ async def make_request(endpoint: str) -> Optional[dict]:
             return None
 
 
-def create_sentiment_bar_chart(sentiments_data: dict) -> io.BytesIO:
+async def fetch_category_colors() -> tuple[dict, dict, dict, dict]:
+    """
+    Fetch sentiment and ideology category data from back-api.
+    
+    Returns:
+        Tuple of (sentiment_item_colors, ideology_item_colors,
+                  sentiment_category_map, ideology_category_map)
+        - item_colors: dict mapping item name -> color hex string
+        - category_map: dict mapping category key -> (color, label) tuple
+    """
+    data = await make_request(BACK_API_FILTERS_URL, "/sentimentsideologies")
+    if not data:
+        print("⚠️ Could not fetch category colors, using defaults")
+        return {}, {}, {}, {}
+    
+    return _build_color_maps(data.get("sentiments", []), data.get("ideologies", []))
+
+
+def _build_color_maps(
+    sentiments: list[dict], ideologies: list[dict]
+) -> tuple[dict, dict, dict, dict]:
+    """
+    Build color lookup maps from API category data.
+    
+    Args:
+        sentiments: List of category dicts with 'category', 'color', 'values'
+        ideologies: List of category dicts with 'category', 'color', 'values'
+        
+    Returns:
+        (sentiment_item_colors, ideology_item_colors,
+         sentiment_category_map, ideology_category_map)
+    """
+    def process_categories(categories: list[dict]) -> tuple[dict, dict]:
+        item_colors = {}
+        category_map = {}
+        for cat in categories:
+            color = cat.get("color") or DEFAULT_COLOR
+            category_key = cat.get("category", "")
+            label = category_key.replace("_", " ").title()
+            category_map[category_key.upper()] = (color, label)
+            for value in cat.get("values", []):
+                item_colors[value] = color
+                item_colors[value.upper()] = color
+                item_colors[value.lower()] = color
+        return item_colors, category_map
+    
+    sent_items, sent_categories = process_categories(sentiments)
+    ideo_items, ideo_categories = process_categories(ideologies)
+    return sent_items, ideo_items, sent_categories, ideo_categories
+
+
+def create_sentiment_bar_chart(sentiments_data: dict, item_colors: dict) -> io.BytesIO:
     """Create horizontal bar chart for detailed sentiment data."""
     return _create_bar_chart(
         data=sentiments_data.get("plain", []),
         title="Rated sentiments",
-        error_msg="No sentiment data available"
+        error_msg="No sentiment data available",
+        item_colors=item_colors
     )
 
 
-def create_sentiment_donut_chart(sentiments_data: dict) -> io.BytesIO:
+def create_sentiment_donut_chart(sentiments_data: dict, category_map: dict) -> io.BytesIO:
     """Create donut chart for categorized sentiment data."""
     return _create_donut_chart(
         data=sentiments_data.get("categorized", []),
         title="Rated sentiments by category",
-        category_map=SENTIMENT_COLORS,
+        category_map=category_map,
         error_msg="No sentiment data available",
         fontsize=11,
         ncol=3
     )
 
 
-def create_ideology_bar_chart(ideologies_data: dict) -> io.BytesIO:
+def create_ideology_bar_chart(ideologies_data: dict, item_colors: dict) -> io.BytesIO:
     """Create horizontal bar chart for detailed ideology data."""
     return _create_bar_chart(
         data=ideologies_data.get("plain", []),
         title="Rated ideological orientations",
-        error_msg="No ideology data available"
+        error_msg="No ideology data available",
+        item_colors=item_colors
     )
 
 
-def create_ideology_donut_chart(ideologies_data: dict) -> io.BytesIO:
+def create_ideology_donut_chart(ideologies_data: dict, category_map: dict) -> io.BytesIO:
     """Create donut chart for categorized ideology data."""
     return _create_donut_chart(
         data=ideologies_data.get("categorized", []),
         title="Rated ideological orientations by category",
-        category_map=IDEOLOGY_COLORS,
+        category_map=category_map,
         error_msg="No ideology data available",
         fontsize=10,
         ncol=2
     )
 
 
-def _create_bar_chart(data: list, title: str, error_msg: str) -> io.BytesIO:
+def _create_bar_chart(data: list, title: str, error_msg: str,
+                      item_colors: dict | None = None) -> io.BytesIO:
     """
     Generic bar chart creator.
     
@@ -129,6 +171,7 @@ def _create_bar_chart(data: list, title: str, error_msg: str) -> io.BytesIO:
         data: List of items with 'name' and 'count' fields
         title: Chart title
         error_msg: Error message if data is empty
+        item_colors: Optional dict mapping item name -> color hex string
         
     Returns:
         BytesIO buffer containing the PNG image
@@ -141,6 +184,12 @@ def _create_bar_chart(data: list, title: str, error_msg: str) -> io.BytesIO:
     names = [item["name"].replace("_", " ").title() for item in sorted_data]
     counts = [item["count"] for item in sorted_data]
     
+    # Resolve bar colors from item_colors map
+    colors = [
+        item_colors.get(item["name"], DEFAULT_COLOR) if item_colors else DEFAULT_COLOR
+        for item in sorted_data
+    ]
+    
     # Dynamic height based on number of items - more compact
     num_items = len(names)
     height = max(4, num_items * 0.2)  # At least 4 inches, 0.2" per item
@@ -148,8 +197,8 @@ def _create_bar_chart(data: list, title: str, error_msg: str) -> io.BytesIO:
     # Create figure with dynamic height
     fig, ax = plt.subplots(figsize=(8, height), dpi=300, facecolor='white')
     
-    # Create horizontal bar chart with more spacing
-    ax.barh(names, counts, color=BAR_COLOR, edgecolor='none', height=0.4)
+    # Create horizontal bar chart with category colors
+    ax.barh(names, counts, color=colors, edgecolor='none', height=0.4)
     
     # Apply clean styling
     _apply_bar_styling(ax, title)
@@ -325,8 +374,8 @@ async def upload_to_x() -> bool:
         
         # Fetch data from back-api concurrently
         sentiments_data, ideologies_data = await asyncio.gather(
-            make_request("/generaldaysentiments"),
-            make_request("/generaldayideologies")
+            make_request(BACK_API_BASE_URL, "/generaldaysentiments"),
+            make_request(BACK_API_BASE_URL, "/generaldayideologies")
         )
         
         if not sentiments_data or not ideologies_data:
@@ -375,11 +424,16 @@ async def upload_to_x() -> bool:
             f"#MediaBias #MediaAnalysis #Medianalytics"
         )
         
+        # Fetch category colors from back-api
+        sent_item_colors, ideo_item_colors, sent_cat_map, ideo_cat_map = (
+            await fetch_category_colors()
+        )
+        
         # Create all charts
-        sentiment_bar = create_sentiment_bar_chart(sentiments_data)
-        sentiment_donut = create_sentiment_donut_chart(sentiments_data)
-        ideology_bar = create_ideology_bar_chart(ideologies_data)
-        ideology_donut = create_ideology_donut_chart(ideologies_data)
+        sentiment_bar = create_sentiment_bar_chart(sentiments_data, sent_item_colors)
+        sentiment_donut = create_sentiment_donut_chart(sentiments_data, sent_cat_map)
+        ideology_bar = create_ideology_bar_chart(ideologies_data, ideo_item_colors)
+        ideology_donut = create_ideology_donut_chart(ideologies_data, ideo_cat_map)
         
         # Save charts to output folder for checking
         output_dir = "/app/output"
@@ -422,10 +476,10 @@ async def upload_to_x() -> bool:
         return False
 
 
-# async def main():
-#     """Execute the upload to X."""
-#     await upload_to_x()
+async def main():
+    """Execute the upload to X."""
+    await upload_to_x()
 
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

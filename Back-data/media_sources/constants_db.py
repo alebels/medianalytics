@@ -1,7 +1,7 @@
 """
 Database-oriented constant objects derived from enums.
 """
-from models.py_schemas import MediaTypeBase, RegionBase, CountryBase
+from config.shared_models import MediaTypeBase, RegionBase, CountryBase
 
 _MEDIA_TYPES: list[MediaTypeBase] = [
 	MediaTypeBase(

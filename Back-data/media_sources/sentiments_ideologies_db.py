@@ -8,6 +8,8 @@ from models.py_schemas import (
 	IdeologyBase,
 )
 
+# TODO: Split into Sentiments and Ideologies files
+
 _SENTIMENT_CATEGORIES: list[SentimentCategoryBase] = [
 	SentimentCategoryBase(
 		category="POSITIVES",
@@ -111,12 +113,12 @@ _IDEOLOGY_CATEGORIES: list[IdeologyCategoryBase] = [
 	),
 	IdeologyCategoryBase(
 		category="RELIGIOUS_ORIENTATIONS",
-		color="#1ebfd4",
+		color="#f57c00",
 		icon="postage-heart",
 	),
 	IdeologyCategoryBase(
 		category="SOCIAL_MOVEMENTS",
-		color="#5d9b28",
+		color="#71bd2e",
 		icon="people",
 	),
 	IdeologyCategoryBase(
@@ -218,8 +220,8 @@ _IDEOLOGIES: list[IdeologyBase] = [
 	IdeologyBase(id_category=4, ideology="ANTI_UKRAINIAN"),
 	IdeologyBase(id_category=4, ideology="PRO_INDIAN"),
 	IdeologyBase(id_category=4, ideology="ANTI_INDIAN"),
-	IdeologyBase(id_category=4, ideology="PRO_OTAN"),
-	IdeologyBase(id_category=4, ideology="ANTI_OTAN"),
+	IdeologyBase(id_category=4, ideology="PRO_NATO"),
+	IdeologyBase(id_category=4, ideology="ANTI_NATO"),
 	IdeologyBase(id_category=4, ideology="PRO_EUROPEAN_UNION"),
 	IdeologyBase(id_category=4, ideology="ANTI_EUROPEAN_UNION"),
 	IdeologyBase(id_category=4, ideology="PRO_BRICS"),

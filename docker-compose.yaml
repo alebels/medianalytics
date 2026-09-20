@@ -1,12 +1,12 @@
 services:
-
   db:
     image: postgres:17-alpine
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db/postgresql.conf:/var/lib/postgresql/postgresql.conf
-    command: ["postgres", "-c", "config_file=/var/lib/postgresql/postgresql.conf"]
+    command:
+      ["postgres", "-c", "config_file=/var/lib/postgresql/postgresql.conf"]
     env_file:
       - .env
     environment:
@@ -72,6 +72,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v1/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     restart: unless-stopped
 
   front:
@@ -120,7 +126,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./Back-ai:/app
-      - ./config/sentiments_ideologies_enums.py:/app/config/sentiments_ideologies_enums.py
     env_file:
       - .env
     environment:
@@ -131,6 +136,9 @@ services:
       - "9000:9000"
     networks:
       - backend-network
+    depends_on:
+      back-api:
+        condition: service_healthy
     restart: unless-stopped
 
 networks:

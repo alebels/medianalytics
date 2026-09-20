@@ -1,10 +1,5 @@
 from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 from typing import Annotated
-from config.constant_enums import (
-    MediaTypeEnum,
-    RegionsEnum,
-    CountriesEnum,
-)
 from models.utils import ItemRead
 from datetime import date
 
@@ -25,8 +20,9 @@ class MediaItemRead(BaseModel):
 
     name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
     full_name: Annotated[str, StringConstraints(min_length=2, max_length=150)] | None = None
-    type: MediaTypeEnum
-    country: CountriesEnum
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
     url: HttpUrl
 
 
@@ -38,9 +34,9 @@ class GeneralMedia(BaseModel):
     id: int
     name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
     full_name: Annotated[str, StringConstraints(min_length=2, max_length=150)] | None = None
-    type: MediaTypeEnum
-    region: RegionsEnum
-    country: CountriesEnum
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
     url: HttpUrl
     total_articles: Annotated[int, Field(gt=0)]
     average_words_article: Annotated[int, Field(gt=0)]
@@ -53,9 +49,9 @@ class GeneralMediaItemRead(BaseModel):
 
     name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
     full_name: Annotated[str, StringConstraints(min_length=2, max_length=150)] | None = None
-    type: MediaTypeEnum
-    country: CountriesEnum
-    region: RegionsEnum
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
     url: HttpUrl
     total_articles: Annotated[int, Field(gt=0)]
     average_words_article: Annotated[int, Field(gt=0)]

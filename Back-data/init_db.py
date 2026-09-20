@@ -10,6 +10,7 @@ from media_sources.sentiments_ideologies_db import (
     _IDEOLOGY_CATEGORIES, _IDEOLOGIES,
 )
 
+# TODO: Split into separate files for each table type (media, sentiment, ideology, etc) to improve maintainability and readability.
 
 # ==================== MEDIA TYPE ====================
 
@@ -217,9 +218,9 @@ async def insert_medias():
             updated_objects = []
 
             for media_data in MEDIAS_INFO:
-                type_id = type_lookup[media_data.type.value]
-                region_id = region_lookup[media_data.region.value]
-                country_id = country_lookup[media_data.country.value]
+                type_id = type_lookup[media_data.type]
+                region_id = region_lookup[media_data.region]
+                country_id = country_lookup[media_data.country]
 
                 if media_data.name in existing_media_dict:
                     # Update existing media if needed

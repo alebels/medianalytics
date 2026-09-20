@@ -1,11 +1,5 @@
-from config.sentiments_ideologies_enums import (IdeologiesEnum, SentimentsEnum)
 from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 from typing import Annotated
-from config.constant_enums import (
-    MediaTypeEnum,
-    RegionsEnum,
-    CountriesEnum
-)
 from models.utils import (
     ItemRead,
     ItemDate,
@@ -21,9 +15,9 @@ class MediaRead(BaseModel):
 
     id: int
     name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
-    type: MediaTypeEnum
-    region: RegionsEnum
-    country: CountriesEnum
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
 
     class Config:
         """
@@ -31,24 +25,6 @@ class MediaRead(BaseModel):
         """
 
         from_attributes = True
-
-
-class CategoryValues(BaseModel):
-    """
-    Pydantic model for reading category and values.
-    """
-
-    category: str
-    values: list[str]
-
-
-class SentimentsIdeologiesRead(BaseModel):
-    """
-    A Pydantic model representing sentiment and ideology results.
-    """
-    
-    sentiments: list[CategoryValues]
-    ideologies: list[CategoryValues]
 
 
 class FillQuery(BaseModel):
@@ -90,9 +66,9 @@ class BaseFilter(BaseModel):
     """
 
     media_id: Annotated[int, Field(gt=0)] | None = None
-    type: MediaTypeEnum | None = None
-    region: RegionsEnum | None = None
-    country: CountriesEnum | None = None
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
     dates: list[date] | None = None
 
     class Config:
@@ -107,8 +83,8 @@ class SentimentsIdeologiesFilter(BaseFilter):
     Filter model for sentiments and ideologies.
     All fields are optional and can be None if not provided by the frontend.
     """
-    sentiments: list[SentimentsEnum] | None = None
-    ideologies: list[IdeologiesEnum] | None = None
+    sentiments: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]] | None = None
+    ideologies: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]] | None = None
 
     class Config:
         """
@@ -150,8 +126,8 @@ class ChartDialogPaginated(BaseFilter):
     """
     Filter model for chart dialog with pagination support.
     """
-    sentiment: SentimentsEnum | None = None
-    ideology: IdeologiesEnum | None = None
+    sentiment: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
+    ideology: Annotated[str, StringConstraints(min_length=2, max_length=80)] | None = None
     word: Annotated[str, StringConstraints(
         min_length=2,
         max_length=70,

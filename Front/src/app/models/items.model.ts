@@ -7,6 +7,8 @@ export interface ItemRead {
 
 export interface CategoryValues {
   readonly category: string;
+  readonly color?: string;
+  readonly icon?: string;
   readonly values: string[];
 }
 

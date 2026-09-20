@@ -1,16 +1,22 @@
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from controllers.controller import AI_ROUTER
+from services.shared_data import SHARED_STORE
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 
-# Define lifespan to manage startup and shutdown events
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    print("Starting AI service")
+    logger.info("Starting AI service")
+    await SHARED_STORE.load()
     yield
-    # Shutdown
-    print("Shutting down AI service")
+    logger.info("Shutting down AI service")
 
 
 # Create the FastAPI app with the lifespan context manager.

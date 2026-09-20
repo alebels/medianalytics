@@ -6,13 +6,10 @@ import {
   ApexYAxis,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import {
-  CHART_THEME,
-  IDEOLOGIES,
-  SENTIMENTS,
-} from '../../../utils/constants';
+import { CHART_THEME, IDEOLOGIES, SENTIMENTS } from '../../../utils/constants';
 import { Component, DestroyRef, OnInit, inject, input } from '@angular/core';
 import { DataChart } from '../../../models/chart.model';
+import { SentimentIdeologyService } from '../../../services/sentiment-ideology.service';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -43,12 +40,13 @@ export class PieChartComponent implements OnInit {
 
   private trans = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
 
   ngOnInit(): void {
     this.initialize();
   }
 
-  private initialize(): void {
+  private async initialize(): Promise<void> {
     this.translateType = this.dataPieChart()?.translate || '';
     this.setTranslateChart();
   }
@@ -77,6 +75,9 @@ export class PieChartComponent implements OnInit {
         floating: false,
         position: 'bottom',
         fontSize: '16px',
+        fontWeight: 600,
+        offsetX: 0,
+        offsetY: 0,
       },
       theme: {
         palette: 'palette7',
@@ -143,36 +144,20 @@ export class PieChartComponent implements OnInit {
   }
 
   private setSentimentColors(): void {
-    // Map colors to corresponding sentiment labels
-    const sentimentColorMap: Record<string, string> = {
-      NEGATIVES: 'var(--color-negative)',
-      NEUTRALS: 'var(--color-neutral)',
-      POSITIVES: 'var(--color-positive)',
-    };
-
-    // Set colors array in the same order as the labels
     this.chartOptions.colors =
       this.dataPieChart()?.xLabels?.map(
-        (label) => sentimentColorMap[label] || 'var(--color-neutral)'
+        (label) =>
+          this.sentimentIdeologySrv.getCategoryColor(label, SENTIMENTS) ||
+          'var(--color-accent)',
       ) || [];
   }
 
   private setIdeologiesColors(): void {
-    // Map colors to corresponding ideologies labels
-    const ideologieColorMap: Record<string, string> = {
-      POLITICAL_SPECTRUM: 'var(--color-political-spectrum)',
-      ECONOMIC_ORIENTATIONS: 'var(--color-economic-orientations)',
-      NATIONAL_STANCES: 'var(--color-national-stances)',
-      GEOPOLITICAL_ALIGNMENTS: 'var(--color-geopolitical-alignments)',
-      RELIGIOUS_ORIENTATIONS: 'var(--color-religious-orientations)',
-      SOCIAL_MOVEMENTS: 'var(--color-social-movements)',
-      EPISTEMOLOGICAL_ORIENTATIONS: 'var(--color-epistemological-orientations)',
-    };
-
-    // Set colors array in the same order as the labels
     this.chartOptions.colors =
       this.dataPieChart()?.xLabels?.map(
-        (label) => ideologieColorMap[label] || 'var(--color-neutral)'
+        (label) =>
+          this.sentimentIdeologySrv.getCategoryColor(label, IDEOLOGIES) ||
+          'var(--color-accent)',
       ) || [];
   }
 
@@ -180,7 +165,7 @@ export class PieChartComponent implements OnInit {
     // Initial translation
     this.chartLabels =
       this.dataPieChart()?.xLabels?.map((label: string) =>
-        this.trans.instant(this.translateType + '.' + label)
+        this.trans.instant(this.translateType + '.' + label),
       ) || [];
     this.chartOptionsUpdate(this.chartLabels);
 
@@ -190,9 +175,24 @@ export class PieChartComponent implements OnInit {
       .subscribe(() => {
         this.chartLabels =
           this.dataPieChart()?.xLabels?.map((label: string) =>
-            this.trans.instant(this.translateType + '.' + label)
+            this.trans.instant(this.translateType + '.' + label),
           ) || [];
         this.chartOptions.labels = this.chartLabels;
       });
+
+    // Update colors when category data arrives/updates
+    if (this.translateType === SENTIMENTS) {
+      this.sentimentIdeologySrv.sentiments$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.setSentimentColors();
+        });
+    } else if (this.translateType === IDEOLOGIES) {
+      this.sentimentIdeologySrv.ideologies$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.setIdeologiesColors();
+        });
+    }
   }
 }

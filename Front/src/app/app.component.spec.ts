@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { PrimeNG } from 'primeng/config';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SentimentIdeologyService } from './services/sentiment-ideology.service';
 import { of } from 'rxjs';
 
 describe('AppComponent', () => {
@@ -28,11 +29,17 @@ describe('AppComponent', () => {
       translation: {}
     };
 
+    const sentimentIdeologySpy = {
+      ensureLoaded: jest.fn().mockResolvedValue(undefined),
+      getTranslatedSentimentsIdeologies: jest.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [AppComponent, RouterTestingModule, TranslateModule.forRoot()],
       providers: [
         { provide: TranslateService, useValue: translateSpy },
-        { provide: PrimeNG, useValue: primeNGSpy }
+        { provide: PrimeNG, useValue: primeNGSpy },
+        { provide: SentimentIdeologyService, useValue: sentimentIdeologySpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

@@ -1,5 +1,5 @@
 import models.utils as schemas
-from models.filters import CategoryValues
+from models.sentiment_ideology import CategoryValues
 
 
 def categorize_items(items: list[schemas.ItemRead], category_groups: list[CategoryValues]) -> list[schemas.ItemRead]:

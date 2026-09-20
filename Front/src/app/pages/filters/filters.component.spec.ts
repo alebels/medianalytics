@@ -75,22 +75,16 @@ describe('FiltersComponent', () => {
     expect(mockFiltersService.getTranslatedMediaCompose).toHaveBeenCalled();
   });
 
-  it('should call getTranslatedSentimentsIdeologies on init', () => {
-    expect(mockSentimentService.getTranslatedSentimentsIdeologies).toHaveBeenCalled();
-  });
-
   it('should set isMobile from GeneralService on init', () => {
     expect(component.isMobile).toBe(false);
   });
 
   it('should re-translate on language change', () => {
     mockFiltersService.getTranslatedMediaCompose.mockClear();
-    mockSentimentService.getTranslatedSentimentsIdeologies.mockClear();
 
     mockTranslateService.onLangChange.next({ lang: 'es', translations: {} });
 
     expect(mockFiltersService.getTranslatedMediaCompose).toHaveBeenCalled();
-    expect(mockSentimentService.getTranslatedSentimentsIdeologies).toHaveBeenCalled();
   });
 
   it('isShowFiltersDialog should update when isShowFiltersDialog$ emits true', () => {

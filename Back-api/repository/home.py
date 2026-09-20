@@ -17,7 +17,6 @@ async def get_general_top_words(db: AsyncSession) -> list[schemas.ItemRead]:
     """
     result = await db.execute(
         select(models.Word.name, models.Word.count_repeated.label("count"))
-        .where(models.Word.name != 'said')
         .order_by(models.Word.count_repeated.desc())
         .limit(100)
     )
@@ -35,19 +34,14 @@ async def get_min_max_date(db: AsyncSession) -> schemas.MinMaxDateRead:
     Returns:
         schemas.MinMaxDateRead: The minimum and maximum dates.
     """
-    # Get minimum date
-    min_date_result = await db.execute(
-        select(func.min(models.Article.insert_date))
+    result = await db.execute(
+        select(
+            func.min(models.Article.insert_date),
+            func.max(models.Article.insert_date)
+        )
     )
-    min_date = min_date_result.scalar()
-    
-    # Get maximum date
-    max_date_result = await db.execute(
-        select(func.max(models.Article.insert_date))
-    )
-    max_date = max_date_result.scalar()
+    min_date, max_date = result.one()
 
-    # Create MinMaxDateRead with date values
     return schemas.MinMaxDateRead(
         min_date=min_date,
         max_date=max_date
@@ -95,12 +89,18 @@ async def get_general_medias(db: AsyncSession) -> list[schemas.MediaItemRead]:
         select(
             models.Media.name,
             models.Media.full_name,
-            models.Media.type,
-            models.Media.country,
-            models.Media.url
-        ).where(
+            models.MediaType.type,
+            models.Country.country,
+            models.Region.region,
+            models.Media.url,
+        )
+        .join(models.MediaType, models.Media.type_id == models.MediaType.id)
+        .join(models.Country, models.Media.country_id == models.Country.id)
+        .join(models.Region, models.Media.region_id == models.Region.id)
+        .where(
             exists().where(models.Article.media_id == models.Media.id)
         )
+        .order_by(models.Media.name.asc())
     )
     medias = result.mappings().all()
     return [schemas.MediaItemRead.model_validate(media) for media in medias]
@@ -136,25 +136,24 @@ async def get_general_sentiments_ideologies(db: AsyncSession, type: str) -> list
 
     Args:
         db (AsyncSession): The database session.
+        type (str): The type to retrieve (C_SENTIMENTS or C_IDEOLOGIES).
     
     Returns:
         list[schemas.ItemRead]: A list of sentiment or ideology counts, ordered by frequency.
     """
-    if type == C_SENTIMENTS:
-        query = text("""
-            SELECT unnest(sentiments) as name, COUNT(*) as count
-            FROM public.article
-            GROUP BY name
-            ORDER BY count DESC
-        """)
-    elif type == C_IDEOLOGIES:
-        query = text("""
-            SELECT unnest(ideologies) as name, COUNT(*) as count
-            FROM public.article
-            GROUP BY name
-            ORDER BY count DESC
-        """)
-    result = await db.execute(query)
+    if type not in (C_SENTIMENTS, C_IDEOLOGIES):
+        raise ValueError(f"Invalid type: {type}")
+
+    column = models.Article.sentiments if type == C_SENTIMENTS else models.Article.ideologies
+    unnested = func.unnest(column).label("name")
+
+    stmt = (
+        select(unnested, func.count().label("count"))
+        .group_by(unnested)
+        .order_by(func.count().desc())
+    )
+
+    result = await db.execute(stmt)
     result_map = result.mappings().all()
     return [schemas.ItemRead.model_validate(item) for item in result_map]
 
@@ -197,15 +196,23 @@ async def get_general_media(db: AsyncSession) -> list[schemas.GeneralMedia]:
             models.Media.id,
             models.Media.name,
             models.Media.full_name,
-            models.Media.type,
-            models.Media.country,
-            models.Media.region,
+            models.MediaType.type,
+            models.Country.country,
+            models.Region.region,
             models.Media.url,
             func.count(models.Article.id).label("total_articles"),
             func.round(func.avg(models.Article.count_words)).label("average_words_article")
         )
         .join(models.Article, models.Article.media_id == models.Media.id)
-        .group_by(models.Media.id)
+        .join(models.MediaType, models.Media.type_id == models.MediaType.id)
+        .join(models.Country, models.Media.country_id == models.Country.id)
+        .join(models.Region, models.Media.region_id == models.Region.id)
+        .group_by(
+            models.Media.id,
+            models.MediaType.type,
+            models.Country.country,
+            models.Region.region,
+        )
         .order_by(models.Media.name.asc())
     )
     
@@ -231,7 +238,6 @@ async def get_general_media_words(db: AsyncSession, id_media: int) -> list[schem
         JOIN facts f ON w.id = f.id_word
         JOIN article a ON a.id = f.id_article
         WHERE a.media_id = :media_id
-        AND w.name != 'said'
         GROUP BY w.name
         ORDER BY count DESC, w.name
         LIMIT 10
@@ -379,7 +385,6 @@ async def get_general_day_top_words(db: AsyncSession) -> list[schemas.ItemRead]:
         JOIN facts f ON w.id = f.id_word
         JOIN article a ON a.id = f.id_article
         WHERE a.insert_date = :latest_date
-        AND w.name != 'said'
         GROUP BY w.name
         ORDER BY count DESC, w.name
         LIMIT 50
@@ -396,33 +401,25 @@ async def get_general_day_sentiments_ideologies(db: AsyncSession, type: str) -> 
 
     Args:
         db (AsyncSession): The database session.
+        type (str): The type to retrieve (C_SENTIMENTS or C_IDEOLOGIES).
 
     Returns:
         list[schemas.ItemRead]: A list of ideologies or sentiments counts for the latest day, ordered by frequency.
     """
-    # Get the latest insert_date first
-    latest_date = await get_latest_insert_date(db)
+    if type not in (C_SENTIMENTS, C_IDEOLOGIES):
+        raise ValueError(f"Invalid type: {type}")
 
-    if latest_date is None:
-        return []
-    
-    if type == C_SENTIMENTS:
-        query = text("""
-            SELECT unnest(sentiments) as name, COUNT(*) as count
-            FROM public.article
-            WHERE insert_date = :latest_date
-            GROUP BY name
-            ORDER BY count DESC
-        """)
-    elif type == C_IDEOLOGIES:
-        query = text("""
-            SELECT unnest(ideologies) as name, COUNT(*) as count
-            FROM public.article
-            WHERE insert_date = :latest_date
-            GROUP BY name
-            ORDER BY count DESC
-        """)
+    subq = select(func.max(models.Article.insert_date)).scalar_subquery()
+    column = models.Article.sentiments if type == C_SENTIMENTS else models.Article.ideologies
+    unnested = func.unnest(column).label("name")
 
-    result = await db.execute(query, {"latest_date": latest_date})
+    stmt = (
+        select(unnested, func.count().label("count"))
+        .where(models.Article.insert_date == subq)
+        .group_by(unnested)
+        .order_by(func.count().desc())
+    )
+
+    result = await db.execute(stmt)
     result_map = result.mappings().all()
     return [schemas.ItemRead.model_validate(item) for item in result_map]

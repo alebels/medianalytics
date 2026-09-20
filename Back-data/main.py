@@ -40,7 +40,7 @@ async def lifespan(_: FastAPI):
             # Schedule daily task
             scheduler.add_job(
                 scheduled_task,
-                CronTrigger(hour=17, minute=40, timezone='Europe/Paris'),
+                CronTrigger(hour=19, minute=54, timezone='Europe/Paris'),
                 id="daily_main_service_task",
                 replace_existing=True,
             )

@@ -1,20 +1,33 @@
-from pydantic import BaseModel
-from config.sentiments_ideologies_enums import SentimentsEnum, IdeologiesEnum
-
-
-SENTIMENTS = ", ".join(sentiment.value for sentiment in SentimentsEnum)
-IDEOLOGIES = ", ".join(ideology.value.replace("_", "-") for ideology in IdeologiesEnum)
+from pydantic import BaseModel, field_validator
+from services.shared_data import SHARED_STORE
 
 
 class TextRequest(BaseModel):
     text: str
 
 
-# Define the Pydantic model for schema validation
 class ResponseSchema(BaseModel):
-    ideologies: list[IdeologiesEnum] | None = None
-    sentiments: list[SentimentsEnum] | None = None
+    ideologies: list[str] | None = None
+    sentiments: list[str] | None = None
+
+    @field_validator("ideologies", mode="before")
+    @classmethod
+    def validate_ideologies(cls, v: list[str] | None) -> list[str] | None:
+        if v is not None:
+            invalid = next((item for item in v if item not in SHARED_STORE.ideologies), None)
+            if invalid:
+                raise ValueError(f"Invalid ideology: {invalid}")
+        return v
+
+    @field_validator("sentiments", mode="before")
+    @classmethod
+    def validate_sentiments(cls, v: list[str] | None) -> list[str] | None:
+        if v is not None:
+            invalid = next((item for item in v if item not in SHARED_STORE.sentiments), None)
+            if invalid:
+                raise ValueError(f"Invalid sentiment: {invalid}")
+        return v
 
 
 class ResponseAI(BaseModel):
-    response: list[IdeologiesEnum] | list[SentimentsEnum]
+    response: list[str]

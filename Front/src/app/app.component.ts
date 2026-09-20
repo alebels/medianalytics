@@ -4,6 +4,7 @@ import { HeaderComponent } from './layaout/header/header.component';
 import { PrimeNG } from 'primeng/config';
 import { RouterOutlet } from '@angular/router';
 import { ScrollTopComponent } from './components/scroll-top/scroll-top.component';
+import { SentimentIdeologyService } from './services/sentiment-ideology.service';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -17,9 +18,11 @@ export class AppComponent implements OnInit {
 
   private trans = inject(TranslateService);
   private config = inject(PrimeNG);
+  private sentimentIdeologySrv = inject(SentimentIdeologyService);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
+    this.sentimentIdeologySrv.ensureLoaded();
     this.checkLanguage();
   }
 
@@ -45,6 +48,7 @@ export class AppComponent implements OnInit {
         this.trans
           .get('primeng')
           .subscribe((res) => this.config.setTranslation(res));
+        this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
       });
   }
 }

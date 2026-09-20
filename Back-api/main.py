@@ -10,11 +10,13 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 from pydantic import ValidationError
 
-from services.filters import get_sentiments_ideologies_categorized
+from services.filters import load_sentiments_ideologies_categorized
 from utils.limiter import LIMITER
 from utils.redis_cache import init_redis_pool, close_redis_pool, get_cache_stats
 from controllers.home import HOME_ROUTER
 from controllers.filters import FILTERS_ROUTER
+from controllers.shared import SHARED_ROUTER
+from repository.database import SessionLocal
 from middleware.security import SecurityMiddleware, RequestLoggingMiddleware
 
 
@@ -31,8 +33,9 @@ logger = logging.getLogger(__name__)
 async def lifespan(_: FastAPI):
     # Startup
     logger.info("Starting API service")
-    get_sentiments_ideologies_categorized()  # Preload sentiments and ideologies categorized
     await init_redis_pool()  # Initialize Redis connection pool
+    async with SessionLocal() as db:
+        await load_sentiments_ideologies_categorized(db)  # Preload sentiments and ideologies from DB
     yield
     # Shutdown
     logger.info("Shutting down API service")
@@ -137,9 +140,11 @@ async def general_exception_handler(request: Request, exc: Exception):
 # Include the router from the controllers.
 app.include_router(HOME_ROUTER)
 app.include_router(FILTERS_ROUTER)
+app.include_router(SHARED_ROUTER)
 
 
 # Health check endpoint
+@app.get("/health")
 @app.get("/api/v1/health")
 async def health_check():
     cache_stats = await get_cache_stats()

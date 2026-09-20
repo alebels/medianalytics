@@ -1,44 +1,40 @@
 import models.filters as schemas
-from config.sentiments_ideologies_compound import SENTIMENTS, IDEOLOGIES
+from models.sentiment_ideology import SentimentsIdeologiesRead
 from utils.constants import C_SENTIMENTS, C_IDEOLOGIES
 from sqlalchemy.ext.asyncio import AsyncSession
 import repository.filters as repo
+from repository.sentiment_ideology import get_sentiments_ideologies_categorized
 from utils.utils import categorize_items, normalize_data_item_dates, set_to_chart_normalized_data
 
 
 # Global variable to store categorized data
-SENTIMENTS_IDEOLOGIES_CATEGORIZED = None
+SENTIMENTS_IDEOLOGIES_CATEGORIZED: SentimentsIdeologiesRead | None = None
 
 
-def get_sentiments_ideologies_categorized() -> schemas.SentimentsIdeologiesRead:
+async def load_sentiments_ideologies_categorized(db: AsyncSession) -> SentimentsIdeologiesRead:
     """
-    Get sentiments and ideologies data grouped by category.
-    
+    Load sentiments and ideologies data grouped by category from the database.
+
+    Args:
+        db (AsyncSession): The database session.
+
     Returns:
-        schemas.SentimentsIdeologiesRead: Sentiments and ideologies grouped by categories.
+        SentimentsIdeologiesRead: Sentiments and ideologies grouped by categories.
     """
     global SENTIMENTS_IDEOLOGIES_CATEGORIZED
-    
+
     if SENTIMENTS_IDEOLOGIES_CATEGORIZED is None:
-        # Convert SENTIMENTS to the expected format
-        sentiments = [
-            schemas.CategoryValues(category=category, values=values)
-            for category, values in SENTIMENTS.items()
-        ]
-        
-        # Convert IDEOLOGIES to the expected format
-        ideologies = [
-            schemas.CategoryValues(category=category, values=values)
-            for category, values in IDEOLOGIES.items()
-        ]
-        
-        # Create the categorized data
-        SENTIMENTS_IDEOLOGIES_CATEGORIZED = schemas.SentimentsIdeologiesRead(
-            sentiments=sentiments,
-            ideologies=ideologies
-        )
-    
+        SENTIMENTS_IDEOLOGIES_CATEGORIZED = await get_sentiments_ideologies_categorized(db)
+
     return SENTIMENTS_IDEOLOGIES_CATEGORIZED
+
+
+def clear_sentiments_ideologies_cache() -> None:
+    """
+    Clear process-level in-memory categorized sentiments and ideologies.
+    """
+    global SENTIMENTS_IDEOLOGIES_CATEGORIZED
+    SENTIMENTS_IDEOLOGIES_CATEGORIZED = None
 
 
 def set_conditions_query(filters: schemas.BaseFilter, base_query: str) -> schemas.FillQuery:
@@ -72,21 +68,32 @@ def set_conditions_query(filters: schemas.BaseFilter, base_query: str) -> schema
         has_where = True
     else:
         conditions = []
+        needs_media_join = (
+            filters.type is not None or 
+            filters.region is not None or 
+            filters.country is not None
+        )
 
         if filters.type is not None:
-            conditions.append("m.type::text = :type")
-            params["type"] = filters.type.value
+            conditions.append("mt.type = :type")
+            params["type"] = filters.type
 
         if filters.region is not None:
-            conditions.append("m.region::text = :region")
-            params["region"] = filters.region.value
+            conditions.append("r.region = :region")
+            params["region"] = filters.region
 
         if filters.country is not None:
-            conditions.append("m.country::text = :country")
-            params["country"] = filters.country.value
+            conditions.append("c.country = :country")
+            params["country"] = filters.country
 
-        if conditions:
+        if needs_media_join and conditions:
             base_query += " JOIN public.media m ON a.media_id = m.id"
+            if filters.type is not None:
+                base_query += " JOIN public.media_type mt ON m.type_id = mt.id"
+            if filters.region is not None:
+                base_query += " JOIN public.region r ON m.region_id = r.id"
+            if filters.country is not None:
+                base_query += " JOIN public.country c ON m.country_id = c.id"
             base_query += " WHERE " + " AND ".join(conditions)
             has_where = True
 
@@ -113,9 +120,9 @@ def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode
     filter_values = []
 
     if mode == C_SENTIMENTS and filters.sentiments is not None:
-        filter_values = [s.value for s in filters.sentiments]
+        filter_values = list(filters.sentiments)
     elif mode == C_IDEOLOGIES and filters.ideologies is not None:
-        filter_values = [i.value for i in filters.ideologies]
+        filter_values = list(filters.ideologies)
 
     # Build the CTE with all article-level filters
     cte_query = f"SELECT a.id, a.{mode}, a.insert_date FROM public.article a"
@@ -124,11 +131,12 @@ def set_query_subquery_article(filters: schemas.SentimentsIdeologiesFilter, mode
     params = result.params
 
     # Add array overlap filter to CTE
+    connector = " AND " if " WHERE " in cte_query else " WHERE "
     if mode == C_SENTIMENTS and filters.sentiments:
-        cte_query += f" AND a.{mode} && :filter_sentiments"
+        cte_query += f"{connector}a.{mode} && :filter_sentiments"
         params["filter_sentiments"] = filter_values
     elif mode == C_IDEOLOGIES and filters.ideologies:
-        cte_query += f" AND a.{mode} && :filter_ideologies"
+        cte_query += f"{connector}a.{mode} && :filter_ideologies"
         params["filter_ideologies"] = filter_values
 
     # Build the main query from the CTE
@@ -224,14 +232,15 @@ async def get_sentiments_ideologies_filter(
     result: schemas.FilterChartsRead = schemas.FilterChartsRead(num_articles=db_data.num_articles)
     if is_categorized:
         # If the db_data is categorized, we need to return it in a specific format
+        categorized_data = await load_sentiments_ideologies_categorized(db)
         if mode == C_SENTIMENTS:
-            categorized_data = SENTIMENTS_IDEOLOGIES_CATEGORIZED.sentiments
+            categorized_values = categorized_data.sentiments
         else:
-            categorized_data = SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
+            categorized_values = categorized_data.ideologies
             
         categorized = categorize_items(
             db_data.plain, 
-            categorized_data
+            categorized_values
         )
         result.categorized = categorized
         result.plain = db_data.plain
@@ -266,9 +275,6 @@ def set_query_word(filters: schemas.WordsFilter) -> schemas.FillQuery:
         JOIN public.facts f ON f.id_word = w.id
         JOIN filtered fa ON f.id_article = fa.id
     """
-
-    # Exclude the word 'said'
-    base_query += " WHERE w.name != 'said'"
 
     # Add grouping clause
     base_query += " GROUP BY w.name"
@@ -364,16 +370,19 @@ def set_query_chart_dialog(filters: schemas.ChartDialogPaginated) -> schemas.Fil
         params["media_id"] = filters.media_id
     else:
         if filters.type is not None:
-            conditions.append("m.type::text = :type")
-            params["type"] = filters.type.value
+            filtered_cte += " JOIN public.media_type mt ON m.type_id = mt.id"
+            conditions.append("mt.type = :type")
+            params["type"] = filters.type
         
         if filters.region is not None:
-            conditions.append("m.region::text = :region")
-            params["region"] = filters.region.value
+            filtered_cte += " JOIN public.region r ON m.region_id = r.id"
+            conditions.append("r.region = :region")
+            params["region"] = filters.region
         
         if filters.country is not None:
-            conditions.append("m.country::text = :country")
-            params["country"] = filters.country.value
+            filtered_cte += " JOIN public.country c ON m.country_id = c.id"
+            conditions.append("c.country = :country")
+            params["country"] = filters.country
     
     # Date filtering
     if filters.dates is not None and len(filters.dates) > 0:
@@ -388,10 +397,10 @@ def set_query_chart_dialog(filters: schemas.ChartDialogPaginated) -> schemas.Fil
     # Specific filters
     if filters.sentiment is not None:
         conditions.append(":sentiment = ANY(a.sentiments)")
-        params["sentiment"] = filters.sentiment.value
+        params["sentiment"] = filters.sentiment
     elif filters.ideology is not None:
         conditions.append(":ideology = ANY(a.ideologies)")
-        params["ideology"] = filters.ideology.value
+        params["ideology"] = filters.ideology
     elif filters.word is not None:
         conditions.append("w.name = :word")
         params["word"] = filters.word

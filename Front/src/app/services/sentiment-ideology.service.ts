@@ -1,7 +1,6 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { CategoryValues, FilterChartsRead } from '../models/items.model';
 import { IDEOLOGIES, SENTIMENTS } from '../utils/constants';
-import { IDEOLOGIES_GROUPS, SENTIMENTS_GROUPS } from '../utils/groups-constant';
 import {
   Ideologies,
   Sentiments,
@@ -18,30 +17,50 @@ import { environment } from '../../environments/environment';
 })
 export class SentimentIdeologyService {
   private readonly ideologiesSub = new BehaviorSubject<Ideologies>(
-    new Ideologies()
+    new Ideologies(),
   );
   public readonly ideologies$ = this.ideologiesSub.asObservable();
 
   private readonly sentimentsSub = new BehaviorSubject<Sentiments>(
-    new Sentiments()
+    new Sentiments(),
   );
   public readonly sentiments$ = this.sentimentsSub.asObservable();
 
+  private rawSentiments: SelectGroupItem2[] = [];
+  private rawIdeologies: SelectGroupItem2[] = [];
+
+  private readonly sentimentColorMap = new Map<string, string>();
+  private readonly ideologyColorMap = new Map<string, string>();
+  private readonly sentimentCategoryColorMap = new Map<string, string>();
+  private readonly ideologyCategoryColorMap = new Map<string, string>();
+
   private apiUrl = environment.apiUrl + '/filters';
 
-  constructor(private http: HttpClient, private trans: TranslateService) {
-    this.initialize();
+  private loadPromise: Promise<void> | null = null;
+
+  constructor(
+    private http: HttpClient,
+    private trans: TranslateService,
+  ) {
+    this.ensureLoaded();
+  }
+
+  ensureLoaded(): Promise<void> {
+    if (!this.loadPromise) {
+      this.loadPromise = this.getSentimentsIdeologies();
+    }
+    return this.loadPromise;
   }
 
   getTranslatedSentimentsIdeologies(): void {
     const sentiments: SelectGroupItem2[] = this.translateAndSortGroups(
-      SENTIMENTS_GROUPS,
-      SENTIMENTS
+      this.rawSentiments,
+      SENTIMENTS,
     );
 
     const ideologies: SelectGroupItem2[] = this.translateAndSortGroups(
-      IDEOLOGIES_GROUPS,
-      IDEOLOGIES
+      this.rawIdeologies,
+      IDEOLOGIES,
     );
 
     this.sentimentsSub.next({ sentiments });
@@ -49,67 +68,146 @@ export class SentimentIdeologyService {
   }
 
   async setFilterSentiment(
-    filter: Record<string, string | number | string[] | null>
+    filter: Record<string, string | number | string[] | null>,
   ): Promise<FilterChartsRead> {
     return await firstValueFrom(
       this.http.post<FilterChartsRead>(
         `${this.apiUrl}/sentimentsfilter`,
-        filter
-      )
+        filter,
+      ),
     );
   }
 
   async setFilterIdeology(
-    filter: Record<string, string | number | string[] | null>
+    filter: Record<string, string | number | string[] | null>,
   ): Promise<FilterChartsRead> {
     return await firstValueFrom(
       this.http.post<FilterChartsRead>(
         `${this.apiUrl}/ideologiesfilter`,
-        filter
-      )
+        filter,
+      ),
     );
   }
 
-  private async initialize(): Promise<void> {
-    await this.getSentimentsIdeologies();
+  getItemColor(name: string, type?: string): string {
+    return this.resolveColor(
+      name,
+      this.sentimentColorMap,
+      this.ideologyColorMap,
+      type,
+    );
+  }
+
+  getCategoryColor(categoryKey: string, type?: string): string {
+    return this.resolveColor(
+      categoryKey,
+      this.sentimentCategoryColorMap,
+      this.ideologyCategoryColorMap,
+      type,
+    );
+  }
+
+  private resolveColor(
+    keyName: string,
+    sentimentMap: Map<string, string>,
+    ideologyMap: Map<string, string>,
+    type?: string,
+  ): string {
+    if (!keyName) return 'var(--color-accent)';
+    const key = keyName.toUpperCase();
+    if (type === SENTIMENTS) {
+      return (
+        sentimentMap.get(key) ||
+        sentimentMap.get(keyName) ||
+        'var(--color-accent)'
+      );
+    } else if (type === IDEOLOGIES) {
+      return (
+        ideologyMap.get(key) ||
+        ideologyMap.get(keyName) ||
+        'var(--color-accent)'
+      );
+    }
+    return (
+      sentimentMap.get(key) || ideologyMap.get(key) || 'var(--color-accent)'
+    );
   }
 
   private async getSentimentsIdeologies(): Promise<void> {
     const data = await firstValueFrom(
       this.http.get<SentimentsIdeologiesRead>(
-        `${this.apiUrl}/sentimentsideologies`
-      )
+        `${this.apiUrl}/sentimentsideologies`,
+      ),
     );
 
-    // Helper function to process groups and items
-    const processGroups = (
-      groups: SelectGroupItem2[],
-      sourceCategories: CategoryValues[]
-    ): void => {
-      for (const group of groups) {
-        const categoryData = sourceCategories.find(
-          (cat: CategoryValues) => cat.category === group.label
+    const createGroups = (source: CategoryValues[] = []): SelectGroupItem2[] =>
+      source.map((cat: CategoryValues) => {
+        const group = new SelectGroupItem2(
+          cat.category,
+          cat.icon || '',
+          cat.color || '',
         );
-        if (categoryData) {
-          group.items = categoryData.values.map(
-            (value: string) => new SelectItem2(value)
-          );
-        } else {
-          group.items = [];
-        }
-      }
-    };
+        group.items = (cat.values || []).map(
+          (value: string) => new SelectItem2(value),
+        );
+        return group;
+      });
 
-    // Process both groups with the same logic
-    processGroups(SENTIMENTS_GROUPS, data.sentiments);
-    processGroups(IDEOLOGIES_GROUPS, data.ideologies);
+    this.rawSentiments = createGroups(data.sentiments);
+    this.rawIdeologies = createGroups(data.ideologies);
+
+    this.populateColorMaps(data);
 
     this.getTranslatedSentimentsIdeologies();
   }
 
+  private populateColorMaps(data: SentimentsIdeologiesRead): void {
+    if (data.sentiments) {
+      for (const cat of data.sentiments) {
+        if (cat.color) {
+          this.sentimentCategoryColorMap.set(cat.category, cat.color);
+          this.sentimentCategoryColorMap.set(
+            cat.category.toUpperCase(),
+            cat.color,
+          );
+        }
+        for (const val of cat.values) {
+          const color =
+            cat.color ||
+            this.sentimentCategoryColorMap.get(cat.category) ||
+            'var(--color-accent)';
+          this.sentimentColorMap.set(val, color);
+          this.sentimentColorMap.set(val.toUpperCase(), color);
+          this.sentimentColorMap.set(val.toLowerCase(), color);
+        }
+      }
+    }
+
+    if (data.ideologies) {
+      for (const cat of data.ideologies) {
+        if (cat.color) {
+          this.ideologyCategoryColorMap.set(cat.category, cat.color);
+          this.ideologyCategoryColorMap.set(
+            cat.category.toUpperCase(),
+            cat.color,
+          );
+        }
+        for (const val of cat.values) {
+          const color =
+            cat.color ||
+            this.ideologyCategoryColorMap.get(cat.category) ||
+            'var(--color-accent)';
+          this.ideologyColorMap.set(val, color);
+          this.ideologyColorMap.set(val.toUpperCase(), color);
+          this.ideologyColorMap.set(val.toLowerCase(), color);
+        }
+      }
+    }
+  }
+
   private translateAndSortGroups(
     groups: SelectGroupItem2[],
-    type: string
+    type: string,
   ): SelectGroupItem2[] {
     return groups.map((group: SelectGroupItem2) => ({
       ...group, // Spread to keep other properties
@@ -119,7 +217,7 @@ export class SentimentIdeologyService {
           return { ...item };
         })
         .sort((a: SelectItem2, b: SelectItem2) =>
-          a.label.localeCompare(b.label)
+          a.label.localeCompare(b.label),
         ), // Sort the new array
     }));
   }

@@ -60,7 +60,6 @@ export class FiltersComponent implements OnInit {
       .pipe(startWith(null), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.filtersSrv.getTranslatedMediaCompose();
-        this.sentimentIdeologySrv.getTranslatedSentimentsIdeologies();
       });
   }
 

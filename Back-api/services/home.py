@@ -4,11 +4,11 @@ import repository.home as repo
 from models.utils import CompoundRead
 from utils.utils import categorize_items
 from utils.constants import C_SENTIMENTS, C_IDEOLOGIES, C_GENERAL, C_DAY
+from services.filters import load_sentiments_ideologies_categorized
 import asyncio
 
 async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: str) -> CompoundRead:
     """Get compound sentiments with both plain and categorized data."""
-    from services.filters import SENTIMENTS_IDEOLOGIES_CATEGORIZED
     
     # Get plain data
     plain = []
@@ -17,11 +17,10 @@ async def get_compound_sentiments_ideologies(db: AsyncSession, mode: str, type: 
     elif mode == C_DAY:
         plain = await repo.get_general_day_sentiments_ideologies(db, type)
     
-    categorized_values = []
-    if type == C_SENTIMENTS:
-        categorized_values = SENTIMENTS_IDEOLOGIES_CATEGORIZED.sentiments
-    elif type == C_IDEOLOGIES:
-        categorized_values = SENTIMENTS_IDEOLOGIES_CATEGORIZED.ideologies
+    categorized_data = await load_sentiments_ideologies_categorized(db)
+    categorized_values = (
+        categorized_data.sentiments if type == C_SENTIMENTS else categorized_data.ideologies
+    )
 
     # Get categorized sentiments using the reusable function
     categorized = categorize_items(

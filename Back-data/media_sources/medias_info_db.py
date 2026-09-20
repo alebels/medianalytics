@@ -8,188 +8,187 @@ This information is used to track and categorize media sources throughout the ap
 The final MEDIAS_INFO is a tuple (immutable) version of the list to prevent modification.
 """
 
-from config.constant_enums import MediaTypeEnum, RegionsEnum, CountriesEnum
 from models.py_schemas import MediaInfo
 
 _MEDIAS_INFO_LIST: list[MediaInfo] = [
     MediaInfo(
         name="El País",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.SPAIN,
+        type="MEDIA",
+        region="EUROPE",
+        country="SPAIN",
         url="https://english.elpais.com/"
     ),
     MediaInfo(
         name="BBC",
         full_name="British Broadcasting Corporation",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE, 
-        country=CountriesEnum.UNITED_KINGDOM,
+        type="MEDIA",
+        region="EUROPE",
+        country="UNITED_KINGDOM",
         url="https://www.bbc.com/"
     ),
     MediaInfo(
         name="Al Jazeera",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.MIDDLE_EAST,
-        country=CountriesEnum.QATAR, 
+        type="MEDIA",
+        region="MIDDLE_EAST",
+        country="QATAR",
         url="https://www.aljazeera.com/"
     ),
     MediaInfo(
         name="The Guardian",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.UNITED_KINGDOM,
+        type="MEDIA",
+        region="EUROPE",
+        country="UNITED_KINGDOM",
         url="https://www.theguardian.com/"
     ),
     MediaInfo(
         name="NBC",
         full_name="National Broadcasting Company",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.NORTH_AMERICA,
-        country=CountriesEnum.UNITED_STATES,
+        type="MEDIA",
+        region="NORTH_AMERICA",
+        country="UNITED_STATES",
         url="https://www.nbcnews.com/"
     ),
     MediaInfo(
         name="AP",
         full_name="Associated Press",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.NORTH_AMERICA,
-        country=CountriesEnum.UNITED_STATES,
+        type="MEDIA",
+        region="NORTH_AMERICA",
+        country="UNITED_STATES",
         url="https://apnews.com/"
     ),
     MediaInfo(
         name="CBS",
         full_name="Columbia Broadcasting System",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.NORTH_AMERICA,
-        country=CountriesEnum.UNITED_STATES,
+        type="MEDIA",
+        region="NORTH_AMERICA",
+        country="UNITED_STATES",
         url="https://www.cbsnews.com/"
     ),
     MediaInfo(
         name="Fox News",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.NORTH_AMERICA,
-        country=CountriesEnum.UNITED_STATES,
+        type="MEDIA",
+        region="NORTH_AMERICA",
+        country="UNITED_STATES",
         url="https://www.foxnews.com/world"
     ),
     MediaInfo(
         name="CNN",
         full_name="Cable News Network",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.NORTH_AMERICA,
-        country=CountriesEnum.UNITED_STATES,
+        type="MEDIA",
+        region="NORTH_AMERICA",
+        country="UNITED_STATES",
         url="https://edition.cnn.com/"
     ),
     MediaInfo(
         name="POLITICO",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.BELGIUM,
+        type="MEDIA",
+        region="EUROPE",
+        country="BELGIUM",
         url="https://www.politico.eu/"
     ),
     MediaInfo(
         name="DW",
         full_name="Deutsche Welle",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.GERMANY,
+        type="MEDIA",
+        region="EUROPE",
+        country="GERMANY",
         url="https://www.dw.com/en/top-stories/s-9097"
     ),
     MediaInfo(
         name="France 24",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.FRANCE,
+        type="MEDIA",
+        region="EUROPE",
+        country="FRANCE",
         url="https://www.france24.com/"
     ),
     MediaInfo(
         name="China Daily",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EAST_ASIA,
-        country=CountriesEnum.CHINA,
+        type="MEDIA",
+        region="EAST_ASIA",
+        country="CHINA",
         url="https://www.chinadaily.com.cn/world"
     ),
     MediaInfo(
         name="Xinhua",
         full_name="New China News Agency",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EAST_ASIA,
-        country=CountriesEnum.CHINA,
+        type="MEDIA",
+        region="EAST_ASIA",
+        country="CHINA",
         url="https://english.news.cn/home.htm"
     ),
     MediaInfo(
         name="Global Times",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EAST_ASIA,
-        country=CountriesEnum.CHINA,
+        type="MEDIA",
+        region="EAST_ASIA",
+        country="CHINA",
         url="https://www.globaltimes.cn/index.html"
     ),
     MediaInfo(
         name="Hindustan Times",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.SOUTHEAST_ASIA,
-        country=CountriesEnum.INDIA,
+        type="MEDIA",
+        region="SOUTHEAST_ASIA",
+        country="INDIA",
         url="https://www.hindustantimes.com/"
     ),
     MediaInfo(
         name="The Japan News",
         full_name="By The Yomiuri Shimbun",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EAST_ASIA,
-        country=CountriesEnum.JAPAN,
+        type="MEDIA",
+        region="EAST_ASIA",
+        country="JAPAN",
         url="https://japannews.yomiuri.co.jp/world/"
     ),
     MediaInfo(
         name="RT",
         full_name="Russia Today",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.EUROPE,
-        country=CountriesEnum.RUSSIA,
+        type="MEDIA",
+        region="EUROPE",
+        country="RUSSIA",
         url="https://www.rt.com/"
     ),
     MediaInfo(
         name="Hürriyet Daily News",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.MIDDLE_EAST,
-        country=CountriesEnum.TURKEY,
+        type="MEDIA",
+        region="MIDDLE_EAST",
+        country="TURKEY",
         url="https://www.hurriyetdailynews.com/"
     ),
     MediaInfo(
         name="The Times of Israel",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.MIDDLE_EAST,
-        country=CountriesEnum.ISRAEL,
+        type="MEDIA",
+        region="MIDDLE_EAST",
+        country="ISRAEL",
         url="https://www.timesofisrael.com/"
     ),
     MediaInfo(
         name="IMF",
         full_name="International Monetary Fund",
-        type=MediaTypeEnum.ORGANIZATION,
-        region=RegionsEnum.INTERNATIONAL,
-        country=CountriesEnum.INTERNATIONAL,
+        type="ORGANIZATION",
+        region="INTERNATIONAL",
+        country="INTERNATIONAL",
         url="https://www.imf.org/en/News"
     ),
     MediaInfo(
         name="WEF",
         full_name="World Economic Forum",
-        type=MediaTypeEnum.ORGANIZATION,
-        region=RegionsEnum.INTERNATIONAL,
-        country=CountriesEnum.INTERNATIONAL,
+        type="ORGANIZATION",
+        region="INTERNATIONAL",
+        country="INTERNATIONAL",
         url="https://www.weforum.org/stories"
     ),
     MediaInfo(
         name="UN",
         full_name="United Nations",
-        type=MediaTypeEnum.ORGANIZATION,
-        region=RegionsEnum.INTERNATIONAL,
-        country=CountriesEnum.INTERNATIONAL,
+        type="ORGANIZATION",
+        region="INTERNATIONAL",
+        country="INTERNATIONAL",
         url="https://news.un.org/en/"
     ),
     MediaInfo(
         name="Press TV",
-        type=MediaTypeEnum.MEDIA,
-        region=RegionsEnum.MIDDLE_EAST,
-        country=CountriesEnum.IRAN,
+        type="MEDIA",
+        region="MIDDLE_EAST",
+        country="IRAN",
         url="https://www.presstv.ir/"
     ),
 ]

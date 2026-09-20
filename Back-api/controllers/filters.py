@@ -2,8 +2,10 @@
 This module contains the controller for handling media-related API endpoints.
 """
 
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from models.sentiment_ideology import SentimentsIdeologiesRead
 import models.filters as schemas
 import repository.filters as repo
 import services.filters as srv
@@ -11,6 +13,8 @@ from utils.constants import C_IDEOLOGIES, C_SENTIMENTS
 from repository.database import get_session
 from utils.limiter import LIMITER
 from utils.redis_cache import cache_response
+
+logger = logging.getLogger(__name__)
 
 
 API_VERSION = "api/v1"
@@ -43,19 +47,20 @@ async def get_medias(
         raise HTTPException(status_code=500, detail="Error retrieving media items")
 
 
-@FILTERS_ROUTER.get("/sentimentsideologies", response_model=schemas.SentimentsIdeologiesRead)
+@FILTERS_ROUTER.get("/sentimentsideologies", response_model=SentimentsIdeologiesRead)
 @LIMITER.limit(f"{NUM_REQUESTS}/minute")
 @cache_response(key_prefix="v1:filters:sentimentsideologies", ttl=2592000)  # 30 days - static data
 async def get_sentiments_ideologies(
-    request: Request
+    request: Request, db: AsyncSession = Depends(get_session)
 ):
     """
     Returns:
         Sentiments and ideologies categorized by their groups.
     """
-    if srv.SENTIMENTS_IDEOLOGIES_CATEGORIZED is None:
+    data = await srv.load_sentiments_ideologies_categorized(db)
+    if not data:
         raise HTTPException(status_code=404, detail="No items found")
-    return srv.SENTIMENTS_IDEOLOGIES_CATEGORIZED
+    return data
 
 
 @FILTERS_ROUTER.post("/sentimentsfilter", response_model=schemas.FilterChartsRead)
@@ -81,7 +86,8 @@ async def post_sentiments_filter(
         if not db_items:
             return schemas.FilterChartsRead()
         return db_items
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error filtering sentiments: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error filtering sentiments")
 
 
@@ -108,7 +114,8 @@ async def post_ideologies_filter(
         if not db_items:
             return schemas.FilterChartsRead()
         return db_items
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error filtering ideologies: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error filtering ideologies")
 
 
@@ -135,7 +142,8 @@ async def post_words_filter(
         if not db_items:
             return schemas.FilterData()
         return db_items
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error filtering words: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error filtering words")
 
 

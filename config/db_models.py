@@ -39,6 +39,7 @@ class Region(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     region: Mapped[str] = mapped_column(String(80), unique=True)
     icon: Mapped[str] = mapped_column(String(50), unique=True, nullable=True)
+    color: Mapped[str] = mapped_column(String(10), unique=True, nullable=True)
 
 
 class Country(Base):
@@ -51,6 +52,7 @@ class Country(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     country: Mapped[str] = mapped_column(String(80), unique=True)
     icon: Mapped[str] = mapped_column(String(50), unique=True, nullable=True)
+    color: Mapped[str] = mapped_column(String(10), unique=True, nullable=True)
 
 
 class MediaType(Base):
@@ -63,6 +65,7 @@ class MediaType(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     type: Mapped[str] = mapped_column(String(80), unique=True)
     icon: Mapped[str] = mapped_column(String(50), unique=True)
+    color: Mapped[str] = mapped_column(String(10), unique=True, nullable=True)
 
 
 class Media(Base):

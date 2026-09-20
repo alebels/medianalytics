@@ -44,7 +44,8 @@ async def get_general_medias(
         return db_items
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error retrieving media items: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error retrieving media items")
 
 
@@ -300,7 +301,8 @@ async def get_general_table(
         return db_items
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error retrieving table data: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error retrieving table data")
 
 
@@ -347,12 +349,13 @@ async def get_general_day_sentiments(
     """
     try:
         db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_SENTIMENTS)
-        if not db_items:
+        if not db_items or (not db_items.plain and not db_items.categorized):
             raise HTTPException(status_code=404, detail="No sentiments found for today")
         return db_items
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error retrieving daily sentiments: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error retrieving daily sentiments")
 
 
@@ -373,12 +376,13 @@ async def get_general_day_ideologies(
     """
     try:
         db_items = await srv.get_compound_sentiments_ideologies(db, C_DAY, C_IDEOLOGIES)
-        if not db_items:
+        if not db_items or (not db_items.plain and not db_items.categorized):
             raise HTTPException(status_code=404, detail="No ideologies found for today")
         return db_items
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error retrieving daily ideologies: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error retrieving daily ideologies")
 
 

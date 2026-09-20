@@ -1,23 +1,22 @@
 from fastapi import APIRouter
+from typing import Final
 from services.ai_core import make_ai_request
-from models.py_models import TextRequest
-from models.ai_templates import (
-    SYSTEM_IDEOLOGICAL, SYSTEM_SENTIMENT,
-    CONTENT_TEMPLATE
-)
+from models.py_models import TextRequest, ResponseAI
 
 API_VERSION = "v1"
 AI_ROUTER = APIRouter(prefix=f"/ai/{API_VERSION}", tags=["AI Requests"])
 
 
-# Define the API endpoints for ideology and sentiment generation
+CONTENT_TEMPLATE: Final = "Text to analyze: '{text}'."
+
+
 @AI_ROUTER.post("/generate_ideology")
-async def generate_ideology(request: TextRequest):
+async def generate_ideology(request: TextRequest) -> ResponseAI | None:
     contents = CONTENT_TEMPLATE.format(text=request.text)
-    return await make_ai_request(SYSTEM_IDEOLOGICAL, contents)
+    return await make_ai_request("ideologies", contents)
 
 
 @AI_ROUTER.post("/generate_sentiment")
-async def generate_sentiment(request: TextRequest):
+async def generate_sentiment(request: TextRequest) -> ResponseAI | None:
     contents = CONTENT_TEMPLATE.format(text=request.text)
-    return await make_ai_request(SYSTEM_SENTIMENT, contents)
+    return await make_ai_request("sentiments", contents)

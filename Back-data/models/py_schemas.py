@@ -5,15 +5,6 @@ This module contains Pydantic models for media, articles, words, and facts schem
 from datetime import date
 from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 from typing import Annotated
-from config.constant_enums import (
-    MediaTypeEnum,
-    RegionsEnum,
-    CountriesEnum,
-)
-from config.sentiments_ideologies_enums import (
-    SentimentsEnum,
-    IdeologiesEnum
-)
 
 # TODO: Split this file into multiple files for better organization and maintainability.
 
@@ -26,9 +17,9 @@ class MediaInfo(BaseModel):
     name: Annotated[str, StringConstraints(min_length=2, max_length=50)]
     full_name: Annotated[str, StringConstraints(min_length=2, max_length=150)] | None = None
     url: HttpUrl
-    type: MediaTypeEnum
-    region: RegionsEnum
-    country: CountriesEnum
+    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
+    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
 
 
 class MediaCompose(BaseModel):
@@ -57,8 +48,8 @@ class ArticleBase(BaseModel):
     title: Annotated[str, StringConstraints(min_length=3, max_length=350)]
     url: HttpUrl
     article: Annotated[str, StringConstraints(min_length=3, max_length=40000)]
-    sentiments: list[SentimentsEnum]
-    ideologies: list[IdeologiesEnum]
+    sentiments: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]]
+    ideologies: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]]
     common_words: dict[str, int]
     entities: dict[str, dict]
     count_words: int
@@ -85,8 +76,8 @@ class ArticleAi(BaseModel):
     Pydantic model for article AI schema.
     """
 
-    sentiments: list[SentimentsEnum]
-    ideologies: list[IdeologiesEnum]
+    sentiments: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]]
+    ideologies: list[Annotated[str, StringConstraints(min_length=2, max_length=80)]]
 
 
 class ArticleCreate(ArticleBase):
@@ -135,38 +126,10 @@ class FactsCreate(FactsBase):
     pass
 
 
-# ----------------- REGION / COUNTRY / MEDIA TYPE -----------------
-class RegionBase(BaseModel):
-    """
-    Pydantic model for region base schema.
-    """
-
-    region: Annotated[str, StringConstraints(min_length=2, max_length=80)]
-    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)] | None = None
-
-
-class CountryBase(BaseModel):
-    """
-    Pydantic model for country base schema.
-    """
-
-    country: Annotated[str, StringConstraints(min_length=2, max_length=80)]
-    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)] | None = None
-
-
-class MediaTypeBase(BaseModel):
-    """
-    Pydantic model for media type base schema.
-    """
-
-    type: Annotated[str, StringConstraints(min_length=2, max_length=80)]
-    icon: Annotated[str, StringConstraints(min_length=1, max_length=50)]
-
-
-# ----------------- SENTIMENT CATEGORY / SENTIMENT -----------------
+# ----------------- SENTIMENTS -----------------
 class SentimentCategoryBase(BaseModel):
     """
-    Pydantic model for sentiment category base schema.
+    Pydantic model for reading sentiment categories.
     """
 
     category: Annotated[str, StringConstraints(min_length=2, max_length=80)]
@@ -176,18 +139,18 @@ class SentimentCategoryBase(BaseModel):
 
 class SentimentBase(BaseModel):
     """
-    Pydantic model for sentiment base schema.
+    Pydantic model for reading sentiment values.
     """
 
-    id_category: int
+    id_category: int | None = None
     sentiment: Annotated[str, StringConstraints(min_length=2, max_length=80)]
-    active: Annotated[bool, Field(default=True)] = True
+    active: bool = True
 
 
-# ----------------- IDEOLOGY CATEGORY / IDEOLOGY -----------------
+# ----------------- IDEOLOGIES -----------------
 class IdeologyCategoryBase(BaseModel):
     """
-    Pydantic model for ideology category base schema.
+    Pydantic model for reading ideology categories.
     """
 
     category: Annotated[str, StringConstraints(min_length=2, max_length=80)]
@@ -197,9 +160,9 @@ class IdeologyCategoryBase(BaseModel):
 
 class IdeologyBase(BaseModel):
     """
-    Pydantic model for ideology base schema.
+    Pydantic model for reading ideology values.
     """
 
-    id_category: int
+    id_category: int | None = None
     ideology: Annotated[str, StringConstraints(min_length=2, max_length=80)]
-    active: Annotated[bool, Field(default=True)] = True
+    active: bool = True

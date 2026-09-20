@@ -13,16 +13,26 @@ async def get_medias(db: AsyncSession) -> list[schemas.MediaRead]:
     Returns:
         list[schemas.MediaRead]: A list of all media records.
     """
-    # Query media that have at least one related article using a join
-    query = select(
-        models.Media.id, models.Media.name, models.Media.type, 
-        models.Media.region, models.Media.country
-    ).where(
-        exists().where(models.Article.media_id == models.Media.id)
+    # Query media that have at least one related article using joins
+    query = (
+        select(
+            models.Media.id,
+            models.Media.name,
+            models.MediaType.type,
+            models.Region.region,
+            models.Country.country,
+        )
+        .join(models.MediaType, models.Media.type_id == models.MediaType.id)
+        .join(models.Region, models.Media.region_id == models.Region.id)
+        .join(models.Country, models.Media.country_id == models.Country.id)
+        .where(
+            exists().where(models.Article.media_id == models.Media.id)
+        )
+        .order_by(models.Media.name.asc())
     )
     
     result = await db.execute(query)
-    medias = result.all()
+    medias = result.mappings().all()
     return [schemas.MediaRead.model_validate(media).model_dump() for media in medias]
 
 

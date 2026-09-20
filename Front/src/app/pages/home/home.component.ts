@@ -159,6 +159,7 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  // TODO: already duplicated in filters as well
   private setFiltersDialog(): void {
     this.sentimentIdeologySrv.sentiments$
       .pipe(takeUntilDestroyed(this.destroyRef))
