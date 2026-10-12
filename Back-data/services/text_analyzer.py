@@ -4,17 +4,17 @@ Module for text analysis using SpaCy and asyncio.
 
 import asyncio
 from collections import Counter, defaultdict
+import re
 import spacy
 from spacy.tokenizer import Tokenizer
 from spacy.util import compile_infix_regex
 from spacy.lang.char_classes import LIST_ELLIPSES, LIST_ICONS
 from utils.utils import clean_text
 
-# TODO: Review
 MY_STOP_WORDS = {
-    "re", "ve", "ll", "n t", "em", "mr", "ms", "dr", "st", "th", "jr", "sr", 
+    "re", "ve", "ll", "nt", "n't", "em", "mr", "ms", "dr", "st", "th", "jr", "sr", 
     "etc", "el", "news", "said", "says", "told", "new", "added", "called", 
-    "like", "including"
+    "like", "including", "according", "reported"
 }
 
 def get_nlp():
@@ -68,8 +68,68 @@ class TextAnalyzer:
         """
         self.original_text = text
         self.chunk_size = chunk_size
+        self.raw_chunks = self._chunk_text(self.original_text)
         self.cleaned_chunks = self._chunk_and_clean_text()
         self.nlp = get_nlp()
+        self._raw_docs = None
+        self._word_counts = None
+
+
+    def _chunk_text(self, text: str) -> list[str]:
+        """
+        Splits text into manageable chunks at sentence boundaries without breaking words.
+        Parameters:
+            text (str): The text to chunk.
+        Returns:
+            list[str]: A list of text chunks.
+        """
+        if not text or not text.strip():
+            return []
+
+        # Split on sentence boundaries (. ! ?) or newlines
+        sentences = re.split(r"(?<=[.!?])\s+|\n+", text.strip())
+        chunks = []
+        current_chunk = []
+        current_len = 0
+
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+
+            # If a single sentence exceeds chunk_size, split it by words
+            if len(sentence) > self.chunk_size:
+                if current_chunk:
+                    chunks.append(" ".join(current_chunk))
+                    current_chunk = []
+                    current_len = 0
+
+                words = sentence.split()
+                temp_chunk = []
+                for word in words:
+                    if temp_chunk and len(" ".join(temp_chunk + [word])) > self.chunk_size:
+                        chunks.append(" ".join(temp_chunk))
+                        temp_chunk = [word]
+                    else:
+                        temp_chunk.append(word)
+                if temp_chunk:
+                    chunks.append(" ".join(temp_chunk))
+                continue
+
+            # Check if adding this sentence exceeds chunk_size
+            candidate_len = current_len + len(sentence) + (1 if current_chunk else 0)
+            if current_chunk and candidate_len > self.chunk_size:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = [sentence]
+                current_len = len(sentence)
+            else:
+                current_chunk.append(sentence)
+                current_len = candidate_len
+
+        if current_chunk:
+            chunks.append(" ".join(current_chunk))
+
+        return chunks
 
 
     def _chunk_and_clean_text(self) -> list[str]:
@@ -78,75 +138,56 @@ class TextAnalyzer:
         Returns:
             list[str]: A list of cleaned text chunks.
         """
-        # Clean the entire text first
         cleaned_text = clean_text(self.original_text)
+        return self._chunk_text(cleaned_text)
 
-        # Split text into chunks without breaking words
-        words = cleaned_text.split()
-        chunks = []
-        current_chunk = []
 
-        for word in words:
-            if len(" ".join(current_chunk + [word])) <= self.chunk_size:
-                current_chunk.append(word)
+    async def _get_raw_docs(self) -> list:
+        """
+        Processes raw text chunks with the SpaCy NLP pipeline using batching.
+        Caches the parsed Doc objects so both entity extraction and POS tagging
+        reuse the same inference pass without duplicate model evaluations.
+        """
+        if self._raw_docs is None:
+            if not self.raw_chunks:
+                self._raw_docs = []
             else:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = [word]
+                def run_pipe():
+                    return list(self.nlp.pipe(self.raw_chunks, batch_size=8))
 
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-
-        return chunks
-
-
-    async def _process_chunks(self, process_function) -> list:
-        """
-        Applies a processing function asynchronously to each chunk.
-        Parameters:
-            process_function (Callable): A function to process each chunk.
-        Returns:
-            list: A list of results from processing each chunk.
-        """
-        return await asyncio.gather(
-            *(process_function(chunk) for chunk in self.cleaned_chunks)
-        )
-
-
-    async def _process_chunk_with_nlp(self, chunk: str):
-        """
-        Processes a single chunk with SpaCy NLP pipeline.
-        Parameters:
-            chunk (str): The text chunk to process.
-        Returns:
-            Doc: Processed SpaCy Doc object.
-        """
-        return self.nlp(chunk)
+                self._raw_docs = await asyncio.to_thread(run_pipe)
+        return self._raw_docs
 
 
     async def remove_stop_words(self) -> str:
         """
-        Removes stop words from the cleaned text chunks asynchronously.
-        Updates the `cleaned_chunks` to exclude stop words.
+        Removes stop words from the cleaned text chunks.
+        Uses fast vocabulary tokenizer lookup without running heavy transformer inference.
         """
-
-        async def remove_stop_words_from_chunk(chunk: str):
-            doc = await self._process_chunk_with_nlp(chunk)
+        def filter_chunk(chunk: str) -> str:
+            doc = self.nlp.make_doc(chunk)
             return " ".join([token.text for token in doc if not token.is_stop])
 
-        self.cleaned_chunks = await self._process_chunks(remove_stop_words_from_chunk)
+        self.cleaned_chunks = [filter_chunk(chunk) for chunk in self.cleaned_chunks]
+        self._word_counts = None  # Reset cached counts if chunks are updated
         return " ".join(self.cleaned_chunks).strip()
 
 
     async def frequency_all_words(self) -> dict[str, int]:
         """
-        Calculates the frequency of each word across all cleaned chunks asynchronously.
+        Calculates and caches the frequency of each word across all cleaned chunks.
         Returns:
             dict[str, int]: A dictionary with word frequencies.
         """
-        word_counts = Counter()
-        for chunk in self.cleaned_chunks:
-            word_counts.update(chunk.split())
-        return dict(word_counts)
+        if self._word_counts is None:
+            counts = Counter()
+            for chunk in self.cleaned_chunks:
+                # Ensure words satisfy DB schema constraints (2 <= length <= 70)
+                words = [w for w in chunk.split() if 2 <= len(w) <= 70]
+                counts.update(words)
+            self._word_counts = counts
+
+        return dict(self._word_counts)
 
 
     async def most_common_words(self, n: int = 8) -> dict[str, int]:
@@ -157,70 +198,65 @@ class TextAnalyzer:
         Returns:
             dict[str, int]: A dictionary of the most common words and their counts.
         """
-        word_counts = await self.frequency_all_words()
-        return dict(Counter(word_counts).most_common(n))
+        if self._word_counts is None:
+            await self.frequency_all_words()
+        return dict(self._word_counts.most_common(n))
 
 
     async def frequency_specific_word(self, word: str) -> int:
         """
-        Finds the frequency of a specific word across all cleaned chunks asynchronously.
+        Finds the frequency of a specific word across all cleaned chunks.
         Parameters:
             word (str): The word to search for.
         Returns:
             int: The frequency of the word.
         """
-        word_counts = await self.frequency_all_words()
-        return word_counts.get(word.lower(), 0)
+        if self._word_counts is None:
+            await self.frequency_all_words()
+        return self._word_counts.get(word.lower(), 0)
 
 
     async def get_entities(self) -> dict[str, dict]:
         """
-        Extracts named entities from the text asynchronously and organizes them by type.
+        Extracts named entities from the raw text and organizes them by type.
         Returns:
             dict[str, dict]: A dictionary with entity types as keys and nested dictionaries with counts.
         """
-
-        async def extract_entities_from_chunk(chunk: str):
-            doc = await self._process_chunk_with_nlp(chunk)
-            entity_counts = defaultdict(lambda: {"_total": 0, "entities": {}})
-            for ent in doc.ents:
-                entity_counts[ent.label_]["entities"][ent.text] = (
-                    entity_counts[ent.label_]["entities"].get(ent.text, 0) + 1
-                )
-                entity_counts[ent.label_]["_total"] += 1
-            return entity_counts
-
-        entity_results = await self._process_chunks(extract_entities_from_chunk)
-
-        # Merge results across chunks
+        docs = await self._get_raw_docs()
         final_entities = defaultdict(lambda: {"_total": 0, "entities": {}})
-        for result in entity_results:
-            for entity_type, data in result.items():
-                final_entities[entity_type]["_total"] += data["_total"]
-                for entity, count in data["entities"].items():
-                    final_entities[entity_type]["entities"][entity] = (
-                        final_entities[entity_type]["entities"].get(entity, 0) + count
-                    )
+
+        for doc in docs:
+            for ent in doc.ents:
+                text = ent.text.strip()
+                if not text:
+                    continue
+                final_entities[ent.label_]["entities"][text] = (
+                    final_entities[ent.label_]["entities"].get(text, 0) + 1
+                )
+                final_entities[ent.label_]["_total"] += 1
 
         return dict(final_entities)
 
 
     async def get_pos_tags(self) -> dict[str, str]:
         """
-        Returns part-of-speech tags for tokens across all chunks asynchronously.
+        Returns part-of-speech tags for tokens across all chunks.
+        Uses majority voting per token so the dominant grammatical category in the article is assigned.
         Returns:
             dict[str, str]: A dictionary of token texts and their POS tags.
         """
+        docs = await self._get_raw_docs()
+        pos_counts = defaultdict(Counter)
 
-        async def extract_pos_tags_from_chunk(chunk: str):
-            doc = await self._process_chunk_with_nlp(chunk)
-            return {token.text: token.pos_ for token in doc}
+        for doc in docs:
+            for token in doc:
+                if not token.is_punct and not token.is_space:
+                    pos_counts[token.text][token.pos_] += 1
+                    pos_counts[token.text.lower()][token.pos_] += 1
 
-        pos_results = await self._process_chunks(extract_pos_tags_from_chunk)
-
-        # Merge POS tags across chunks
-        pos_tags = {}
-        for result in pos_results:
-            pos_tags.update(result)
+        pos_tags = {
+            token_key: counts.most_common(1)[0][0]
+            for token_key, counts in pos_counts.items()
+        }
 
         return pos_tags

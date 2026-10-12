@@ -122,7 +122,7 @@ _IDEOLOGY_CATEGORIES: list[IdeologyCategoryBase] = [
 		icon="people",
 	),
 	IdeologyCategoryBase(
-		category="EPISTEMOLOGICAL_ORIENTATIONS",
+		category="KNOWLEDGE_STANCES",
 		color="#b342e4",
 		icon="pencil",
 	),
